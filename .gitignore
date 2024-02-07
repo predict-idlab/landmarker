@@ -1,0 +1,50 @@
+# Temporary and binary files
+*~
+*.py[cod]
+*.so
+*.cfg
+!.isort.cfg
+!setup.cfg
+*.orig
+*.log
+*.pot
+__pycache__
+__pypackages__
+.cache/*
+.*.swp
+.ipynb_checkpoints/*
+iframe_figures/*
+.DS_Store
+.directory
+.tox
+.mypy_cache
+examples/data
+test_notebooks
+
+# Project files
+.ropeproject
+.project
+.pydevproject
+.settings
+.idea
+.vscode
+tags
+
+# Unittest and coverage
+htmlcov/*
+.coverage
+.tox
+junit.xml
+coverage.xml
+.pytest_cache/
+
+# Build and docs folder/files
+build/*
+dist/*
+sdist/*
+wheel/*
+.pdm-build
+docs/_build/*
+cover/*
+MANIFEST
+.pdm-python
