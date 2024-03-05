@@ -18,7 +18,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -U .
-          pdm sync -d --only-keep -G doc
+          pdm sync -d
       - name: Sphinx build
         run: pdm run doc
       - name: Deploy to GitHub Pages

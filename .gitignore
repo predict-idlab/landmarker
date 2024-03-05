@@ -29,7 +29,7 @@ test_notebooks
 .idea
 .vscode
 tags
-
+junit
 # Unittest and coverage
 htmlcov/*
 .coverage

@@ -1,8 +1,16 @@
 <p align="center">
     <a href="https://predict-idlab.github.io/landmarker">
-        <img alt="landmarker" src="/docs/_static/images/logo.svg" width="66%">
+        <img alt="landmarker" src="https://raw.githubusercontent.com/predict-idlab/landmarker/main/docs/_static/images/logo.svg" width="66%">
     </a>
 </p>
+
+[![PyPI Latest Release](https://img.shields.io/pypi/v/landmarker.svg)](https://pypi.org/project/landmarker/)
+[![support-version](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)](https://pypi.org/project/landmarker/)
+[![codecov](https://img.shields.io/codecov/c/github/predict-idlab/landmarker?logo=codecov)](https://codecov.io/gh/predict-idlab/landmarker)
+[![CodeQL](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?)](http://makeapullrequest.com)
+[![Documentation](https://github.com/predict-idlab/landmarker/actions/workflows/documentation.yml/badge.svg)](https://predict-idlab.github.io/landmarker/)
+[![Testing](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml)
 
 
 Landmarker is a [PyTorch](https://pytorch.org/)-based toolkit for (anatomical) landmark detection in images. It is designed to be easy to use and to provide a flexible framework for state-of-the-art landmark detection algorithms for small and large datasets. Landmarker was developed for landmark detection in medical images. However, it can be used for any type of landmark detection problem.
