@@ -1,0 +1,2248 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Training and Evaluating Adaptive Heatmap Regression Model for Landmark Detection with ISBI 2015 Cephalometric X-ray Dataset" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="_collections/examples/adaptive_scn_isbi2015.html" />
+<meta property="og:site_name" content="Landmarker" />
+<meta property="og:description" content="In this tutorial, we will train and evaluate an adaptive heatmap regression model for landmark detection with the ISBI 2015 Cephalometric X-ray dataset. The ISBI 2015 Cephalometric X-ray dataset is..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary__collections_examples_adaptive_scn_isbi2015_ef4493d5.png" />
+<meta property="og:image:alt" content="In this tutorial, we will train and evaluate an adaptive heatmap regression model for landmark detection with the ISBI 2015 Cephalometric X-ray dataset. The..." />
+<meta name="description" content="In this tutorial, we will train and evaluate an adaptive heatmap regression model for landmark detection with the ISBI 2015 Cephalometric X-ray dataset. The ISBI 2015 Cephalometric X-ray dataset is..." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Training and Evaluating Static Heatmap Regression Model for Multi-Instance and Multi-Class Landmark Detetection (EndoVis 2015 Challenge)" href="static_unet_endovis2015.html" /><link rel="prev" title="🔦 Examples" href="../../examples/index.html" />
+
+    <link rel="shortcut icon" href="../../_static/favicon_landmarker.svg"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Training and Evaluating Adaptive Heatmap Regression Model for Landmark Detection with ISBI 2015 Cephalometric X-ray Dataset - Landmarker Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Landmarker Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../../_static//images/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../../_static//images/logo-dark-mode.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">Landmarker Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">🚀 Getting Started</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../examples/index.html">🔦 Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 🔦 Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Training and Evaluating Adaptive Heatmap Regression Model for Landmark Detection with ISBI 2015 Cephalometric X-ray Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_unet_endovis2015.html">Training and Evaluating Static Heatmap Regression Model for Multi-Instance and Multi-Class Landmark Detetection (EndoVis 2015 Challenge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="static_unet_plant_centroids.html">Training and Evaluating Static Heatmap Regression Model for Multi-Instance and Single-Class Landmark Detetection (Plant Centroids)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_scn_isbi2015.html">Demonstration of Pipeline for Training/Evaluation Landmark Detection (ISBI 2015 Cephalometric X-ray Dataset)</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/index.html">📖 API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 📖 API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/data.html">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/losses.html">Losses Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/models.html">Models Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/train.html">Train Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/uncertainty.html">Uncertainty Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/utils.html">Utils Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/visualize.html">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contributing.html">🤝 Contributing to <code class="docutils literal notranslate"><span class="pre">landmarker</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/changelog.html">📈 Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/code_of_conduct.html">🫶 Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/license.html">📝 License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/data.html">Data Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/losses.html">Losses Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/models.html">Models Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/train.html">Train Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/utils.html">Utils Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/visualize.html">Visualize Module</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/predict-idlab/landmarker/edit/main/docs/_collections/examples/adaptive_scn_isbi2015.ipynb" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <p align="center">
+    <a href="https://predict-idlab.github.io/landmarker">
+        <img alt="landmarker" src="https://raw.githubusercontent.com/predict-idlab/landmarker/main/docs/_static/images/logo.svg" width="66%">
+    </a>
+</p>
+<section id="training-and-evaluating-adaptive-heatmap-regression-model-for-landmark-detection-with-isbi-2015-cephalometric-x-ray-dataset">
+<h1>Training and Evaluating Adaptive Heatmap Regression Model for Landmark Detection with ISBI 2015 Cephalometric X-ray Dataset<a class="headerlink" href="#training-and-evaluating-adaptive-heatmap-regression-model-for-landmark-detection-with-isbi-2015-cephalometric-x-ray-dataset" title="Link to this heading">#</a></h1>
+<p>In this tutorial, we will train and evaluate an adaptive heatmap regression model for landmark
+detection with the ISBI 2015 Cephalometric X-ray dataset. The ISBI 2015 Cephalometric X-ray dataset
+is a dataset of 2D cephalometric X-rays. The dataset contains 400 images, each with 19 landmarks
+annotated. The dataset is split into a training set of 150 images and two test sets of 150 and
+100 images respectively.</p>
+<p>We will go through the following steps:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#Loading-the-dataset"><span class="xref myst">Loading the dataset</span></a></p></li>
+<li><p><a class="reference internal" href="#Constructing-a-heatmap-generator"><span class="xref myst">Constructing a heatmap generator</span></a></p></li>
+<li><p><a class="reference internal" href="#Inspecting-the-dataset"><span class="xref myst">Inspecting the dataset</span></a></p></li>
+<li><p><a class="reference internal" href="#Training-the-model"><span class="xref myst">Training and initializing the SpatialConfiguration model</span></a></p></li>
+<li><p><a class="reference internal" href="#Evaluating-the-model"><span class="xref myst">Evaluating the model</span></a></p></li>
+</ul>
+<a target="_blank" href="https://colab.research.google.com/github/predict-idlab/landmarker/examples/adaptive_scn_isbi2015.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a><section id="setup-environment">
+<h2>Setup environment<a class="headerlink" href="#setup-environment" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import landmarker&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>landmarker
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setup-imports-and-variables">
+<h2>Setup imports and variables<a class="headerlink" href="#setup-imports-and-variables" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Compose</span><span class="p">,</span> <span class="n">RandAffined</span><span class="p">,</span> <span class="n">RandGaussianNoised</span><span class="p">,</span> <span class="n">RandStdShiftIntensityd</span><span class="p">,</span>
+                              <span class="n">RandScaleIntensityd</span><span class="p">,</span> <span class="n">RandAdjustContrastd</span><span class="p">,</span> <span class="n">RandHistogramShiftd</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="loading-the-dataset">
+<h2>Loading the dataset<a class="headerlink" href="#loading-the-dataset" title="Link to this heading">#</a></h2>
+<section id="short-description-of-the-data-and-dataset-module">
+<h3>Short description of the data and dataset module<a class="headerlink" href="#short-description-of-the-data-and-dataset-module" title="Link to this heading">#</a></h3>
+<p>The <a class="reference external" href="https://github.com/predict-idlab/landmarker">landmarker</a> package has several built-in
+datasets in the <code class="docutils literal notranslate"><span class="pre">landmarker.datasets</span></code> module, as well as utility classes for building your own
+datasets in the <code class="docutils literal notranslate"><span class="pre">landmarker.data</span></code> module. There are three types of datasets: ‘LandmarkDataset’,
+‘HeatmapDataset’, and ‘MaskDataset’. The ‘LandmarkDataset’ is a dataset of images with landmarks,
+the ‘HeatmapDataset’ is a dataset of images with heatmaps, and the ‘MaskDataset’ is a dataset of
+images with masks (i.e., binary segmentation masks indiciating the location of the landmarks). The
+‘HeatmapDataset’ and ‘MaskDataset’ both inherit from the ‘LandmarkDataset’ class, and thus also
+contain information about the landmarks. The ‘MaskDataset’ can be constructed from specified image
+and landmarks pairs, or from images and masks pairs, because often that is how the data is
+distributed. The ‘HeatmapDataset’ can be constructed from images and landmarks pairs.</p>
+<p>Images can be provided as a list of paths to stored images, or as a a numpy arary, torch tensor,
+list of numpy  arrays or list of torch tensors. Landmarks can be as numpy arrays or torch tensors.
+These landmarks can be provided in three different shapes: (1) (N, D) where N is the number of
+samples and D is the number of dimensions, (2) (N, C, D) where C is the number of landmark
+classes, (3) (N, C, I, D) where I is the number of instances per landmark class, if less than I
+instances are provided, the remaining instances are filled with NaNs.</p>
+<p>For built-in datasets, the <code class="docutils literal notranslate"><span class="pre">landmarker.datasets</span></code> module provides a function for
+downloading and loading the dataset, e.g. <code class="docutils literal notranslate"><span class="pre">get_cepha_landmark_datasets</span></code> for the ISBI 2015
+Cephalometric X-ray dataset. Most of these functions take the same arguments, namely <code class="docutils literal notranslate"><span class="pre">path_dir</span></code>,
+some are dataset specific. The <code class="docutils literal notranslate"><span class="pre">path_dir</span></code> argument specifies the directory where the dataset is
+downloaded to, or loaded from if it is already downloaded. For most datasets multiple functions
+are provided for getting different types of datasets. For example, the ISBI 2015 Cephalometric
+X-ray dataset has the following functions: <code class="docutils literal notranslate"><span class="pre">get_cepha_landmark_datasets</span></code> and
+<code class="docutils literal notranslate"><span class="pre">get_cepha_heatmap_datasets</span></code>.</p>
+</section>
+<section id="download-and-load-isbi-2015-landmark-dataset">
+<h3>Download and load ISBI 2015 landmark dataset<a class="headerlink" href="#download-and-load-isbi-2015-landmark-dataset" title="Link to this heading">#</a></h3>
+<p>The ISBI 2015 Cephalometric X-ray dataset is a dataset of 2D cephalometric X-ray images with 19
+landmarks. The dataset is split into a training set of 150 images and two test sets, where test
+set  1 contains 150 images and test set 2 contains 100 images. When loading the dataset, you can
+also specify a transform function, which is applied to the images and landmarks of the training
+set. Currently, we only support the <code class="docutils literal notranslate"><span class="pre">monai.transforms.ComposeD</span> <span class="pre">transform,</span> <span class="pre">which</span> <span class="pre">allows</span> <span class="pre">you</span> <span class="pre">to</span> <span class="pre">compose</span> <span class="pre">multiple</span> <span class="pre">transforms.</span> <span class="pre">The</span> </code>monai.transforms<code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">contains</span> <span class="pre">many</span> <span class="pre">useful</span> <span class="pre">transforms,</span> <span class="pre">such</span> <span class="pre">as</span></code>RandomAffine<code class="docutils literal notranslate"><span class="pre">and</span></code>NormalizeIntensity`. The transforms must be dictionary transforms, i.e.,
+they must return a dictionary with the keys ‘image’ and (‘seg’), in the case of heatmap and mask
+regression.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fn_keys</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">spatial_transformd</span> <span class="o">=</span> <span class="p">[</span><span class="n">RandAffined</span><span class="p">(</span><span class="n">fn_keys</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">rotate_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">12</span><span class="p">),</span>
+                        <span class="n">translate_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                        <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+                        <span class="n">shear_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+                        <span class="p">)]</span>
+
+<span class="n">composed_transformd</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span><span class="n">spatial_transformd</span> <span class="o">+</span>
+                            <span class="p">[</span><span class="n">RandGaussianNoised</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.005</span><span class="p">),</span>  <span class="c1"># Add gaussian noise</span>
+                        <span class="n">RandStdShiftIntensityd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">factors</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>  <span class="c1"># Add random intensity shift</span>
+                        <span class="n">RandScaleIntensityd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="n">factors</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>  <span class="c1"># Add random intensity scaling</span>
+                        <span class="n">RandAdjustContrastd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">2</span><span class="p">)),</span>  <span class="c1"># Randomly adjust contrast</span>
+                        <span class="n">RandHistogramShiftd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>  <span class="c1"># Randomly shift histogram</span>
+                        <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.datasets</span> <span class="kn">import</span> <span class="n">get_cepha_landmark_datasets</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">get_cepha_landmark_datasets</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">composed_transformd</span><span class="p">,</span>
+                                 <span class="n">store_imgs</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dim_img</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+                                 <span class="n">junior</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">single_dataset</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Reading, normalizing and resizing 400 images and landmarks...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/400 [00:00&lt;?, ?it/s]/opt/conda/lib/python3.11/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+100%|██████████| 400/400 [00:08&lt;00:00, 48.59it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">split_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="n">ds_train</span><span class="p">,</span> <span class="n">ds_val</span><span class="p">,</span> <span class="n">ds_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">split_lengths</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="constructing-a-heatmap-generator">
+<h2>Constructing a heatmap generator<a class="headerlink" href="#constructing-a-heatmap-generator" title="Link to this heading">#</a></h2>
+<p>The heatmap generator is a class that generates heatmaps from landmarks. It is used to generate
+heatmaps from the landmarks of the training set, which are then used to train the model. The
+<code class="docutils literal notranslate"><span class="pre">landmarker.heatmap_generator</span></code> module contains several heatmap generators, such as the
+<code class="docutils literal notranslate"><span class="pre">GaussianHeatmapGenerator</span></code> and <code class="docutils literal notranslate"><span class="pre">LaplaceHeatmapGenerator</span></code> which generate a multivariate
+Gaussian and Laplace distribution respectively. The HeatmapGenerator subclasses take the following
+arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sigmas</span></code>: the standard deviation of the Gaussian distribution, or the scale of the Laplace. This
+could be a scalar, or a list of scalars, one for each landmark class. Additionally, it could be a
+covariance matrix, or a list of covariance matrices, one for each landmark class.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gamma</span></code>: If provided, the heatmaps are scaled by <code class="docutils literal notranslate"><span class="pre">gamma</span></code> before being returned.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rotation</span></code>: If provided, the heatmaps are rotated by <code class="docutils literal notranslate"><span class="pre">rotation</span></code> before being returned.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">heatmap_size</span></code>: The size of the returned heatmaps.</p></li>
+<li><p>learnable: If True, the <code class="docutils literal notranslate"><span class="pre">sigma</span></code> and <code class="docutils literal notranslate"><span class="pre">rotation</span></code> parameters are learnable parameters, and thus
+will be optimized during training.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">background</span></code>: A boolean indicating whether to add a background class to the heatmaps. If True,
+the heatmaps will have an additional channel, which is 1 everywhere except at the location of the
+landmarks, where it is 0. The background class is the first class, i.e., the first channel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">all_points</span></code>: A boolean indicating whether to add a channel with all the landmarks. If True, the
+heatmaps will have an additional channel, which is 1 at the location of the landmarks, and 0.
+everywhere else.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">continuous</span></code>: A boolean indicating whether to use continuous or discrete landmarks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">device</span></code>: The device on which the heatmaps are generated.</p></li>
+</ul>
+<p>The landmarks provide to the heatmap generator must be a torch.Tensor and can be in three different
+shapes: (1) (N, D) where N is the number of samples and D is the number of dimensions, (2) (N, C, D)
+where C is the number of landmark classes, (3) (N, C, I, D) where I is the number of instances per
+landmark class, if less than I instances are provided, the remaining instances are filled with NaNs.
+The heatmap generator will return a torch.Tensor of shape (N, C, H, W), where H and W are the height
+and width of the heatmaps respectively.</p>
+<p><strong>Note that with 2D landmarks the y coordinates are the first dimension, and the x coordinates are the
+second dimension.</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.heatmap.generator</span> <span class="kn">import</span> <span class="n">GaussianHeatmapGenerator</span>
+
+<span class="n">heatmap_generator</span> <span class="o">=</span> <span class="n">GaussianHeatmapGenerator</span><span class="p">(</span>
+    <span class="n">nb_landmarks</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
+    <span class="n">sigmas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">heatmap_size</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+    <span class="n">learnable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># If True, the heatmap generator will be trainable</span>
+    <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="inspecting-the-dataset">
+<h2>Inspecting the dataset<a class="headerlink" href="#inspecting-the-dataset" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize</span> <span class="kn">import</span> <span class="n">inspection_plot</span>
+
+<span class="c1"># Plot the first 3 images from the training set</span>
+<span class="n">heatmap_generator</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span> <span class="c1"># because dataset tensors are still on cpu</span>
+<span class="n">inspection_plot</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">heatmap_generator</span><span class="o">=</span><span class="n">heatmap_generator</span><span class="p">)</span>
+<span class="n">heatmap_generator</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span> <span class="c1"># set the desired device back</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/873ebe0e6a7021a570ba93815a9f31fab3f4b0cf7f64d40619a626184b74a5a6.png" src="../../_images/873ebe0e6a7021a570ba93815a9f31fab3f4b0cf7f64d40619a626184b74a5a6.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the first 3 images from dataset without transforms</span>
+<span class="n">heatmap_generator</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span> <span class="c1"># because dataset tensors are still on cpu</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">inspection_plot</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">heatmap_generator</span><span class="o">=</span><span class="n">heatmap_generator</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">composed_transformd</span>
+<span class="n">heatmap_generator</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span> <span class="c1"># set the desired device back</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/10c220b121a91e0cd5459f0afd7b929902d736ae97990840fa1b05f06a93a071.png" src="../../_images/10c220b121a91e0cd5459f0afd7b929902d736ae97990840fa1b05f06a93a071.png" />
+</div>
+</div>
+</section>
+<section id="training-and-initializing-the-spatialconfiguration-model">
+<h2>Training and initializing the SpatialConfiguration model<a class="headerlink" href="#training-and-initializing-the-spatialconfiguration-model" title="Link to this heading">#</a></h2>
+<section id="initializing-the-model-optimizer-and-loss-function">
+<h3>Initializing the model, optimizer and loss function<a class="headerlink" href="#initializing-the-model-optimizer-and-loss-function" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.models.spatial_configuration_net</span> <span class="kn">import</span> <span class="n">OriginalSpatialConfigurationNet</span>
+<span class="kn">from</span> <span class="nn">landmarker.losses</span> <span class="kn">import</span> <span class="n">GeneralizedNormalHeatmapLoss</span><span class="p">,</span> <span class="n">GaussianHeatmapL2Loss</span>
+<span class="kn">from</span> <span class="nn">landmarker.train</span> <span class="kn">import</span> <span class="n">EarlyStopping</span><span class="p">,</span> <span class="n">SaveBestModel</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">OriginalSpatialConfigurationNet</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">19</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of learnable parameters: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)))</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">1e-6</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">([</span>
+    <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="s2">&quot;weight_decay&quot;</span><span class="p">:</span><span class="mf">1e-3</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">heatmap_generator</span><span class="o">.</span><span class="n">sigmas</span><span class="p">},</span>
+    <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">heatmap_generator</span><span class="o">.</span><span class="n">rotation</span><span class="p">}]</span>
+    <span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">nesterov</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># criterion = GeneralizedNormalHeatmapLoss(</span>
+<span class="c1">#     alpha=5,</span>
+<span class="c1">#     distance=&#39;l2&#39;</span>
+<span class="c1"># )</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">GaussianHeatmapL2Loss</span><span class="p">(</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mi">5</span>
+<span class="p">)</span>
+
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">save_best_model</span> <span class="o">=</span> <span class="n">SaveBestModel</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ReduceLROnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                                          <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cooldown</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of learnable parameters: 6181030
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setting-the-data-loaders">
+<h3>Setting the data loaders<a class="headerlink" href="#setting-the-data-loaders" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_val</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="training-the-model">
+<h3>Training the model<a class="headerlink" href="#training-the-model" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.heatmap.decoder</span> <span class="kn">import</span> <span class="n">heatmap_to_coord</span>
+<span class="kn">from</span> <span class="nn">landmarker.metrics</span> <span class="kn">import</span> <span class="n">point_error</span>
+
+<span class="k">def</span> <span class="nf">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="n">running_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">landmarks</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">heatmaps</span> <span class="o">=</span> <span class="n">heatmap_generator</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="o">.</span><span class="n">sigmas</span><span class="p">,</span> <span class="n">heatmaps</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">val_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;local_soft_argmax&quot;</span><span class="p">):</span>
+    <span class="n">eval_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">eval_mpe</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">landmarks</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="p">,</span> <span class="n">dim_orig</span><span class="p">,</span> <span class="n">pixel_spacing</span><span class="p">,</span>
+                <span class="n">padding</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)):</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="n">dim_orig</span> <span class="o">=</span> <span class="n">dim_orig</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="n">pixel_spacing</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">heatmaps</span> <span class="o">=</span> <span class="n">heatmap_generator</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="o">.</span><span class="n">sigmas</span><span class="p">,</span> <span class="n">heatmaps</span><span class="p">)</span>
+            <span class="n">offset_coords</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">landmarks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">pred_landmarks</span> <span class="o">=</span> <span class="n">heatmap_to_coord</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">offset_coords</span><span class="o">=</span><span class="n">offset_coords</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">eval_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">eval_mpe</span> <span class="o">+=</span> <span class="n">point_error</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="n">dim_orig</span><span class="p">,</span>
+                                    <span class="n">pixel_spacing</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">eval_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">),</span> <span class="n">eval_mpe</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
+        <span class="n">train_loss</span> <span class="o">=</span> <span class="n">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">val_loss</span><span class="p">,</span> <span class="n">val_mpe</span> <span class="o">=</span> <span class="n">val_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2"> - Train loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> - Val loss: </span><span class="si">{</span><span class="n">val_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> - Val mpe: </span><span class="si">{</span><span class="n">val_mpe</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">early_stopping</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
+        <span class="n">save_best_model</span><span class="p">(</span><span class="n">val_mpe</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+        <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading best model...&quot;</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_best_model</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">heatmap_generator</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">composed_transformd</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span>
+      <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:27&lt;00:00,  7.39it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1/1000 - Train loss: 2502.0005 - Val loss: 2460.0886 - Val mpe: 16.0984
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:25&lt;00:00,  7.70it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.13it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 2/1000 - Train loss: 2416.2396 - Val loss: 2355.6402 - Val mpe: 5.8708
+INFO: Val_Loss improved (16.09842300 --&gt; 5.87075424). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.67it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.15it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 3/1000 - Train loss: 2320.3651 - Val loss: 2252.0196 - Val mpe: 3.7765
+INFO: Val_Loss improved (5.87075424 --&gt; 3.77650952). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.64it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.18it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 4/1000 - Train loss: 2241.3421 - Val loss: 2170.1922 - Val mpe: 3.2480
+INFO: Val_Loss improved (3.77650952 --&gt; 3.24802995). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 5/1000 - Train loss: 2191.4752 - Val loss: 2136.4035 - Val mpe: 3.1644
+INFO: Val_Loss improved (3.24802995 --&gt; 3.16435409). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 6/1000 - Train loss: 2138.3780 - Val loss: 2043.5194 - Val mpe: 2.4104
+INFO: Val_Loss improved (3.16435409 --&gt; 2.41041231). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 7/1000 - Train loss: 2111.3214 - Val loss: 2011.7185 - Val mpe: 2.2669
+INFO: Val_Loss improved (2.41041231 --&gt; 2.26694703). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.99it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 8/1000 - Train loss: 2061.8907 - Val loss: 1948.8141 - Val mpe: 2.1343
+INFO: Val_Loss improved (2.26694703 --&gt; 2.13429523). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 9/1000 - Train loss: 1994.5533 - Val loss: 1891.7609 - Val mpe: 1.9695
+INFO: Val_Loss improved (2.13429523 --&gt; 1.96951354). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 10/1000 - Train loss: 1936.4082 - Val loss: 1820.2079 - Val mpe: 1.7693
+INFO: Val_Loss improved (1.96951354 --&gt; 1.76926875). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 11/1000 - Train loss: 1882.5334 - Val loss: 1756.2953 - Val mpe: 1.6254
+INFO: Val_Loss improved (1.76926875 --&gt; 1.62540758). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 12/1000 - Train loss: 1837.5068 - Val loss: 1725.9756 - Val mpe: 1.6061
+INFO: Val_Loss improved (1.62540758 --&gt; 1.60606337). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 13/1000 - Train loss: 1803.5645 - Val loss: 1682.9398 - Val mpe: 1.4844
+INFO: Val_Loss improved (1.60606337 --&gt; 1.48436594). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.13it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 14/1000 - Train loss: 1751.3267 - Val loss: 1625.8770 - Val mpe: 1.4386
+INFO: Val_Loss improved (1.48436594 --&gt; 1.43862391). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 15/1000 - Train loss: 1703.7325 - Val loss: 1616.9889 - Val mpe: 1.4356
+INFO: Val_Loss improved (1.43862391 --&gt; 1.43560576). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.20it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 16/1000 - Train loss: 1681.9078 - Val loss: 1594.6264 - Val mpe: 1.3513
+INFO: Val_Loss improved (1.43560576 --&gt; 1.35130310). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.01it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 17/1000 - Train loss: 1635.2474 - Val loss: 1566.1755 - Val mpe: 1.3399
+INFO: Val_Loss improved (1.35130310 --&gt; 1.33989978). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 18/1000 - Train loss: 1620.8349 - Val loss: 1568.1147 - Val mpe: 1.3095
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1566.17550171,                             Val Loss: 1568.11466431]
+INFO: Val_Loss improved (1.33989978 --&gt; 1.30953109). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.57it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 19/1000 - Train loss: 1606.6994 - Val loss: 1516.1122 - Val mpe: 1.3103
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 20/1000 - Train loss: 1595.0671 - Val loss: 1497.1205 - Val mpe: 1.2789
+INFO: Val_Loss improved (1.30953109 --&gt; 1.27893722). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 21/1000 - Train loss: 1583.1172 - Val loss: 1526.9703 - Val mpe: 1.3125
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1497.12045654,                             Val Loss: 1526.97025146]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 22/1000 - Train loss: 1570.0909 - Val loss: 1491.4588 - Val mpe: 1.2972
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 23/1000 - Train loss: 1553.8700 - Val loss: 1499.5439 - Val mpe: 1.2521
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1491.45883667,                             Val Loss: 1499.54393677]
+INFO: Val_Loss improved (1.27893722 --&gt; 1.25213683). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 24/1000 - Train loss: 1545.2085 - Val loss: 1459.4266 - Val mpe: 1.2506
+INFO: Val_Loss improved (1.25213683 --&gt; 1.25060284). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 25/1000 - Train loss: 1521.3849 - Val loss: 1491.8010 - Val mpe: 1.2613
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1459.42656738,                             Val Loss: 1491.80104492]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.95it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 26/1000 - Train loss: 1527.8951 - Val loss: 1456.9247 - Val mpe: 1.2808
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 27/1000 - Train loss: 1508.1235 - Val loss: 1449.3879 - Val mpe: 1.2442
+INFO: Val_Loss improved (1.25060284 --&gt; 1.24418652). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 28/1000 - Train loss: 1497.6301 - Val loss: 1430.3492 - Val mpe: 1.2455
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.01it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 29/1000 - Train loss: 1488.5035 - Val loss: 1443.5812 - Val mpe: 1.2273
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1430.34920898,                             Val Loss: 1443.58122925]
+INFO: Val_Loss improved (1.24418652 --&gt; 1.22728920). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 30/1000 - Train loss: 1471.4200 - Val loss: 1422.7596 - Val mpe: 1.2425
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.98it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 31/1000 - Train loss: 1474.2788 - Val loss: 1424.5801 - Val mpe: 1.2381
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1422.75956177,                             Val Loss: 1424.58006592]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.16it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 32/1000 - Train loss: 1454.1813 - Val loss: 1406.7071 - Val mpe: 1.2090
+INFO: Val_Loss improved (1.22728920 --&gt; 1.20904374). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.93it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 33/1000 - Train loss: 1461.7786 - Val loss: 1408.9387 - Val mpe: 1.2188
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1406.70710938,                             Val Loss: 1408.93869629]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 34/1000 - Train loss: 1446.0020 - Val loss: 1397.2962 - Val mpe: 1.1997
+INFO: Val_Loss improved (1.20904374 --&gt; 1.19973338). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 35/1000 - Train loss: 1438.7904 - Val loss: 1414.1452 - Val mpe: 1.1844
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1397.29623291,                             Val Loss: 1414.14515503]
+INFO: Val_Loss improved (1.19973338 --&gt; 1.18444276). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 36/1000 - Train loss: 1418.3194 - Val loss: 1407.8863 - Val mpe: 1.1929
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1397.29623291,                             Val Loss: 1407.88629883]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.58it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.12it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 37/1000 - Train loss: 1417.2409 - Val loss: 1393.6305 - Val mpe: 1.1765
+INFO: Val_Loss improved (1.18444276 --&gt; 1.17651296). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 38/1000 - Train loss: 1418.8638 - Val loss: 1378.4031 - Val mpe: 1.1594
+INFO: Val_Loss improved (1.17651296 --&gt; 1.15940487). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 39/1000 - Train loss: 1410.4786 - Val loss: 1385.4043 - Val mpe: 1.1683
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1378.40312256,                             Val Loss: 1385.40426270]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.15it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 40/1000 - Train loss: 1395.6309 - Val loss: 1372.0832 - Val mpe: 1.1887
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.95it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 41/1000 - Train loss: 1387.7436 - Val loss: 1356.2638 - Val mpe: 1.1459
+INFO: Val_Loss improved (1.15940487 --&gt; 1.14592314). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 42/1000 - Train loss: 1397.5923 - Val loss: 1375.4140 - Val mpe: 1.1574
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1375.41404175]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.21it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 43/1000 - Train loss: 1386.1116 - Val loss: 1367.4269 - Val mpe: 1.1763
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1367.42689575]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.23it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 44/1000 - Train loss: 1386.6198 - Val loss: 1379.8658 - Val mpe: 1.1495
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1379.86577271]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.12it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 45/1000 - Train loss: 1379.7977 - Val loss: 1366.4281 - Val mpe: 1.1521
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1366.42814331]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 46/1000 - Train loss: 1367.9730 - Val loss: 1366.6042 - Val mpe: 1.1355
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1366.60417358]
+INFO: Val_Loss improved (1.14592314 --&gt; 1.13547659). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 47/1000 - Train loss: 1368.4054 - Val loss: 1359.3908 - Val mpe: 1.1507
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1359.39082764]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.16it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 48/1000 - Train loss: 1365.6974 - Val loss: 1358.1459 - Val mpe: 1.1423
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1356.26375000,                             Val Loss: 1358.14587280]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.23it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 49/1000 - Train loss: 1365.1489 - Val loss: 1355.7301 - Val mpe: 1.1515
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 50/1000 - Train loss: 1355.7740 - Val loss: 1340.2439 - Val mpe: 1.1321
+INFO: Val_Loss improved (1.13547659 --&gt; 1.13205874). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 51/1000 - Train loss: 1348.7282 - Val loss: 1370.0630 - Val mpe: 1.1460
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1370.06295166]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 52/1000 - Train loss: 1344.8297 - Val loss: 1343.4959 - Val mpe: 1.1317
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1343.49592773]
+INFO: Val_Loss improved (1.13205874 --&gt; 1.13174057). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 53/1000 - Train loss: 1342.0111 - Val loss: 1346.6251 - Val mpe: 1.1377
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1346.62505737]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 54/1000 - Train loss: 1345.0947 - Val loss: 1347.2788 - Val mpe: 1.1274
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1347.27879883]
+INFO: Val_Loss improved (1.13174057 --&gt; 1.12736833). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 55/1000 - Train loss: 1358.5512 - Val loss: 1340.7465 - Val mpe: 1.1236
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1340.74646851]
+INFO: Val_Loss improved (1.12736833 --&gt; 1.12357593). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 56/1000 - Train loss: 1333.3749 - Val loss: 1346.8502 - Val mpe: 1.1327
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1346.85021118]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.15it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 57/1000 - Train loss: 1340.8460 - Val loss: 1343.6040 - Val mpe: 1.1544
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1343.60401611]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 58/1000 - Train loss: 1333.5870 - Val loss: 1370.3228 - Val mpe: 1.1231
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1340.24387085,                             Val Loss: 1370.32275879]
+INFO: Val_Loss improved (1.12357593 --&gt; 1.12309813). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 59/1000 - Train loss: 1335.6915 - Val loss: 1339.8849 - Val mpe: 1.1279
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 60/1000 - Train loss: 1323.9412 - Val loss: 1333.9423 - Val mpe: 1.1205
+INFO: Val_Loss improved (1.12309813 --&gt; 1.12049019). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 61/1000 - Train loss: 1314.2453 - Val loss: 1321.5774 - Val mpe: 1.1278
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 62/1000 - Train loss: 1314.0815 - Val loss: 1330.1338 - Val mpe: 1.1259
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1330.13378906]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 63/1000 - Train loss: 1320.2291 - Val loss: 1336.2184 - Val mpe: 1.1253
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1336.21838379]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.13it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 64/1000 - Train loss: 1313.1414 - Val loss: 1350.9936 - Val mpe: 1.0972
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1350.99360474]
+INFO: Val_Loss improved (1.12049019 --&gt; 1.09715974). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.94it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 65/1000 - Train loss: 1307.8940 - Val loss: 1321.6070 - Val mpe: 1.1169
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1321.60702148]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.01it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 66/1000 - Train loss: 1305.1851 - Val loss: 1373.4092 - Val mpe: 1.1374
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1373.40915161]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 67/1000 - Train loss: 1301.0570 - Val loss: 1349.5007 - Val mpe: 1.1215
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1349.50070190]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.64it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 68/1000 - Train loss: 1302.3307 - Val loss: 1328.4090 - Val mpe: 1.1126
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1328.40902222]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.96it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 69/1000 - Train loss: 1288.1582 - Val loss: 1324.6254 - Val mpe: 1.1231
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1324.62542236]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 70/1000 - Train loss: 1281.6894 - Val loss: 1328.8693 - Val mpe: 1.1042
+INFO: Early stopping counter                     9 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1328.86928955]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 71/1000 - Train loss: 1290.9518 - Val loss: 1331.3726 - Val mpe: 1.1328
+INFO: Early stopping counter                     10 of 30                         [Best Val Loss: 1321.57744629,                             Val Loss: 1331.37260132]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 72/1000 - Train loss: 1284.5962 - Val loss: 1316.2549 - Val mpe: 1.1093
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.58it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 73/1000 - Train loss: 1275.4287 - Val loss: 1320.4346 - Val mpe: 1.1164
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1316.25491577,                             Val Loss: 1320.43460083]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 74/1000 - Train loss: 1298.7429 - Val loss: 1351.2367 - Val mpe: 1.1003
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1316.25491577,                             Val Loss: 1351.23668335]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 75/1000 - Train loss: 1285.6036 - Val loss: 1314.8303 - Val mpe: 1.0998
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 76/1000 - Train loss: 1273.1496 - Val loss: 1313.5217 - Val mpe: 1.1053
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 77/1000 - Train loss: 1267.6121 - Val loss: 1321.3954 - Val mpe: 1.0984
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1313.52169922,                             Val Loss: 1321.39538086]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 78/1000 - Train loss: 1274.0952 - Val loss: 1328.9485 - Val mpe: 1.1170
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1313.52169922,                             Val Loss: 1328.94847900]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.58it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.96it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 79/1000 - Train loss: 1271.9613 - Val loss: 1356.3434 - Val mpe: 1.1090
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1313.52169922,                             Val Loss: 1356.34341187]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 80/1000 - Train loss: 1279.2557 - Val loss: 1317.3899 - Val mpe: 1.1158
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1313.52169922,                             Val Loss: 1317.38994873]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 81/1000 - Train loss: 1267.8095 - Val loss: 1308.5733 - Val mpe: 1.1184
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.14it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 82/1000 - Train loss: 1261.7041 - Val loss: 1327.1334 - Val mpe: 1.1123
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1327.13344727]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 83/1000 - Train loss: 1274.4589 - Val loss: 1333.2320 - Val mpe: 1.1088
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1333.23197998]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 84/1000 - Train loss: 1272.2213 - Val loss: 1340.9727 - Val mpe: 1.1027
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1340.97271729]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 85/1000 - Train loss: 1271.5085 - Val loss: 1338.7190 - Val mpe: 1.1143
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1338.71901855]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 86/1000 - Train loss: 1258.0164 - Val loss: 1314.8320 - Val mpe: 1.0959
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1314.83195312]
+INFO: Val_Loss improved (1.09715974 --&gt; 1.09590042). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 87/1000 - Train loss: 1247.1574 - Val loss: 1317.9223 - Val mpe: 1.0946
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1317.92227783]
+INFO: Val_Loss improved (1.09590042 --&gt; 1.09464967). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.14it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 88/1000 - Train loss: 1251.5698 - Val loss: 1313.9952 - Val mpe: 1.1009
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1313.99521729]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.13it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 89/1000 - Train loss: 1269.3163 - Val loss: 1309.7888 - Val mpe: 1.0984
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1309.78875977]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 90/1000 - Train loss: 1245.3513 - Val loss: 1317.2120 - Val mpe: 1.1001
+INFO: Early stopping counter                     9 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1317.21202881]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.96it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 91/1000 - Train loss: 1251.9910 - Val loss: 1330.2805 - Val mpe: 1.0953
+INFO: Early stopping counter                     10 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1330.28048096]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.15it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 92/1000 - Train loss: 1252.1102 - Val loss: 1318.0697 - Val mpe: 1.0938
+INFO: Early stopping counter                     11 of 30                         [Best Val Loss: 1308.57333496,                             Val Loss: 1318.06968628]
+INFO: Val_Loss improved (1.09464967 --&gt; 1.09380889). Saving model ...
+Epoch 00092: reducing learning rate of group 0 to 5.0000e-07.
+Epoch 00092: reducing learning rate of group 1 to 5.0000e-07.
+Epoch 00092: reducing learning rate of group 2 to 5.0000e-07.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 93/1000 - Train loss: 1222.1097 - Val loss: 1306.0507 - Val mpe: 1.0800
+INFO: Val_Loss improved (1.09380889 --&gt; 1.07999444). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 94/1000 - Train loss: 1212.1322 - Val loss: 1300.3770 - Val mpe: 1.0870
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 95/1000 - Train loss: 1208.6308 - Val loss: 1296.9834 - Val mpe: 1.0859
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 96/1000 - Train loss: 1208.7230 - Val loss: 1295.2366 - Val mpe: 1.0975
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 97/1000 - Train loss: 1196.7126 - Val loss: 1293.2379 - Val mpe: 1.0837
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 98/1000 - Train loss: 1193.7193 - Val loss: 1310.4274 - Val mpe: 1.0983
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1293.23787720,                             Val Loss: 1310.42743286]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.96it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 99/1000 - Train loss: 1182.2580 - Val loss: 1296.3301 - Val mpe: 1.0927
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1293.23787720,                             Val Loss: 1296.33005737]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 100/1000 - Train loss: 1181.9321 - Val loss: 1310.0047 - Val mpe: 1.0863
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1293.23787720,                             Val Loss: 1310.00468506]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 101/1000 - Train loss: 1190.4808 - Val loss: 1303.8710 - Val mpe: 1.0911
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1293.23787720,                             Val Loss: 1303.87102661]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.18it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 102/1000 - Train loss: 1185.5258 - Val loss: 1292.3101 - Val mpe: 1.0817
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.99it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 103/1000 - Train loss: 1173.0228 - Val loss: 1307.6817 - Val mpe: 1.0829
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1307.68169922]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.01it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 104/1000 - Train loss: 1188.0529 - Val loss: 1312.0361 - Val mpe: 1.0770
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1312.03606689]
+INFO: Val_Loss improved (1.07999444 --&gt; 1.07701480). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.18it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 105/1000 - Train loss: 1177.4519 - Val loss: 1307.0063 - Val mpe: 1.0979
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1307.00627319]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 106/1000 - Train loss: 1177.2376 - Val loss: 1301.4065 - Val mpe: 1.0733
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1301.40650635]
+INFO: Val_Loss improved (1.07701480 --&gt; 1.07330239). Saving model ...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 107/1000 - Train loss: 1171.2305 - Val loss: 1303.0434 - Val mpe: 1.0776
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1303.04340698]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 108/1000 - Train loss: 1171.5627 - Val loss: 1312.2510 - Val mpe: 1.0905
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1312.25104492]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 109/1000 - Train loss: 1168.3722 - Val loss: 1303.3688 - Val mpe: 1.0868
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1303.36884644]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 110/1000 - Train loss: 1164.4457 - Val loss: 1293.8121 - Val mpe: 1.0876
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1293.81214355]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 111/1000 - Train loss: 1182.9000 - Val loss: 1302.3196 - Val mpe: 1.0809
+INFO: Early stopping counter                     9 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1302.31962402]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 112/1000 - Train loss: 1178.0874 - Val loss: 1304.6534 - Val mpe: 1.0735
+INFO: Early stopping counter                     10 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1304.65339478]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 113/1000 - Train loss: 1162.1789 - Val loss: 1299.9327 - Val mpe: 1.0846
+INFO: Early stopping counter                     11 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1299.93274841]
+Epoch 00113: reducing learning rate of group 0 to 2.5000e-07.
+Epoch 00113: reducing learning rate of group 1 to 2.5000e-07.
+Epoch 00113: reducing learning rate of group 2 to 2.5000e-07.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.14it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 114/1000 - Train loss: 1148.8411 - Val loss: 1318.4970 - Val mpe: 1.0841
+INFO: Early stopping counter                     12 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1318.49701782]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.98it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 115/1000 - Train loss: 1149.8977 - Val loss: 1299.6151 - Val mpe: 1.0809
+INFO: Early stopping counter                     13 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1299.61513916]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 116/1000 - Train loss: 1145.0817 - Val loss: 1293.6832 - Val mpe: 1.0743
+INFO: Early stopping counter                     14 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1293.68324341]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.98it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 117/1000 - Train loss: 1140.4063 - Val loss: 1303.3208 - Val mpe: 1.0810
+INFO: Early stopping counter                     15 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1303.32078735]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 118/1000 - Train loss: 1141.1708 - Val loss: 1299.1383 - Val mpe: 1.0898
+INFO: Early stopping counter                     16 of 30                         [Best Val Loss: 1292.31011597,                             Val Loss: 1299.13831299]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.17it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 119/1000 - Train loss: 1133.0845 - Val loss: 1291.9228 - Val mpe: 1.0815
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.16it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 120/1000 - Train loss: 1132.9069 - Val loss: 1301.7748 - Val mpe: 1.0783
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1291.92279297,                             Val Loss: 1301.77478760]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 121/1000 - Train loss: 1130.9459 - Val loss: 1288.3164 - Val mpe: 1.0861
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 122/1000 - Train loss: 1138.8856 - Val loss: 1297.6129 - Val mpe: 1.0860
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1297.61292847]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.01it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 123/1000 - Train loss: 1143.3367 - Val loss: 1295.7684 - Val mpe: 1.0874
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1295.76844055]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.58it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 124/1000 - Train loss: 1137.5545 - Val loss: 1294.1737 - Val mpe: 1.0849
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1294.17369202]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 125/1000 - Train loss: 1127.5459 - Val loss: 1288.6652 - Val mpe: 1.0862
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1288.66521118]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.24it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 126/1000 - Train loss: 1136.7763 - Val loss: 1299.4486 - Val mpe: 1.0921
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1299.44862122]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.09it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 127/1000 - Train loss: 1119.9524 - Val loss: 1307.2672 - Val mpe: 1.0806
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1307.26723511]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 128/1000 - Train loss: 1137.8505 - Val loss: 1297.5988 - Val mpe: 1.0831
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1297.59880371]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.11it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 129/1000 - Train loss: 1124.5146 - Val loss: 1295.0771 - Val mpe: 1.0786
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1295.07709229]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.17it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 130/1000 - Train loss: 1125.8533 - Val loss: 1304.2342 - Val mpe: 1.0882
+INFO: Early stopping counter                     9 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1304.23424072]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.06it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 131/1000 - Train loss: 1113.3909 - Val loss: 1301.1338 - Val mpe: 1.0801
+INFO: Early stopping counter                     10 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1301.13377197]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 132/1000 - Train loss: 1119.6914 - Val loss: 1295.0891 - Val mpe: 1.0785
+INFO: Early stopping counter                     11 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1295.08909668]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.12it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 133/1000 - Train loss: 1118.8289 - Val loss: 1302.7000 - Val mpe: 1.0827
+INFO: Early stopping counter                     12 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1302.70003967]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 134/1000 - Train loss: 1125.3919 - Val loss: 1304.5798 - Val mpe: 1.0822
+INFO: Early stopping counter                     13 of 30                         [Best Val Loss: 1288.31641235,                             Val Loss: 1304.57979126]
+Epoch 00134: reducing learning rate of group 0 to 1.2500e-07.
+Epoch 00134: reducing learning rate of group 1 to 1.2500e-07.
+Epoch 00134: reducing learning rate of group 2 to 1.2500e-07.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.17it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 135/1000 - Train loss: 1120.5080 - Val loss: 1287.6325 - Val mpe: 1.0900
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 136/1000 - Train loss: 1112.8956 - Val loss: 1299.6225 - Val mpe: 1.0847
+INFO: Early stopping counter                     1 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.62250366]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 137/1000 - Train loss: 1105.3387 - Val loss: 1300.3365 - Val mpe: 1.0812
+INFO: Early stopping counter                     2 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1300.33646851]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.20it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 138/1000 - Train loss: 1100.3838 - Val loss: 1296.2457 - Val mpe: 1.0831
+INFO: Early stopping counter                     3 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1296.24566284]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.16it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 139/1000 - Train loss: 1105.9494 - Val loss: 1296.8610 - Val mpe: 1.0874
+INFO: Early stopping counter                     4 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1296.86104309]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.22it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 140/1000 - Train loss: 1106.7504 - Val loss: 1298.0793 - Val mpe: 1.0897
+INFO: Early stopping counter                     5 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1298.07929199]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.14it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 141/1000 - Train loss: 1097.4185 - Val loss: 1299.5552 - Val mpe: 1.0859
+INFO: Early stopping counter                     6 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.55520264]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 142/1000 - Train loss: 1105.6962 - Val loss: 1298.0726 - Val mpe: 1.0911
+INFO: Early stopping counter                     7 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1298.07258911]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 143/1000 - Train loss: 1100.0773 - Val loss: 1303.3372 - Val mpe: 1.0850
+INFO: Early stopping counter                     8 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1303.33718384]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.63it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.99it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 144/1000 - Train loss: 1096.0509 - Val loss: 1300.8561 - Val mpe: 1.0780
+INFO: Early stopping counter                     9 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1300.85610168]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.00it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 145/1000 - Train loss: 1099.5819 - Val loss: 1299.6213 - Val mpe: 1.0841
+INFO: Early stopping counter                     10 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.62129700]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.12it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 146/1000 - Train loss: 1087.6018 - Val loss: 1295.7990 - Val mpe: 1.0823
+INFO: Early stopping counter                     11 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1295.79904541]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 147/1000 - Train loss: 1087.3660 - Val loss: 1299.7433 - Val mpe: 1.0868
+INFO: Early stopping counter                     12 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.74333008]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 148/1000 - Train loss: 1096.4897 - Val loss: 1308.9072 - Val mpe: 1.0844
+INFO: Early stopping counter                     13 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1308.90724426]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 149/1000 - Train loss: 1099.9345 - Val loss: 1306.3984 - Val mpe: 1.0826
+INFO: Early stopping counter                     14 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1306.39841125]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.04it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 150/1000 - Train loss: 1104.8305 - Val loss: 1305.1052 - Val mpe: 1.0872
+INFO: Early stopping counter                     15 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1305.10524841]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.99it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 151/1000 - Train loss: 1092.6764 - Val loss: 1301.9654 - Val mpe: 1.0845
+INFO: Early stopping counter                     16 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1301.96540222]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.08it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 152/1000 - Train loss: 1092.6454 - Val loss: 1307.2558 - Val mpe: 1.0875
+INFO: Early stopping counter                     17 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1307.25581116]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.56it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 153/1000 - Train loss: 1094.2362 - Val loss: 1292.1501 - Val mpe: 1.0844
+INFO: Early stopping counter                     18 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1292.15008301]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 154/1000 - Train loss: 1099.1114 - Val loss: 1295.5731 - Val mpe: 1.0803
+INFO: Early stopping counter                     19 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1295.57311707]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 12.97it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 155/1000 - Train loss: 1089.4263 - Val loss: 1302.5926 - Val mpe: 1.0878
+INFO: Early stopping counter                     20 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1302.59259888]
+Epoch 00155: reducing learning rate of group 0 to 6.2500e-08.
+Epoch 00155: reducing learning rate of group 1 to 6.2500e-08.
+Epoch 00155: reducing learning rate of group 2 to 6.2500e-08.
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.59it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 156/1000 - Train loss: 1094.2453 - Val loss: 1302.0712 - Val mpe: 1.0809
+INFO: Early stopping counter                     21 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1302.07116028]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.62it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.18it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 157/1000 - Train loss: 1084.5893 - Val loss: 1295.4143 - Val mpe: 1.0801
+INFO: Early stopping counter                     22 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1295.41431030]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 158/1000 - Train loss: 1090.9135 - Val loss: 1299.7678 - Val mpe: 1.0858
+INFO: Early stopping counter                     23 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.76776855]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 159/1000 - Train loss: 1079.0250 - Val loss: 1300.7329 - Val mpe: 1.0859
+INFO: Early stopping counter                     24 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1300.73285461]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 160/1000 - Train loss: 1083.0852 - Val loss: 1296.9035 - Val mpe: 1.0879
+INFO: Early stopping counter                     25 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1296.90354736]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 161/1000 - Train loss: 1077.0447 - Val loss: 1298.1467 - Val mpe: 1.0831
+INFO: Early stopping counter                     26 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1298.14672302]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.05it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 162/1000 - Train loss: 1085.5905 - Val loss: 1300.0181 - Val mpe: 1.0830
+INFO: Early stopping counter                     27 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1300.01809509]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.61it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 163/1000 - Train loss: 1083.1181 - Val loss: 1298.4638 - Val mpe: 1.0838
+INFO: Early stopping counter                     28 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1298.46378235]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.10it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 164/1000 - Train loss: 1090.0683 - Val loss: 1299.8173 - Val mpe: 1.0802
+INFO: Early stopping counter                     29 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1299.81727051]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 200/200 [00:26&lt;00:00,  7.60it/s]
+100%|██████████| 100/100 [00:07&lt;00:00, 13.02it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 165/1000 - Train loss: 1085.9051 - Val loss: 1301.8318 - Val mpe: 1.0869
+INFO: Early stopping counter                     30 of 30                         [Best Val Loss: 1287.63249084,                             Val Loss: 1301.83181152]
+INFO: Early stopping DONE!
+INFO: Best Val Loss: 1287.63249084
+Loading best model...
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="evaluating-the-model">
+<h2>Evaluating the model<a class="headerlink" href="#evaluating-the-model" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_landmarks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">true_landmarks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">dim_origs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pixel_spacings</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">paddings</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_mpe</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">landmarks</span><span class="p">,</span> <span class="n">affine_matrixs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="p">,</span>
+        <span class="n">dim_orig</span><span class="p">,</span> <span class="n">pixel_spacing</span><span class="p">,</span> <span class="n">padding</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">dim_orig</span> <span class="o">=</span> <span class="n">dim_orig</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="n">pixel_spacing</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="c1"># heatmap = heatmap_generator(landmarks)</span>
+        <span class="n">offset_coords</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">landmarks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pred_landmark</span> <span class="o">=</span> <span class="n">heatmap_to_coord</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">offset_coords</span><span class="o">=</span><span class="n">offset_coords</span><span class="p">,</span>
+                                        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;local_soft_argmax&quot;</span><span class="p">)</span>
+        <span class="n">test_mpe</span> <span class="o">+=</span> <span class="n">point_error</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">pred_landmark</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:],</span> <span class="n">dim_orig</span><span class="p">,</span>
+                                <span class="n">pixel_spacing</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+        <span class="n">pred_landmarks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pred_landmark</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">true_landmarks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">landmarks</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">dim_origs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim_orig</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">pixel_spacings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pixel_spacing</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">paddings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">padding</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+<span class="n">pred_landmarks</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pred_landmarks</span><span class="p">)</span>
+<span class="n">true_landmarks</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">true_landmarks</span><span class="p">)</span>
+<span class="n">dim_origs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">dim_origs</span><span class="p">)</span>
+<span class="n">pixel_spacings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pixel_spacings</span><span class="p">)</span>
+<span class="n">paddings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">paddings</span><span class="p">)</span>
+
+<span class="n">test_mpe</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test Mean PE: </span><span class="si">{</span><span class="n">test_mpe</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 100/100 [00:06&lt;00:00, 15.84it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Mean PE: 1.0885
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.metrics</span> <span class="kn">import</span> <span class="n">sdr</span>
+
+<span class="n">sdr_test</span> <span class="o">=</span> <span class="n">sdr</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">true_landmarks</span><span class="o">=</span><span class="n">true_landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="o">=</span><span class="n">pred_landmarks</span><span class="p">,</span>
+               <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span> <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sdr_test</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SDR for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">mm: </span><span class="si">{</span><span class="n">sdr_test</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDR for 2.0mm: 88.4211
+SDR for 2.5mm: 92.1579
+SDR for 3.0mm: 94.5789
+SDR for 4.0mm: 97.6316
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.metrics</span> <span class="kn">import</span> <span class="n">sdr</span>
+
+<span class="n">sdr_test</span> <span class="o">=</span> <span class="n">sdr</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">true_landmarks</span><span class="o">=</span><span class="n">true_landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="o">=</span><span class="n">pred_landmarks</span><span class="p">,</span>
+               <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span> <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sdr_test</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SDR for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">mm: </span><span class="si">{</span><span class="n">sdr_test</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>SDR for 2.0mm: 88.4211
+SDR for 2.5mm: 92.1579
+SDR for 3.0mm: 94.5789
+SDR for 4.0mm: 97.6316
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize.utils</span> <span class="kn">import</span> <span class="n">prediction_inspect_plot</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">prediction_inspect_plot</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">ds_test</span><span class="o">.</span><span class="n">indices</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/e64bd8d30b04d73a9bd7e1454d9baebb229c7044d98fff5d251dd10b3000f37f.png" src="../../_images/e64bd8d30b04d73a9bd7e1454d9baebb229c7044d98fff5d251dd10b3000f37f.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize</span> <span class="kn">import</span> <span class="n">detection_report</span>
+
+<span class="n">detection_report</span><span class="p">(</span><span class="n">true_landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+                    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings</span><span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">class_names</span><span class="p">,</span>
+                    <span class="n">radius</span><span class="o">=</span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Detection report:
+1# Point-to-point error (PE) statistics:
+======================================================================
+Class               Mean PE   Median PE Std PE    Min       Max       
+----------------------------------------------------------------------
+landmark_0          0.71      0.61      0.43      0.01      2.33      
+landmark_1          1.09      0.68      1.33      0.06      8.42      
+landmark_2          1.22      0.86      1.17      0.08      5.13      
+landmark_3          1.50      1.02      1.58      0.18      8.13      
+landmark_4          1.36      1.08      0.96      0.14      4.64      
+landmark_5          1.04      0.80      0.76      0.05      3.28      
+landmark_6          0.89      0.86      0.58      0.05      2.77      
+landmark_7          0.78      0.60      0.56      0.03      2.69      
+landmark_8          0.76      0.61      0.51      0.02      2.24      
+landmark_9          2.16      1.82      1.47      0.10      6.26      
+landmark_10         0.80      0.63      0.68      0.08      4.46      
+landmark_11         0.59      0.35      1.00      0.03      8.29      
+landmark_12         1.11      0.94      0.70      0.05      3.34      
+landmark_13         0.91      0.79      0.63      0.04      3.11      
+landmark_14         1.13      0.90      1.02      0.09      6.60      
+landmark_15         1.13      0.81      1.04      0.10      6.36      
+landmark_16         1.00      0.81      0.89      0.12      7.53      
+landmark_17         1.27      1.00      1.08      0.05      6.18      
+landmark_18         1.23      0.87      1.23      0.09      7.43      
+======================================================================
+
+2# Success detection rate (SDR):
+================================================================================
+Class               SDR (PE≤2.0mm) SDR (PE≤2.5mm) SDR (PE≤3.0mm) SDR (PE≤4.0mm) 
+--------------------------------------------------------------------------------
+landmark_0          98.00          100.00         100.00         100.00         
+landmark_1          86.00          88.00          91.00          96.00          
+landmark_2          84.00          89.00          91.00          94.00          
+landmark_3          83.00          87.00          90.00          93.00          
+landmark_4          82.00          88.00          90.00          98.00          
+landmark_5          91.00          95.00          98.00          100.00         
+landmark_6          93.00          97.00          100.00         100.00         
+landmark_7          96.00          99.00          100.00         100.00         
+landmark_8          97.00          100.00         100.00         100.00         
+landmark_9          54.00          63.00          73.00          87.00          
+landmark_10         95.00          96.00          98.00          99.00          
+landmark_11         94.00          95.00          97.00          99.00          
+landmark_12         89.00          95.00          98.00          100.00         
+landmark_13         94.00          97.00          99.00          100.00         
+landmark_14         89.00          92.00          96.00          98.00          
+landmark_15         91.00          93.00          96.00          97.00          
+landmark_16         94.00          97.00          97.00          99.00          
+landmark_17         85.00          90.00          91.00          98.00          
+landmark_18         85.00          90.00          92.00          97.00          
+================================================================================
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize</span> <span class="kn">import</span> <span class="n">plot_cpe</span>
+
+<span class="n">plot_cpe</span><span class="p">(</span><span class="n">true_landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+                    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings</span><span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">class_names</span><span class="p">,</span>
+                    <span class="n">group</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CPE curve&quot;</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;ecdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/6ac8ba80b7e64132fc221f47a84f6706a12ee4cf935235615dbc6821e8d7e22d.png" src="../../_images/6ac8ba80b7e64132fc221f47a84f6706a12ee4cf935235615dbc6821e8d7e22d.png" />
+</div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="static_unet_endovis2015.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Training and Evaluating Static Heatmap Regression Model for Multi-Instance and Multi-Class Landmark Detetection (EndoVis 2015 Challenge)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../../examples/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">🔦 Examples</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Jef Jonkers
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/predict-idlab/landmarker" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Training and Evaluating Adaptive Heatmap Regression Model for Landmark Detection with ISBI 2015 Cephalometric X-ray Dataset</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment</a></li>
+<li><a class="reference internal" href="#setup-imports-and-variables">Setup imports and variables</a></li>
+<li><a class="reference internal" href="#loading-the-dataset">Loading the dataset</a><ul>
+<li><a class="reference internal" href="#short-description-of-the-data-and-dataset-module">Short description of the data and dataset module</a></li>
+<li><a class="reference internal" href="#download-and-load-isbi-2015-landmark-dataset">Download and load ISBI 2015 landmark dataset</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#constructing-a-heatmap-generator">Constructing a heatmap generator</a></li>
+<li><a class="reference internal" href="#inspecting-the-dataset">Inspecting the dataset</a></li>
+<li><a class="reference internal" href="#training-and-initializing-the-spatialconfiguration-model">Training and initializing the SpatialConfiguration model</a><ul>
+<li><a class="reference internal" href="#initializing-the-model-optimizer-and-loss-function">Initializing the model, optimizer and loss function</a></li>
+<li><a class="reference internal" href="#setting-the-data-loaders">Setting the data loaders</a></li>
+<li><a class="reference internal" href="#training-the-model">Training the model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#evaluating-the-model">Evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    </body>
+</html>
