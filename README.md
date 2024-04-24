@@ -49,7 +49,7 @@ If you use Landmarker in your research, please cite the following paper:
 SCIENTIFIC PAPER UNDER REVIEW
 
 ## 📝 License
-Landmark is licensed under the IMEC [license](LICENSE).
+Landmark is licensed under the MIT [license](LICENSE).
 
 ---
 
