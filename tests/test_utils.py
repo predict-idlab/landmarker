@@ -2,14 +2,24 @@
 
 import json
 import os
-import cv2
 
+import cv2
 import numpy as np
 import pytest
 import torch
 
-from landmarker.utils.utils import (all_annotations_to_landmarks, all_annotations_to_landmarks_numpy, annotation_to_landmark_numpy, covert_video_to_frames, get_angle, get_angle_numpy, get_paths,
-                                    pixel_to_unit, pixel_to_unit_numpy, annotation_to_landmark)
+from landmarker.utils.utils import (
+    all_annotations_to_landmarks,
+    all_annotations_to_landmarks_numpy,
+    annotation_to_landmark,
+    annotation_to_landmark_numpy,
+    covert_video_to_frames,
+    get_angle,
+    get_angle_numpy,
+    get_paths,
+    pixel_to_unit,
+    pixel_to_unit_numpy,
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -20,7 +30,7 @@ def setup_data():
     os.mkdir(tmpdir)
     test_files = ["file1.txt", "file2.txt", "file3.jpg"]
     for file in test_files:
-        with open(os.path.join(tmpdir, file), 'a', encoding="utf8") as f:
+        with open(os.path.join(tmpdir, file), "a", encoding="utf8") as f:
             f.close()
 
     # Define test cases
@@ -96,7 +106,7 @@ def test_annotation_to_landmark():
     # Test with a class name that is not in the json_obj
     class_names = ["class1", "class4"]
     landmarks = annotation_to_landmark(json_obj, class_names)
-    expected_landmarks = torch.Tensor([[2, 1], [float('nan'), float('nan')]])
+    expected_landmarks = torch.Tensor([[2, 1], [float("nan"), float("nan")]])
     assert torch.allclose(landmarks, expected_landmarks, equal_nan=True)
 
 
@@ -133,16 +143,18 @@ def test_all_annotations_to_landmarks():
     class_names = ["class1", "class2", "class3"]
 
     # Write the test cases to temporary files
-    paths = list(get_paths(tmpdir, "json"))
+    paths = sorted(list(get_paths(tmpdir, "json")))
 
     # Call the function with the test cases
     landmarks = all_annotations_to_landmarks(paths, class_names)
 
     # Check the result
-    expected_landmarks = torch.Tensor([
-        [[2, 1], [4, 3], [6, 5]],
-        [[8, 7], [10, 9], [12, 11]],
-    ])
+    expected_landmarks = torch.Tensor(
+        [
+            [[2, 1], [4, 3], [6, 5]],
+            [[8, 7], [10, 9], [12, 11]],
+        ]
+    )
     assert torch.allclose(landmarks, expected_landmarks)
 
 
@@ -153,16 +165,18 @@ def test_all_annotations_to_landmarks_numpy():
     class_names = ["class1", "class2", "class3"]
 
     # Write the test cases to temporary files
-    paths = list(get_paths(tmpdir, "json"))
+    paths = sorted(list(get_paths(tmpdir, "json")))
 
     # Call the function with the test cases
     landmarks = all_annotations_to_landmarks_numpy(paths, class_names)
 
     # Check the result
-    expected_landmarks = np.array([
-        [[2, 1], [4, 3], [6, 5]],
-        [[8, 7], [10, 9], [12, 11]],
-    ])
+    expected_landmarks = np.array(
+        [
+            [[2, 1], [4, 3], [6, 5]],
+            [[8, 7], [10, 9], [12, 11]],
+        ]
+    )
     assert np.allclose(landmarks, expected_landmarks)
 
 
@@ -225,8 +239,9 @@ def test_pixel_to_unit_spacing_torch():
     dim = (50, 100)
     dim_orig = torch.Tensor([[100, 150], [200, 200]])
 
-    landmarks_resized = landmarks * \
-        torch.Tensor(dim).reshape((-1, 1, 2)) / dim_orig.reshape((-1, 1, 2))
+    landmarks_resized = (
+        landmarks * torch.Tensor(dim).reshape((-1, 1, 2)) / dim_orig.reshape((-1, 1, 2))
+    )
 
     expected_result = landmarks * pixel_spacing.reshape((-1, 1, 2))
 
@@ -242,8 +257,12 @@ def test_pixel_to_unit_no_resize_torch():
     landmarks = torch.Tensor([[[30, 20], [100, 70]], [[105, 60], [70, 80]]])
     pixel_spacing = torch.Tensor([[0.3, 0.1], [0.1, 0.3]])
 
-    expected_result = torch.Tensor([[[30*0.3, 20*0.1], [100*0.3, 70*0.1]],
-                                    [[105*0.1, 60*0.3], [70*0.1, 80*0.3]]])
+    expected_result = torch.Tensor(
+        [
+            [[30 * 0.3, 20 * 0.1], [100 * 0.3, 70 * 0.1]],
+            [[105 * 0.1, 60 * 0.3], [70 * 0.1, 80 * 0.3]],
+        ]
+    )
 
     result = pixel_to_unit(landmarks, pixel_spacing)
 
@@ -295,8 +314,9 @@ def test_pixel_to_unit_padding_numpy():
     padding = np.array([[100, 0], [50, 0]])
 
     landmarks_padded = landmarks_orig + padding.reshape((-1, 1, 2))
-    landmarks = landmarks_padded * (np.array(dim).reshape((-1, 1, 2)) /
-                                    (dim_orig + 2*padding).reshape((-1, 1, 2)))
+    landmarks = landmarks_padded * (
+        np.array(dim).reshape((-1, 1, 2)) / (dim_orig + 2 * padding).reshape((-1, 1, 2))
+    )
 
     result = pixel_to_unit_numpy(landmarks, pixel_spacing, dim, dim_orig, padding)
 
@@ -310,8 +330,12 @@ def test_pixel_to_unit_no_resize_numpy():
     landmarks = np.array([[[30, 20], [100, 70]], [[105, 60], [70, 80]]])
     pixel_spacing = np.array([[0.3, 0.1], [0.1, 0.3]])
 
-    expected_result = np.array([[[30*0.3, 20*0.1], [100*0.3, 70*0.1]],
-                                [[105*0.1, 60*0.3], [70*0.1, 80*0.3]]])
+    expected_result = np.array(
+        [
+            [[30 * 0.3, 20 * 0.1], [100 * 0.3, 70 * 0.1]],
+            [[105 * 0.1, 60 * 0.3], [70 * 0.1, 80 * 0.3]],
+        ]
+    )
 
     result = pixel_to_unit_numpy(landmarks, pixel_spacing)
 

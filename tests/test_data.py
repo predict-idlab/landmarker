@@ -67,8 +67,8 @@ def setup_data():
     clear_data()
 
 
-def test_landmark_dataset_grayscale_stored_imgs():
-    """Test LandmarkDataset with grayscale images and store_imgs=True."""
+def test_landmark_dataset_stored_imgs():
+    """Test LandmarkDatase with store_imgs=True."""
     dataset = LandmarkDataset(
         imgs=[f"tests/data/{i}_img_uint8.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
@@ -174,8 +174,8 @@ def test_landmark_dataset_grayscale_stored_imgs():
     )  # landmark
 
 
-def test_landmark_dataset_grayscale_not_store_img():
-    """Test LandmarkDataset with grayscale images and store_imgs=False."""
+def test_landmark_dataset_not_store_img():
+    """Test LandmarkDataset with images and store_imgs=False."""
     dataset = LandmarkDataset(
         imgs=[f"tests/data/{i}_img_uint8.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
@@ -208,12 +208,11 @@ def test_landmark_dataset_grayscale_not_store_img():
     assert torch.allclose(dataset[0][-1], torch.Tensor((32, 0)))  # padding
 
 
-def test_landmark_dataset_no_grayscale():
-    """Test LandmarkDataset with no grayscale images."""
+def test_landmark_dataset():
+    """Test LandmarkDataset with images."""
     dataset = LandmarkDataset(
         imgs=[f"tests/data/{i}_img_color.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
-        grayscale=False,
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0][0].shape == torch.Size([3, 64, 64])  # image
@@ -223,7 +222,6 @@ def test_landmark_dataset_no_grayscale():
         imgs=[f"tests/data/{i}_img_color.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
         dim_img=(32, 20),
-        grayscale=False,
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0][0].shape == torch.Size([3, 32, 20])  # image
@@ -232,7 +230,6 @@ def test_landmark_dataset_no_grayscale():
     dataset = LandmarkDataset(
         imgs=[f"tests/data/{i}_img_color.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
-        grayscale=False,
         store_imgs=False,
     )
     assert len(dataset) == len(pytest.landmarks)
@@ -243,7 +240,6 @@ def test_landmark_dataset_no_grayscale():
         imgs=[f"tests/data/{i}_img_color.png" for i in range(NSIM)],
         landmarks=pytest.landmarks,
         dim_img=(32, 20),
-        grayscale=False,
         store_imgs=False,
     )
     assert len(dataset) == len(pytest.landmarks)
@@ -419,7 +415,7 @@ def test_mask_landmark_dataset():
 
 def test_mask_landmark_transforms():
     """Test MaskDataset with transforms."""
-    fn_keys = ("image", "seg")
+    fn_keys = ("image", "mask")
     spatial_transformd = [
         RandAffined(
             fn_keys,
@@ -504,7 +500,7 @@ def test_heatmap_dataset():
 
 def test_heatmap_dataset_transforms():
     """Test HeatmapDataset with transforms."""
-    fn_keys = ("image", "seg")
+    fn_keys = ("image", "mask")
     spatial_transformd = [
         RandAffined(
             fn_keys,
