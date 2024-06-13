@@ -9,7 +9,6 @@ from src.landmarker.heatmap.decoder import (
     coord_cov_windowed_weigthed_sample_cov,
     coord_local_soft_argmax,
     coord_soft_argmax,
-    coord_soft_argmax_cov,
     coord_weighted_spatial_mean,
     cov_from_gaussian_ls,
     heatmap_coord_to_weighted_sample_cov,
@@ -38,6 +37,33 @@ def create_heatmap(subpixel=False, sigmas=1.0, rotations=0.0, return_covs=False,
 
     # Create some example input data
     landmarks = torch.tensor([[[20, 20], [30, 40], [45, 25]]], dtype=torch.float)
+
+    if subpixel:
+        landmarks += torch.rand(landmarks.shape, dtype=torch.float32)
+
+    # Call the method being tested
+    heatmaps = generator(landmarks)
+
+    if return_covs:
+        return heatmaps, landmarks, generator.get_covariance_matrix()
+    return heatmaps, landmarks
+
+
+def create_3d_heatmap(subpixel=False, sigmas=1.0, rotations=0.0, return_covs=False, gamma=None):
+    """Create a heatmap and corresponding landmarks for testing."""
+    # Create a generator with some example parameters
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=3,
+        sigmas=sigmas,
+        rotation=rotations,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=gamma,
+        device="cpu",
+    )
+
+    # Create some example input data
+    landmarks = torch.tensor([[[20, 20, 20], [30, 40, 30], [45, 25, 40]]], dtype=torch.float)
 
     if subpixel:
         landmarks += torch.rand(landmarks.shape, dtype=torch.float32)
@@ -86,48 +112,103 @@ def create_batch_of_heatmaps(
     return heatmaps, landmarks_batch
 
 
-def check_retriever_output(retriever_fun, atol=1e-2, rtol=0, **kwargs):
-    """Check the output of a retriever function."""
-    # Create some example input data
-    heatmaps, landmarks = create_heatmap(  # pylint: disable=unbalanced-tuple-unpacking
-        subpixel=False, return_covs=False
+def create_batch_of_3d_heatmaps(
+    subpixel=False, sigmas=1.0, rotations=0.0, return_covs=False, gamma=None
+):
+    """Create a batch of heatmaps and corresponding landmarks for testing."""
+    # Create a generator with some example parameters
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=3,
+        sigmas=sigmas,
+        rotation=rotations,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=gamma,
+        device="cpu",
     )
 
+    landmarks_batch = torch.tensor(
+        [
+            [[10, 10, 10], [30, 40, 30], [50, 60, 50]],
+            [[16, 17, 16], [24, 35, 24], [30, 58, 30]],
+            [[24, 24, 24], [14, 14, 14], [54, 30, 54]],
+            [[30, 30, 30], [36, 46, 36], [20, 10, 20]],
+        ],
+        dtype=torch.float,
+    )
+
+    if subpixel:
+        landmarks_batch += torch.rand(landmarks_batch.shape, dtype=torch.float32)
+
     # Call the method being tested
-    coords = retriever_fun(heatmaps, **kwargs).float()
+    heatmaps = generator(landmarks_batch)
+
+    if return_covs:
+        return heatmaps, landmarks_batch, generator.get_covariance_matrix()
+    return heatmaps, landmarks_batch
+
+
+def check_retriever_output(retriever_fun, atol=1e-2, rtol=0, spatial_dims=2, **kwargs):
+    """Check the output of a retriever function."""
+    # Create some example input data
+    if spatial_dims == 2:
+        heatmaps, landmarks = create_heatmap(  # pylint: disable=unbalanced-tuple-unpacking
+            subpixel=False, return_covs=False
+        )
+    else:
+        heatmaps, landmarks = create_3d_heatmap(  # pylint: disable=unbalanced-tuple-unpacking
+            subpixel=False, return_covs=False
+        )
+
+    # Call the method being tested
+    coords = retriever_fun(heatmaps, spatial_dims=spatial_dims, **kwargs).float()
 
     # Check the output
-    assert coords.shape == (1, 3, 2)
+    assert coords.shape == (1, 3, spatial_dims)
     assert torch.allclose(coords, landmarks, atol=atol, rtol=rtol)
 
     # Create some batched example input data
-    heatmaps, landmarks = create_batch_of_heatmaps(  # pylint: disable=unbalanced-tuple-unpacking
-        subpixel=False, return_covs=False
-    )
-
+    if spatial_dims == 2:
+        heatmaps, landmarks = (
+            create_batch_of_heatmaps(  # pylint: disable=unbalanced-tuple-unpacking
+                subpixel=False, return_covs=False
+            )
+        )
+    else:
+        heatmaps, landmarks = (
+            create_batch_of_3d_heatmaps(  # pylint: disable=unbalanced-tuple-unpacking
+                subpixel=False, return_covs=False
+            )
+        )
     # Call the method being tested
-    coords = retriever_fun(heatmaps, **kwargs).float()
+    coords = retriever_fun(heatmaps, spatial_dims=spatial_dims, **kwargs).float()
 
     # Check the output
-    assert coords.shape == (4, 3, 2)
+    assert coords.shape == (4, 3, spatial_dims)
     assert torch.allclose(coords, landmarks, atol=atol, rtol=rtol)
 
     # Create some batched example input data with subpixel landmarks
-    heatmaps, landmarks = create_batch_of_heatmaps(  # pylint: disable=unbalanced-tuple-unpacking
-        subpixel=True
-    )
+    if spatial_dims == 2:
+        heatmaps, landmarks = create_batch_of_heatmaps(
+            subpixel=True
+        )  # pylint: disable=unbalanced-tuple-unpacking
+    else:
+        heatmaps, landmarks = create_batch_of_3d_heatmaps(
+            subpixel=True
+        )  # pylint: disable=unbalanced-tuple-unpacking
 
     # Call the method being tested
-    coords = retriever_fun(heatmaps, **kwargs).float()
+    coords = retriever_fun(heatmaps, spatial_dims=spatial_dims, **kwargs).float()
 
     # Check the output
-    assert coords.shape == (4, 3, 2)
+    assert coords.shape == (4, 3, spatial_dims)
     assert torch.allclose(coords.round(), landmarks.round(), atol=atol)
 
 
 def test_coord_argmax():
     """Test the coord_argmax function."""
     check_retriever_output(coord_argmax, atol=1e-2, rtol=0)
+    check_retriever_output(coord_argmax, atol=1e-2, rtol=0, spatial_dims=3)
 
 
 def test_coord_local_soft_argmax():
@@ -152,34 +233,6 @@ def test_coord_soft_argmax():
 
 def test_coord_cov_from_guassian_ls_scipy():
     """Test the coord_cov_from_guassian_ls_scipy function."""
-    # Create some example input data
-    rotations = np.array([0.0, 0, 1])
-    sigmas = np.array([[5, 5], [5, 6], [4, 3]])
-
-    heatmap_generator = GaussianHeatmapGenerator(
-        nb_landmarks=3,
-        sigmas=sigmas,
-        rotation=rotations,
-        heatmap_size=(64, 64),
-        learnable=False,
-        gamma=1,
-    )
-    landmarks = torch.tensor(
-        [[[64 // 2, 64 // 2], [64 // 2, 64 // 2], [64 // 2, 64 // 2]]], dtype=torch.float
-    )
-    heatmaps = heatmap_generator(landmarks)
-    covs_true = heatmap_generator.get_covariance_matrix().unsqueeze(0)
-
-    # Call the method being tested
-    coords, covs = coord_soft_argmax_cov(torch.logit(heatmaps))
-    coords = coords.float()
-
-    # Check the output
-    assert coords.shape == (1, 3, 2)
-    assert covs.shape == (1, 3, 2, 2)
-    assert torch.allclose(coords, landmarks, atol=0.5)
-    assert torch.allclose(covs, covs_true, atol=0.5)
-
     # Create some example input data
     rotations = np.array([0, 0, 0])
     sigmas = np.array([[5, 5], [1, 1], [2, 1]])
@@ -249,7 +302,7 @@ def test_coord_cov_from_soft_argmax():
     covs_true = heatmap_generator.get_covariance_matrix().unsqueeze(0)
 
     # Call the method being tested
-    coords, covs = coord_soft_argmax_cov(torch.logit(heatmaps))
+    coords, covs = heatmap_to_coord_cov(torch.logit(heatmaps), method="soft_argmax")
     coords = coords.float()
 
     # Check the output
@@ -259,7 +312,7 @@ def test_coord_cov_from_soft_argmax():
     assert torch.allclose(covs, covs_true, atol=0.5)
 
     # Call the method being tested
-    coords, covs = coord_soft_argmax_cov(heatmaps, logit_scale=False)
+    coords, covs = heatmap_to_coord_cov(heatmaps, method="soft_argmax", logit_scale=False)
     coords = coords.float()
 
     # Check the output

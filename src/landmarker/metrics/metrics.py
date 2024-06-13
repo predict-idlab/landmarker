@@ -37,7 +37,7 @@ def point_error(
             or "none".
     """
     if pixel_spacing is None:
-        pixel_spacing = torch.ones((len(true_landmarks), 2))
+        pixel_spacing = torch.ones((len(true_landmarks), true_landmarks.shape[-1]))
     true_landmarks = pixel_to_unit(
         true_landmarks, pixel_spacing=pixel_spacing, dim=dim, dim_orig=dim_orig, padding=padding
     )
@@ -46,7 +46,6 @@ def point_error(
     )
 
     # Calculate MRE
-
     if reduction == "mean":
         return torch.mean(torch.sqrt(torch.sum((true_landmarks - pred_landmarks) ** 2, -1)))
     if reduction == "none":
@@ -193,9 +192,9 @@ def transform_multi_instance_tensor(
             "If true_landmarks is a torch.Tensor, it must have at most 4 "
             + "dimensions. and at least 2 dimensions."
         )
-    landmarks_list: list[torch.Tensor] | list[list[torch.Tensor]] | list[
-        list[list[torch.Tensor]]
-    ] | list = []
+    landmarks_list: (
+        list[torch.Tensor] | list[list[torch.Tensor]] | list[list[list[torch.Tensor]]] | list
+    ) = []
     for i in range(landmarks.shape[0]):
         if len(landmarks.shape) == 2:
             landmarks_list.append(landmarks[i])  # type: ignore

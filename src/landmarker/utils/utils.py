@@ -165,6 +165,11 @@ def pixel_to_unit(
     Returns:
         torch.Tensor: landmarks in units
     """
+    spatial_dim = landmarks.shape[-1]
+    if dim is not None:
+        assert len(dim) == spatial_dim, f"dim must have {spatial_dim} elements."
+    if dim_orig is not None:
+        assert dim_orig.shape[-1] == spatial_dim, f"dim_orig must have {spatial_dim} elements."
     if len(landmarks.shape) == 4:
         added_dim: tuple[int, ...] = (1, 1)  # for multi-instance
     else:
@@ -175,20 +180,20 @@ def pixel_to_unit(
         else:
             assert padding.shape == dim_orig.shape
         if pixel_spacing is None:
-            pixel_spacing = torch.ones((1, 2), device=landmarks.device)
+            pixel_spacing = torch.ones((1, spatial_dim), device=landmarks.device)
         dim = torch.as_tensor(dim, device=landmarks.device)
         landmarks_unresize = (
             landmarks
-            * (dim_orig + 2.0 * padding).reshape((-1, *added_dim, 2))
-            / dim.reshape((-1, *added_dim, 2))
+            * (dim_orig + 2.0 * padding).reshape((-1, *added_dim, spatial_dim))
+            / dim.reshape((-1, *added_dim, spatial_dim))
         )
-        landmarks_unpadded = landmarks_unresize - padding.reshape((-1, *added_dim, 2))
-        return landmarks_unpadded * pixel_spacing.reshape((-1, *added_dim, 2))
+        landmarks_unpadded = landmarks_unresize - padding.reshape((-1, *added_dim, spatial_dim))
+        return landmarks_unpadded * pixel_spacing.reshape((-1, *added_dim, spatial_dim))
     if dim is not None or dim_orig is not None:
         raise ValueError("dim and dim_orig must be both None or both not None.")
     if pixel_spacing is None:
         return landmarks
-    return landmarks * pixel_spacing.reshape((-1, *added_dim, 2))
+    return landmarks * pixel_spacing.reshape((-1, *added_dim, spatial_dim))
 
 
 def pixel_to_unit_numpy(
@@ -212,23 +217,35 @@ def pixel_to_unit_numpy(
     Returns:
         np.ndarray: landmarks in units
     """
+    spatial_dim = landmarks.shape[-1]
+    if dim is not None:
+        assert len(dim) == spatial_dim, f"dim must have {spatial_dim} elements."
+    if dim_orig is not None:
+        assert dim_orig.shape[-1] == spatial_dim, f"dim_orig must have {spatial_dim} elements."
+    if len(landmarks.shape) == 4:
+        added_dim: tuple[int, ...] = (1, 1)
+    else:
+        added_dim = (1,)
     if dim is not None and dim_orig is not None:
         if padding is None:
-            padding = np.zeros((len(landmarks), 2))
+            padding = np.zeros_like(dim_orig)
+        else:
+            assert padding.shape == dim_orig.shape
         if pixel_spacing is None:
-            pixel_spacing = np.ones((len(landmarks), 2))
-        if isinstance(dim, tuple):
-            dim = np.array(dim)
+            pixel_spacing = np.ones((1, spatial_dim))
+        dim = np.array(dim)
         landmarks_unresize = (
-            landmarks * (dim_orig + 2.0 * padding).reshape((-1, 1, 2)) / dim.reshape((-1, 1, 2))
+            landmarks
+            * (dim_orig + 2.0 * padding).reshape((-1, *added_dim, spatial_dim))
+            / dim.reshape((-1, *added_dim, spatial_dim))
         )
-        landmarks_unpadded = landmarks_unresize - padding.reshape((-1, 1, 2))
-        return landmarks_unpadded * pixel_spacing.reshape((-1, 1, 2))
+        landmarks_unpadded = landmarks_unresize - padding.reshape((-1, *added_dim, spatial_dim))
+        return landmarks_unpadded * pixel_spacing.reshape((-1, *added_dim, spatial_dim))
     if dim is not None or dim_orig is not None:
         raise ValueError("dim and dim_orig must be both None or both not None.")
     if pixel_spacing is None:
         return landmarks
-    return landmarks * pixel_spacing.reshape((-1, 1, 2))
+    return landmarks * pixel_spacing.reshape((-1, *added_dim, spatial_dim))
 
 
 def covert_video_to_frames(video_path: str, frames_path: str, zero_fill: int = 6) -> None:

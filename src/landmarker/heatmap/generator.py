@@ -18,8 +18,7 @@ class HeatmapGenerator:
         gamma (float or None): scaling factor of the heatmap function
         rotation (float or list[float] or torch.Tensor or np.ndarray): rotation of the heatmap
             function
-        heatmap_size (tuple[int, int]): size of the heatmap
-        full_map (bool): whether to return the full heatmap or only the part around the landmark
+        heatmap_size (tuple[int, ...]): size of the heatmap
         learnable (bool): whether the sigmas and rotation are learnable
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
@@ -33,8 +32,7 @@ class HeatmapGenerator:
         sigmas: float | list[float] | torch.Tensor | np.ndarray = 1.0,
         gamma: Optional[float] = None,
         rotation: float | list[float] | torch.Tensor | np.ndarray = 0,
-        heatmap_size: tuple[int, int] = (512, 512),
-        full_map: bool = True,
+        heatmap_size: tuple[int, ...] = (512, 512),
         learnable: bool = False,
         background: bool = False,
         all_points: bool = False,
@@ -44,13 +42,13 @@ class HeatmapGenerator:
         self.nb_landmarks = nb_landmarks
         self.learnable = learnable
         self.device = device
+        self.heatmap_size = heatmap_size
+        self.spatial_dims = len(heatmap_size)
         self.set_sigmas(sigmas)
         self.set_rotation(rotation)
         self.sigmas: torch.Tensor = self.sigmas.to(device)
         self.rotation: torch.Tensor = self.rotation.to(device)
         self.gamma = gamma
-        self.heatmap_size = heatmap_size
-        self.full_map = full_map
         self.background = background
         self.all_points = all_points
         self.continuous = continuous
@@ -70,7 +68,7 @@ class HeatmapGenerator:
         )
         self.sigmas = (
             torch.ones(
-                (self.nb_landmarks, 2),
+                (self.nb_landmarks, self.spatial_dims),
                 requires_grad=self.learnable,
                 device=self.device,
                 dtype=torch.float,
@@ -91,15 +89,26 @@ class HeatmapGenerator:
         rotation = torch.tensor(
             rotation, device=self.device, dtype=torch.float, requires_grad=self.learnable
         )
-        self.rotation = (
-            torch.ones(
-                (self.nb_landmarks),
-                requires_grad=self.learnable,
-                device=self.device,
-                dtype=torch.float,
+        if self.spatial_dims == 2:
+            self.rotation = (
+                torch.ones(
+                    (self.nb_landmarks,),
+                    requires_grad=self.learnable,
+                    device=self.device,
+                    dtype=torch.float,
+                )
+                * rotation
             )
-            * rotation
-        )
+        else:
+            self.rotation = (
+                torch.ones(
+                    (self.nb_landmarks, self.spatial_dims),
+                    requires_grad=self.learnable,
+                    device=self.device,
+                    dtype=torch.float,
+                )
+                * rotation
+            )
         if self.learnable:
             self.rotation = torch.nn.Parameter(self.rotation)
 
@@ -142,7 +151,7 @@ class HeatmapGenerator:
         elif self.background:
             heatmaps = torch.cat(
                 (
-                    torch.ones((heatmaps.shape[0], 1, *heatmaps.shape[2:]), device=self.device)
+                    torch.ones((heatmaps.shape[0], 1, *self.heatmap_size), device=self.device)
                     - heatmaps.sum(dim=1, keepdim=True),
                     heatmaps,
                 ),
@@ -161,9 +170,9 @@ class HeatmapGenerator:
         """Abstract heatmap function
 
         Args:
-            landmark_t (torch.Tensor): coordinates of the landmark (y, x)
-            coords (torch.Tensor): coordinates of the pixel (y, x)
-            covariance (torch.Tensor): covariance matrix (y, x)
+            landmark_t (torch.Tensor): coordinates of the landmark (y, x) or (y, x, z)
+            coords (torch.Tensor): coordinates of the pixel (y, x) or (y, x, z)
+            covariance (torch.Tensor): covariance matrix
             gamma (float or None): scaling factor of the heatmap function
         """
 
@@ -172,24 +181,120 @@ class HeatmapGenerator:
         Get the covariance matrix of the heatmap function.
 
         Args:
-            return4by4 (bool): whether to return a 4 by 4 covariance matrix or a 2 by 2 covariance
-                matrix
+            return4by4 (bool): whether to return a 4 by 4 covariance matrix or a spatial_dims by
+                spatial_dims covariance matrix.
 
         Returns:
             torch.Tensor: covariance matrix
         """
-        rotation = torch.stack(
-            (
-                torch.stack((torch.cos(self.rotation), -torch.sin(self.rotation)), dim=-1),
-                torch.stack((torch.sin(self.rotation), torch.cos(self.rotation)), dim=-1),
-            ),
-            dim=-2,
-        )
+        if self.spatial_dims == 2:
+            rotation = torch.stack(
+                (
+                    torch.stack((torch.cos(self.rotation), -torch.sin(self.rotation)), dim=-1),
+                    torch.stack((torch.sin(self.rotation), torch.cos(self.rotation)), dim=-1),
+                ),
+                dim=-2,
+            )
 
-        diagonal = torch.diag_embed((self.sigmas**2))
-        if return4by4:
-            rotation = from_2by2_to_4by4(rotation).to(self.device)
-            diagonal = from_2by2_to_4by4(diagonal).to(self.device)
+            diagonal = torch.diag_embed((self.sigmas**2))
+            if return4by4:
+                rotation = from_2by2_to_4by4(rotation).to(self.device)
+                diagonal = from_2by2_to_4by4(diagonal).to(self.device)
+        else:  # 3D case
+            # see: https://msl.cs.uiuc.edu/planning/node102.html
+            rotation_yaw = torch.stack(
+                (
+                    torch.stack(
+                        (
+                            torch.cos(self.rotation[..., 0]),
+                            -torch.sin(self.rotation[..., 0]),
+                            torch.zeros_like(self.rotation[..., 0]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            torch.sin(self.rotation[..., 0]),
+                            torch.cos(self.rotation[..., 0]),
+                            torch.zeros_like(self.rotation[..., 0]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            torch.zeros_like(self.rotation[..., 0]),
+                            torch.zeros_like(self.rotation[..., 0]),
+                            torch.ones_like(self.rotation[..., 0]),
+                        ),
+                        dim=-1,
+                    ),
+                ),
+                dim=-2,
+            )
+            rotation_pitch = torch.stack(
+                (
+                    torch.stack(
+                        (
+                            torch.cos(self.rotation[..., 1]),
+                            torch.zeros_like(self.rotation[..., 1]),
+                            torch.sin(self.rotation[..., 1]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            torch.zeros_like(self.rotation[..., 1]),
+                            torch.ones_like(self.rotation[..., 1]),
+                            torch.zeros_like(self.rotation[..., 1]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            -torch.sin(self.rotation[..., 1]),
+                            torch.zeros_like(self.rotation[..., 1]),
+                            torch.cos(self.rotation[..., 1]),
+                        ),
+                        dim=-1,
+                    ),
+                ),
+                dim=-2,
+            )
+            rotation_roll = torch.stack(
+                (
+                    torch.stack(
+                        (
+                            torch.ones_like(self.rotation[..., 2]),
+                            torch.zeros_like(self.rotation[..., 2]),
+                            torch.zeros_like(self.rotation[..., 2]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            torch.zeros_like(self.rotation[..., 2]),
+                            torch.cos(self.rotation[..., 2]),
+                            -torch.sin(self.rotation[..., 2]),
+                        ),
+                        dim=-1,
+                    ),
+                    torch.stack(
+                        (
+                            torch.zeros_like(self.rotation[..., 2]),
+                            torch.sin(self.rotation[..., 2]),
+                            torch.cos(self.rotation[..., 2]),
+                        ),
+                        dim=-1,
+                    ),
+                ),
+                dim=-2,
+            )
+            rotation = rotation_yaw @ rotation_pitch @ rotation_roll
+
+            diagonal = torch.diag_embed((self.sigmas**2))
+            if return4by4:
+                rotation = from_3by3_to_4by4(rotation).to(self.device)
+                diagonal = from_3by3_to_4by4(diagonal).to(self.device)
         covariance = rotation @ diagonal @ rotation.transpose(-2, -1)
         return covariance
 
@@ -200,21 +305,22 @@ class HeatmapGenerator:
         the image. Works with batches and multiple landmarks.
 
         Args:
-            landmarks (torch.Tensor): landmarks of shape (B, C, M, 2) or (B, C, 2)
+            landmarks (torch.Tensor): landmarks of shape (B, C, M, S) or (B, C, S)
             gamma (float or None): scaling factor of the heatmap function
             affine_matrix (torch.Tensor): affine matrix of shape (B, 1, 4, 4)
 
         Returns:
-            torch.Tensor: heatmap of shape (B, C, M, H, W) or (B, C, H, W)
+            torch.Tensor: heatmap of shape (B, C, M, H, W,) or (B, C, H, W) if landmarks are 2D
+                else (B, C, M, D, H, W) or (B, C, D, H, W) if landmarks are 3D
         """
         covariance = self.get_covariance_matrix(return4by4=True)
         covariance = affine_matrix @ covariance @ affine_matrix.transpose(-2, -1)
 
-        x = landmarks[..., 1]
-        y = landmarks[..., 0]
-        x_round = torch.round(x).int()
-        y_round = torch.round(y).int()
-        if self.full_map:
+        if self.spatial_dims == 2:
+            x = landmarks[..., 1]
+            y = landmarks[..., 0]
+            x_round = torch.round(x).int()
+            y_round = torch.round(y).int()
             xs = torch.arange(0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.device)
             ys = torch.arange(0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.device)
             xs, ys = torch.meshgrid(xs, ys, indexing="xy")
@@ -230,51 +336,32 @@ class HeatmapGenerator:
             heatmap = self.heatmap_fun(
                 torch.stack((y_t, x_t), -1), torch.stack((ys, xs), -1), covariance, gamma
             )
-            return heatmap
-        raise NotImplementedError()
-        # heatmap = torch.zeros((*landmarks.shape[:-1], *self.heatmap_size)).to(self.device)
-        # max_dist_x = torch.round(self.bound * sigmas[1]).int().to(self.device)
-        # max_dist_y = torch.round(self.bound * sigmas[0]).int().to(self.device)
-        # xs = torch.arange(0, 2 * max_dist_x + 1, 1, dtype=torch.float32, device=self.device)
-        # ys = torch.arange(0, 2 * max_dist_y + 1, 1, dtype=torch.float32, device=self.device)
-        # xs, ys = torch.meshgrid(xs, ys, indexing='xy')
-        # xs = xs.view(1, *xs.shape).repeat(*landmarks.shape[:-1], 1, 1)
-        # ys = ys.view(1, *ys.shape).repeat(*landmarks.shape[:-1], 1, 1)
-        # x_t, y_t = max_dist_x.float(), max_dist_y.float()
-        # if self.continuous:
-        #     x_t = x_t + (x - x_round)
-        #     y_t = y_t + (y - y_round)
-        # x_t = x_t.view(*landmarks.shape[:-1], 1, 1)
-        # y_t = y_t.view(*landmarks.shape[:-1], 1, 1)
-        # g = self.heatmap_fun(x_t, y_t, xs, ys, covariance, gamma)
-        # xs_min = torch.maximum(torch.tensor(
-        #     [0], device=self.device), x_round - max_dist_x).int()
-        # xs_max = torch.minimum(torch.tensor(
-        #     [self.heatmap_size[1]], device=self.device), x_round + max_dist_x + 1).int()
-        # ys_min = torch.maximum(torch.tensor(
-        #     [0], device=self.device), y_round - max_dist_y).int()
-        # ys_max = torch.minimum(torch.tensor(
-        #     [self.heatmap_size[0]], device=self.device), y_round + max_dist_y + 1).int()
-
-        # g_min_x, g_max_x = max_dist_x + xs_min - x_round, max_dist_x + xs_max - x_round
-        # g_min_y, g_max_y = max_dist_y + ys_min - y_round, max_dist_y + ys_max - y_round
-
-        # # all g's below epsilon are set to 0
-        # g[g < self.epsilon] = 0
-
-        # # Set heatmap to values, by looping through the batch
-        # for b in range(landmarks.shape[0]):
-        #     for c in range(landmarks.shape[1]):
-        #         if len(landmarks.shape) > 3:
-        #             for m in range(landmarks.shape[2]):
-        #                 heatmap[b, c, m, ys_min[b, c, m]:ys_max[b, c, m],
-        #                         xs_min[b, c, m]:xs_max[b, c, m]
-        #                         ] = g[b, g_min_y[b, c, m]:g_max_y[b, c, m],
-        #                               g_min_x[b, c, m]:g_max_x[b, c, m]]
-        #         else:
-        #             heatmap[b, c, ys_min[b, c]:ys_max[b, c], xs_min[b, c]:xs_max[b, c]
-        #                     ] = g[b, g_min_y[b, c]:g_max_y[b, c], g_min_x[b, c]:g_max_x[b, c]]
-        # return heatmap
+        else:
+            z = landmarks[..., 0]
+            y = landmarks[..., 1]
+            x = landmarks[..., 2]
+            z_round = torch.round(z).int()
+            y_round = torch.round(y).int()
+            x_round = torch.round(x).int()
+            zs = torch.arange(0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.device)
+            ys = torch.arange(0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.device)
+            xs = torch.arange(0, self.heatmap_size[2], 1, dtype=torch.float32, device=self.device)
+            zs, ys, xs = torch.meshgrid(zs, ys, xs, indexing="ij")
+            pre_shape = tuple(1 for _ in range(len(landmarks.shape[:-1])))
+            zs = zs.view(*pre_shape, *zs.shape).repeat(*landmarks.shape[:-1], 1, 1, 1)
+            ys = ys.view(*pre_shape, *ys.shape).repeat(*landmarks.shape[:-1], 1, 1, 1)
+            xs = xs.view(*pre_shape, *xs.shape).repeat(*landmarks.shape[:-1], 1, 1, 1)
+            if self.continuous:
+                z_t, y_t, x_t = z, y, x
+            else:
+                z_t, y_t, x_t = z_round, y_round, x_round
+            z_t = z_t.view(*landmarks.shape[:-1], 1, 1, 1)
+            y_t = y_t.view(*landmarks.shape[:-1], 1, 1, 1)
+            x_t = x_t.view(*landmarks.shape[:-1], 1, 1, 1)
+            heatmap = self.heatmap_fun(
+                torch.stack((z_t, y_t, x_t), -1), torch.stack((zs, ys, xs), -1), covariance, gamma
+            )
+        return heatmap
 
 
 class GaussianHeatmapGenerator(HeatmapGenerator):
@@ -289,7 +376,6 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         rotation (float or list[float] or torch.Tensor or np.ndarray): rotation of the gaussian
             heatmap function
         heatmap_size (tuple[int, int]): size of the heatmap
-        full_map (bool): whether to return the full heatmap or only the part around the landmark
         learnable (bool): whether the sigmas and rotation are learnable
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
@@ -303,8 +389,7 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         sigmas: float | list[float] | torch.Tensor | np.ndarray = 1.0,
         gamma: Optional[float] = None,
         rotation: float | list[float] | torch.Tensor | np.ndarray = 0,
-        heatmap_size: tuple[int, int] = (512, 512),
-        full_map: bool = True,
+        heatmap_size: tuple[int, ...] = (512, 512),
         learnable: bool = False,
         background: bool = False,
         all_points: bool = False,
@@ -317,7 +402,6 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
             gamma,
             rotation,
             heatmap_size,
-            full_map,
             learnable,
             background,
             all_points,
@@ -335,35 +419,55 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         """Gaussian heatmap function
 
         Args:
-            landmark_t (torch.Tensor): coordinates of the landmark (y, x)
-            coords (torch.Tensor): coordinates of the pixel (y, x)
-            covariance (torch.Tensor): covariance matrix (y, x)
+            landmark_t (torch.Tensor): coordinates of the landmark (y, x) or (z, y, x)
+            coords (torch.Tensor): coordinates of the pixel (y, x) or (z, y, x)
+            covariance (torch.Tensor): covariance matrix (y, x) or (z, y, x)
             gamma (float or None): scaling factor of the heatmap function
 
 
         Returns:
             torch.Tensor: value of the gaussian heatmap function for the given pixel
         """
-        if len(covariance.shape) == len(landmark_t.shape[:-1]):
-            inverse_covariance = torch.inverse(covariance[..., :2, :2]).unsqueeze(-3).unsqueeze(-3)
+        if len(covariance.shape) == len(landmark_t.shape[: -(self.spatial_dims - 1)]):
+            inverse_covariance = (
+                torch.inverse(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                .unsqueeze(-3)
+                .unsqueeze(-3)
+            )
         else:
             # multiple of the same landmarks
             inverse_covariance = (
-                torch.inverse(covariance[..., :2, :2]).unsqueeze(-3).unsqueeze(-3).unsqueeze(-3)
+                torch.inverse(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                .unsqueeze(-3)
+                .unsqueeze(-3)
+                .unsqueeze(-3)
             )
+        if self.spatial_dims == 3:
+            inverse_covariance = inverse_covariance.unsqueeze(-3)
         diff = (landmark_t - coords).unsqueeze(-2)
+        # if self.spatial_dims == 3:
+        #     assert False, f"diff shape: {diff.shape}" + f"inv shape: {inverse_covariance.shape}"
         if gamma is not None:
-            return (
-                gamma
-                / (2 * torch.pi * torch.sqrt(torch.det(covariance[..., :2, :2])))
-                .unsqueeze(-1)
-                .unsqueeze(-1)
-                * torch.exp(-0.5 * (diff @ inverse_covariance @ diff.transpose(-2, -1))).view(
-                    *landmark_t.shape[:-3], *coords.shape[-3:-1]
-                )
-            )
-        return torch.exp(-0.5 * (diff @ inverse_covariance @ diff.transpose(-2, -1))).view(
-            *landmark_t.shape[:-3], *coords.shape[-3:-1]
+            if self.spatial_dims == 2:
+                scale = gamma / (
+                    (2 * torch.pi) ** (self.spatial_dims / 2)
+                    * torch.sqrt(
+                        torch.det(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                    )
+                ).unsqueeze(-1).unsqueeze(-1)
+            else:
+                scale = gamma / (
+                    (2 * torch.pi) ** (self.spatial_dims / 2)
+                    * torch.sqrt(
+                        torch.det(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                    )
+                ).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
+
+        else:
+            scale = 1
+        return scale * torch.exp(-0.5 * (diff @ inverse_covariance @ diff.transpose(-2, -1))).view(
+            *landmark_t.shape[: -(self.spatial_dims + 1)],
+            *coords.shape[-(self.spatial_dims + 1) : -1],
         )
 
 
@@ -379,7 +483,6 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         rotation (float or list[float] or torch.Tensor or np.ndarray): rotation of the laplacian
             heatmap function
         heatmap_size (tuple[int, int]): size of the heatmap
-        full_map (bool): whether to return the full heatmap or only the part around the landmark
         learnable (bool): whether the sigmas and rotation are learnable
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
@@ -393,8 +496,7 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         sigmas: float | list[float] | torch.Tensor | np.ndarray = 1.0,
         gamma: Optional[float] = None,
         rotation: float | list[float] | torch.Tensor | np.ndarray = 0,
-        heatmap_size: tuple[int, int] = (512, 512),
-        full_map: bool = True,
+        heatmap_size: tuple[int, ...] = (512, 512),
         learnable: bool = False,
         background: bool = False,
         all_points: bool = False,
@@ -407,13 +509,14 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
             gamma,
             rotation,
             heatmap_size,
-            full_map,
             learnable,
             background,
             all_points,
             continuous,
             device,
         )
+        if self.spatial_dims != 2:
+            raise ValueError("Laplacian heatmap generator only works in 2D")
 
     def heatmap_fun(
         self,
@@ -435,11 +538,18 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
             torch.Tensor: value of the gaussian heatmap function for the given pixel
         """
         if len(covariance.shape) == len(landmark_t.shape[:-1]):
-            inverse_covariance = torch.inverse(covariance[..., :2, :2]).unsqueeze(-3).unsqueeze(-3)
+            inverse_covariance = (
+                torch.inverse(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                .unsqueeze(-(self.spatial_dims + 1))
+                .unsqueeze(-(self.spatial_dims + 1))
+            )
         else:
             # multiple of the same landmarks
             inverse_covariance = (
-                torch.inverse(covariance[..., :2, :2]).unsqueeze(-3).unsqueeze(-3).unsqueeze(-3)
+                torch.inverse(covariance[..., : self.spatial_dims, : self.spatial_dims])
+                .unsqueeze(-(self.spatial_dims + 1))
+                .unsqueeze(-(self.spatial_dims + 1))
+                .unsqueeze(-(self.spatial_dims + 1))
             )
         diff = (landmark_t - coords).unsqueeze(-2)
         if gamma is not None:
