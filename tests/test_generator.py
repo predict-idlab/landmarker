@@ -151,7 +151,6 @@ def test_gaussian_heatmap_generator():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -203,7 +202,6 @@ def test_gaussian_heatmap_generator_multiple_instances():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -255,7 +253,6 @@ def test_gaussian_heatmap_generator_multiple_instances_with_nan():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -292,7 +289,6 @@ def test_gaussian_heatmap_generator_learnable():
         heatmap_size=(64, 64),
         learnable=True,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -320,7 +316,6 @@ def test_gaussian_heatmap_generator_background():
         learnable=True,
         gamma=None,
         background=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -352,7 +347,6 @@ def test_gaussian_heatmap_generator_all_points():
         gamma=None,
         background=False,
         all_points=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -385,7 +379,6 @@ def test_gaussian_heatmap_generator_not_continuous():
         learnable=False,
         gamma=None,
         continuous=False,
-        device="cpu",
     )
 
     # Call the generator method
@@ -420,7 +413,6 @@ def test_gaussian_heatmap_generator_assymetric_sigmas():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -479,7 +471,6 @@ def test_gaussian_heatmap_generator_rotation():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -539,7 +530,6 @@ def test_gaussian_heatmap_generator_adaptive():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Change sigmas and rotation
@@ -587,7 +577,6 @@ def test_gaussian_heatmap_generator_affine():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Set affine matrix
@@ -719,7 +708,6 @@ def test_gaussian_heatmap_generator_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=1.0,
-        device="cpu",
     )
 
     # Call generator method
@@ -737,7 +725,6 @@ def test_gaussian_heatmap_generator_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     heatmaps = generator(landmarks_3d)
@@ -781,7 +768,6 @@ def test_gaussian_heatmap_generator_multiple_instances_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -829,7 +815,6 @@ def test_gaussian_heatmap_generator_multiple_instances_with_nan_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -877,7 +862,6 @@ def test_gaussian_heatmap_generator_learnable_3d():
         heatmap_size=(64, 64, 64),
         learnable=True,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -924,7 +908,6 @@ def test_gaussian_heatmap_generator_background_3d():
         learnable=False,
         gamma=None,
         background=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -971,7 +954,6 @@ def test_gaussian_heatmap_generator_all_points_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
         all_points=True,
     )
 
@@ -1025,7 +1007,6 @@ def test_gaussian_heatmap_generator_not_continuous_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1061,7 +1042,6 @@ def test_gaussian_heatmap_generator_asymmetric_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1158,7 +1138,6 @@ def test_gaussian_heatmap_generator_affine_3d():
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Set affine matrix
@@ -1199,7 +1178,6 @@ def test_laplacian_heatmap_generator():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -1242,7 +1220,6 @@ def test_laplacian_heatmap_generator_with_gamma():
             heatmap_size=(64, 64),
             learnable=False,
             gamma=gamma,
-            device="cpu",
         )
 
         # Call the generator method
@@ -1293,7 +1270,6 @@ def test_laplacian_heatmap_generator_subpixel():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1319,7 +1295,6 @@ def test_laplacian_heatmap_generator_learnable():
         heatmap_size=(64, 64),
         learnable=True,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1347,7 +1322,6 @@ def test_laplacian_heatmap_generator_background():
         learnable=True,
         gamma=None,
         background=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1379,7 +1353,6 @@ def test_laplacian_heatmap_generator_all_points():
         gamma=None,
         background=False,
         all_points=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1412,7 +1385,6 @@ def test_laplacian_heatmap_generator_not_continuous():
         learnable=False,
         gamma=None,
         continuous=False,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1447,7 +1419,6 @@ def test_laplacian_heatmap_generator_assymetric_sigmas():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -1506,7 +1477,6 @@ def test_laplacian_heatmap_generator_rotation():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -1566,7 +1536,6 @@ def test_laplacian_heatmap_generator_adaptive():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Change sigmas and rotation
@@ -1614,7 +1583,6 @@ def test_laplacian_heatmap_generator_affine():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Set affine matrix

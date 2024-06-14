@@ -674,9 +674,8 @@ def coord_cov_from_gaussian_ls_scipy(
             1,
             gamma=gamma,
             heatmap_size=(heatmap.shape[-2], heatmap.shape[-1]),
-            device=heatmap.device,
             learnable=False,
-        )
+        ).to(heatmap.device)
 
         def fun_to_minimize(x):
             gaussian_generator.set_sigmas(x[:2])
@@ -773,9 +772,8 @@ def cov_from_gaussian_ls_scipy(
             1,
             gamma=gamma,
             heatmap_size=(heatmap.shape[-2], heatmap.shape[-1]),
-            device=heatmap.device,
             learnable=False,
-        )
+        ).to(heatmap.device)
 
         def fun_to_minimize(x):
             gaussian_generator.set_sigmas(x[:2])

@@ -5,8 +5,6 @@ The three classes are subclasses of ``torch.utils.data.Dataset``.
 
 from typing import Callable, Optional
 
-import cv2
-import monai
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -40,7 +38,8 @@ class LandmarkDataset(Dataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
+            or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)
@@ -115,7 +114,7 @@ class LandmarkDataset(Dataset):
         self, pixel_spacing: Optional[list[int] | tuple[int, ...] | np.ndarray | torch.Tensor]
     ) -> None:
         if pixel_spacing is not None:
-            if isinstance(pixel_spacing, (tuple, list)) or len(pixel_spacing.shape) == 1:
+            if isinstance(pixel_spacing, (tuple, list)):
                 assert (
                     len(pixel_spacing) == self.spatial_dims
                 ), f"pixel_spacing must be of shape {self.spatial_dims}"
@@ -124,6 +123,14 @@ class LandmarkDataset(Dataset):
                 )
             elif pixel_spacing.shape == (len(self.landmarks_original), self.spatial_dims):
                 self.pixel_spacings = torch.Tensor(pixel_spacing)
+            elif pixel_spacing.shape == (self.spatial_dims,):
+                self.pixel_spacings = (
+                    torch.Tensor(pixel_spacing).unsqueeze(0).repeat(len(self.landmarks_original), 1)
+                )
+            elif pixel_spacing.shape == (len(self.landmarks_original),):
+                self.pixel_spacings = (
+                    torch.Tensor(pixel_spacing).unsqueeze(1).repeat(1, self.spatial_dims)
+                )
             else:
                 raise ValueError(
                     f"Pixel_spacing must be of shape (N, {self.spatial_dims}) or "
@@ -201,16 +208,7 @@ class LandmarkDataset(Dataset):
     def __len__(self) -> int:
         return len(self.landmarks_original) * self.ds_size_factor
 
-    def __getitem__(self, idx: int) -> tuple[
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-    ]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         flip_code = idx % self.ds_size_factor
         idx = idx // self.ds_size_factor
         if not self.store_imgs:
@@ -264,16 +262,14 @@ class LandmarkDataset(Dataset):
             landmark_t = landmark
             affine_matrix = torch.eye(4)
 
-        return (
-            img,
-            landmark_t,
-            affine_matrix,
-            landmark,
-            self.landmarks_original[idx],
-            dim_original,
-            self.pixel_spacings[idx],
-            padding,
-        )
+        return {
+            "image": img,
+            "landmark": landmark_t,
+            "affine": affine_matrix,
+            "dim_original": dim_original,
+            "spacing": self.pixel_spacings[idx],
+            "padding": padding,
+        }
 
     def _transform_img_landmark(
         self, img: torch.Tensor, landmark: torch.Tensor, transform: Compose
@@ -308,7 +304,7 @@ class LandmarkDataset(Dataset):
             imgs (list[torch.Tensor]): list of images.
             dim_original (torch.Tensor): original dimensions of the images.
         """
-        print(f"Reading and normalizing {len(paths)} images...")
+        print(f"Reading {len(paths)} images...")
         imgs = []
         dim_original = torch.zeros((len(paths), self.spatial_dims))
         for i, path in enumerate(tqdm(paths)):
@@ -318,7 +314,7 @@ class LandmarkDataset(Dataset):
         return imgs, dim_original
 
     def _resize_all_imgs_landmarks(
-        self, imgs: list[torch.Tensor], landmarks: torch.Tensor, dim_img: tuple[int, int]
+        self, imgs: list[torch.Tensor], landmarks: torch.Tensor, dim_img: tuple[int, ...]
     ) -> tuple[list[torch.Tensor], torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Resize all images in ``imgs`` and resize all landmarks in ``landmarks``.
@@ -364,7 +360,8 @@ class MaskDataset(LandmarkDataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
+            or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)
@@ -453,17 +450,7 @@ class MaskDataset(LandmarkDataset):
         else:
             raise ValueError("Either mask_paths or landmarks must be provided")
 
-    def __getitem__(self, idx: int) -> tuple[  # type: ignore
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-    ]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         flip_code = idx % self.ds_size_factor
         idx = idx // self.ds_size_factor
         if not self.store_masks_imgs:
@@ -540,17 +527,15 @@ class MaskDataset(LandmarkDataset):
         else:
             landmark_t = landmark
             affine_matrix = torch.eye(4)
-        return (
-            img,
-            mask,
-            landmark_t,
-            affine_matrix,
-            landmark,
-            self.landmarks_original[idx],
-            self.dim_original[idx],
-            self.pixel_spacings[idx],
-            padding,
-        )
+        return {
+            "image": img,
+            "mask": mask,
+            "landmark": landmark_t,
+            "affine": affine_matrix,
+            "dim_original": self.dim_original[idx],
+            "spacing": self.pixel_spacings[idx],
+            "padding": padding,
+        }
 
     def _transform_img_mask_landmark(
         self, img: torch.Tensor, mask: torch.Tensor, landmark: torch.Tensor, transform: Callable
@@ -733,7 +718,7 @@ class MaskDataset(LandmarkDataset):
         return landmarks
 
     def _read_extract_resize_masks_landmarks(
-        self, paths: list[str], dim: tuple[int, int]
+        self, paths: list[str], dim: tuple[int, ...]
     ) -> tuple[list[torch.Tensor], torch.Tensor]:
         """
         Read masks, extract landmarks from these masks and resize the masks and the landmarks.
@@ -767,7 +752,7 @@ class MaskDataset(LandmarkDataset):
         return masks, torch.stack(landmarks)
 
     def _read_extract_resize_mask_landmark(
-        self, path: str, dim: tuple[int, int]
+        self, path: str, dim: tuple[int, ...]
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Read a mask, extract the landmark from this mask and resize the mask.
@@ -799,7 +784,8 @@ class HeatmapDataset(LandmarkDataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
+            or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)
@@ -895,7 +881,6 @@ class HeatmapDataset(LandmarkDataset):
                 gamma=gamma,
                 heatmap_size=heatmap_size,
                 learnable=False,
-                device="cpu",
                 background=background,
                 all_points=all_points,
             )
@@ -906,7 +891,6 @@ class HeatmapDataset(LandmarkDataset):
                 gamma=gamma,
                 heatmap_size=heatmap_size,
                 learnable=False,
-                device="cpu",
                 background=background,
                 all_points=all_points,
             )
@@ -919,17 +903,7 @@ class HeatmapDataset(LandmarkDataset):
         if self.store_imgs:
             self.heatmaps = self._create_heatmaps_batch(self.landmarks)
 
-    def __getitem__(self, idx: int) -> tuple[  # type: ignore[override]
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-    ]:
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         flip_code = idx % self.ds_size_factor
         idx = idx // self.ds_size_factor
         if self.store_imgs:
@@ -994,17 +968,15 @@ class HeatmapDataset(LandmarkDataset):
         else:
             landmark_t = landmark
             affine_matrix = torch.eye(4)
-        return (
-            img,
-            heatmap,
-            landmark_t,
-            affine_matrix,
-            landmark,
-            self.landmarks_original[idx],
-            dim_original,
-            self.pixel_spacings[idx],
-            padding,
-        )
+        return {
+            "image": img,
+            "heatmap": heatmap,
+            "landmark": landmark_t,
+            "affine": affine_matrix,
+            "dim_original": dim_original,
+            "spacing": self.pixel_spacings[idx],
+            "padding": padding,
+        }
 
     def _transform_img_heatmap_landmark(
         self, img: torch.Tensor, heatmap: torch.Tensor, landmark: torch.Tensor, transform: Callable

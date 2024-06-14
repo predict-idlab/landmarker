@@ -5,10 +5,10 @@ from typing import Optional
 
 import numpy as np
 import torch
-from typing_extensions import Self
+from torch import nn
 
 
-class HeatmapGenerator:
+class HeatmapGenerator(nn.Module):
     """
     Heatmap generator abstract class for generating heatmaps from landmarks
 
@@ -23,7 +23,6 @@ class HeatmapGenerator:
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
-        device (str): device to use for the heatmap generator
     """
 
     def __init__(
@@ -37,17 +36,14 @@ class HeatmapGenerator:
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
-        device: str | torch.device = "cpu",
     ) -> None:
+        super(HeatmapGenerator, self).__init__()
         self.nb_landmarks = nb_landmarks
         self.learnable = learnable
-        self.device = device
         self.heatmap_size = heatmap_size
         self.spatial_dims = len(heatmap_size)
         self.set_sigmas(sigmas)
         self.set_rotation(rotation)
-        self.sigmas: torch.Tensor = self.sigmas.to(device)
-        self.rotation: torch.Tensor = self.rotation.to(device)
         self.gamma = gamma
         self.background = background
         self.all_points = all_points
@@ -63,20 +59,26 @@ class HeatmapGenerator:
             sigmas (float or list[float] or torch.Tensor or np.ndarray): sigmas of the heatmap
                 function
         """
+        if isinstance(sigmas, torch.Tensor):
+            device = sigmas.device
+        else:
+            device = torch.device("cpu")
         sigmas = torch.tensor(
-            sigmas, device=self.device, dtype=torch.float, requires_grad=self.learnable
+            sigmas, device=device, dtype=torch.float, requires_grad=self.learnable
         )
-        self.sigmas = (
+        sigmas = (
             torch.ones(
                 (self.nb_landmarks, self.spatial_dims),
                 requires_grad=self.learnable,
-                device=self.device,
+                device=device,
                 dtype=torch.float,
             )
             * sigmas
         )
         if self.learnable:
-            self.sigmas = torch.nn.Parameter(self.sigmas)
+            self.sigmas = torch.nn.Parameter(sigmas)
+        else:
+            self.register_buffer("sigmas", sigmas)
 
     def set_rotation(self, rotation: float | list[float] | torch.Tensor | np.ndarray) -> None:
         """
@@ -86,43 +88,39 @@ class HeatmapGenerator:
             rotation (float or list[float] or torch.Tensor or np.ndarray): rotation of the heatmap
                 function
         """
+        if hasattr(self, "sigmas"):
+            device = self.sigmas.device
+        elif isinstance(rotation, torch.Tensor):
+            device = rotation.device
+        else:
+            device = torch.device("cpu")
         rotation = torch.tensor(
-            rotation, device=self.device, dtype=torch.float, requires_grad=self.learnable
+            rotation, device=device, dtype=torch.float, requires_grad=self.learnable
         )
         if self.spatial_dims == 2:
-            self.rotation = (
+            rotation = (
                 torch.ones(
                     (self.nb_landmarks,),
                     requires_grad=self.learnable,
-                    device=self.device,
+                    device=device,
                     dtype=torch.float,
                 )
                 * rotation
             )
         else:
-            self.rotation = (
+            rotation = (
                 torch.ones(
                     (self.nb_landmarks, self.spatial_dims),
                     requires_grad=self.learnable,
-                    device=self.device,
+                    device=device,
                     dtype=torch.float,
                 )
                 * rotation
             )
         if self.learnable:
-            self.rotation = torch.nn.Parameter(self.rotation)
-
-    def to(self, device: str | torch.device) -> Self:
-        """
-        Move the heatmap generator to a given device.
-
-        Args:
-            device (str): device to move the heatmap generator to
-        """
-        self.device = device
-        self.sigmas = self.sigmas.to(device)
-        self.rotation = self.rotation.to(device)
-        return self
+            self.rotation = torch.nn.Parameter(rotation)
+        else:
+            self.register_buffer("rotation", rotation)
 
     def __call__(
         self, landmarks: torch.Tensor, affine_matrix: torch.Tensor = torch.eye(4)
@@ -136,9 +134,9 @@ class HeatmapGenerator:
         elif affine_matrix.shape[-1] == 3:
             # go from 3 by 3 affine matrix to 4 by 4
             affine_matrix = from_3by3_to_4by4(affine_matrix)
-        affine_matrix = affine_matrix.to(self.device).unsqueeze(1)
-        heatmaps = torch.zeros((landmarks.shape[0], landmarks.shape[1], *self.heatmap_size)).to(
-            self.device
+        affine_matrix = affine_matrix.unsqueeze(1)
+        heatmaps = torch.zeros(
+            (landmarks.shape[0], landmarks.shape[1], *self.heatmap_size), device=self.sigmas.device
         )
         if len(landmarks.shape) == 2:
             heatmaps = self.create_heatmap(landmarks.unsqueeze(1), self.gamma, affine_matrix)
@@ -151,7 +149,9 @@ class HeatmapGenerator:
         elif self.background:
             heatmaps = torch.cat(
                 (
-                    torch.ones((heatmaps.shape[0], 1, *self.heatmap_size), device=self.device)
+                    torch.ones(
+                        (heatmaps.shape[0], 1, *self.heatmap_size), device=self.sigmas.device
+                    )
                     - heatmaps.sum(dim=1, keepdim=True),
                     heatmaps,
                 ),
@@ -198,8 +198,8 @@ class HeatmapGenerator:
 
             diagonal = torch.diag_embed((self.sigmas**2))
             if return4by4:
-                rotation = from_2by2_to_4by4(rotation).to(self.device)
-                diagonal = from_2by2_to_4by4(diagonal).to(self.device)
+                rotation = from_2by2_to_4by4(rotation)
+                diagonal = from_2by2_to_4by4(diagonal)
         else:  # 3D case
             # see: https://msl.cs.uiuc.edu/planning/node102.html
             rotation_yaw = torch.stack(
@@ -293,8 +293,8 @@ class HeatmapGenerator:
 
             diagonal = torch.diag_embed((self.sigmas**2))
             if return4by4:
-                rotation = from_3by3_to_4by4(rotation).to(self.device)
-                diagonal = from_3by3_to_4by4(diagonal).to(self.device)
+                rotation = from_3by3_to_4by4(rotation)
+                diagonal = from_3by3_to_4by4(diagonal)
         covariance = rotation @ diagonal @ rotation.transpose(-2, -1)
         return covariance
 
@@ -321,8 +321,12 @@ class HeatmapGenerator:
             y = landmarks[..., 0]
             x_round = torch.round(x).int()
             y_round = torch.round(y).int()
-            xs = torch.arange(0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.device)
-            ys = torch.arange(0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.device)
+            xs = torch.arange(
+                0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.sigmas.device
+            )
+            ys = torch.arange(
+                0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.sigmas.device
+            )
             xs, ys = torch.meshgrid(xs, ys, indexing="xy")
             pre_shape = tuple(1 for _ in range(len(landmarks.shape[:-1])))
             xs = xs.view(*pre_shape, *xs.shape).repeat(*landmarks.shape[:-1], 1, 1)
@@ -343,9 +347,15 @@ class HeatmapGenerator:
             z_round = torch.round(z).int()
             y_round = torch.round(y).int()
             x_round = torch.round(x).int()
-            zs = torch.arange(0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.device)
-            ys = torch.arange(0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.device)
-            xs = torch.arange(0, self.heatmap_size[2], 1, dtype=torch.float32, device=self.device)
+            zs = torch.arange(
+                0, self.heatmap_size[0], 1, dtype=torch.float32, device=self.sigmas.device
+            )
+            ys = torch.arange(
+                0, self.heatmap_size[1], 1, dtype=torch.float32, device=self.sigmas.device
+            )
+            xs = torch.arange(
+                0, self.heatmap_size[2], 1, dtype=torch.float32, device=self.sigmas.device
+            )
             zs, ys, xs = torch.meshgrid(zs, ys, xs, indexing="ij")
             pre_shape = tuple(1 for _ in range(len(landmarks.shape[:-1])))
             zs = zs.view(*pre_shape, *zs.shape).repeat(*landmarks.shape[:-1], 1, 1, 1)
@@ -380,7 +390,6 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
-        device (str): device to use for the heatmap generator
     """
 
     def __init__(
@@ -394,9 +403,8 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
-        device: str | torch.device = "cpu",
     ) -> None:
-        super().__init__(
+        super(GaussianHeatmapGenerator, self).__init__(
             nb_landmarks,
             sigmas,
             gamma,
@@ -406,7 +414,6 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
             background,
             all_points,
             continuous,
-            device,
         )
 
     def heatmap_fun(
@@ -487,7 +494,6 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
-        device (str): device to use for the heatmap generator
     """
 
     def __init__(
@@ -501,9 +507,8 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
-        device: str | torch.device = "cpu",
     ) -> None:
-        super().__init__(
+        super(LaplacianHeatmapGenerator, self).__init__(
             nb_landmarks,
             sigmas,
             gamma,
@@ -513,7 +518,6 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
             background,
             all_points,
             continuous,
-            device,
         )
         if self.spatial_dims != 2:
             raise ValueError("Laplacian heatmap generator only works in 2D")

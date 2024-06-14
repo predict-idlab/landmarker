@@ -32,7 +32,6 @@ def create_heatmap(subpixel=False, sigmas=1.0, rotations=0.0, return_covs=False,
         heatmap_size=(64, 64),
         learnable=False,
         gamma=gamma,
-        device="cpu",
     )
 
     # Create some example input data
@@ -59,7 +58,6 @@ def create_3d_heatmap(subpixel=False, sigmas=1.0, rotations=0.0, return_covs=Fal
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=gamma,
-        device="cpu",
     )
 
     # Create some example input data
@@ -88,7 +86,6 @@ def create_batch_of_heatmaps(
         heatmap_size=(64, 64),
         learnable=False,
         gamma=gamma,
-        device="cpu",
     )
 
     landmarks_batch = torch.tensor(
@@ -124,7 +121,6 @@ def create_batch_of_3d_heatmaps(
         heatmap_size=(64, 64, 64),
         learnable=False,
         gamma=gamma,
-        device="cpu",
     )
 
     landmarks_batch = torch.tensor(

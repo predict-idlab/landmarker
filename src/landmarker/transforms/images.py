@@ -7,10 +7,32 @@ import torchvision.transforms as T  # type: ignore
 
 
 def resize_with_pad(
-    images: torch.Tensor, dim: tuple[int, int]
-) -> tuple[torch.Tensor, tuple[int, int]]:
+    images: torch.Tensor, dim: tuple[int, ...], spatial_dims: int = 2
+) -> tuple[torch.Tensor, tuple[int, ...]]:
     """
     Resize images to ``dim`` and pad them to preserve the aspect ratio.
+        source: https://github.com/pytorch/vision/issues/6236
+
+    Args:
+        images (torch.Tensor): images to resize and pad.
+        dim (tuple[int, int]): dimension of the images.
+
+    Returns:
+        images (torch.Tensor): resized and padded images.
+        padding (tuple[int, int]): padding applied to the images.
+    """
+    if spatial_dims == 2 and len(dim) == 2:
+        return resize_with_pad_2d(images, dim)
+    elif spatial_dims == 3 and len(dim) == 3:
+        return resize_with_pad_3d(images, dim)
+    raise ValueError("spatial_dims must be 2 or 3.")
+
+
+def resize_with_pad_2d(
+    images: torch.Tensor, dim: tuple[int, ...]
+) -> tuple[torch.Tensor, tuple[int, int]]:
+    """
+    Resize 2D images to ``dim`` and pad them to preserve the aspect ratio.
         source: https://github.com/pytorch/vision/issues/6236
 
     Args:
@@ -41,3 +63,15 @@ def resize_with_pad(
             images = T.functional.pad(images, (0, h_padding), 0, "constant")
             return T.functional.resize(images, (h, w)), (h_padding, 0)
     return T.functional.resize(images, (h, w)), (0, 0)
+
+
+def resize_with_pad_3d(
+    images: torch.Tensor, dim: tuple[int, ...]
+) -> tuple[torch.Tensor, tuple[int, int, int]]:
+    """
+    Resize 3D images to ``dim`` and pad them to preserve the aspect ratio.
+    """
+    # d_orig, h_orig, w_orig = images.shape[-3], images.shape[-2], images.shape[-1]
+    # d, h, w = dim[0], dim[1], dim[2]
+
+    raise NotImplementedError("3D image resizing is not implemented yet.")
