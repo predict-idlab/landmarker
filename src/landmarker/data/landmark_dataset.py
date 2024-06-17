@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torchvision.transforms as T  # type: ignore
-from monai.transforms import Compose, Flip, LoadImage  # type: ignore
+from monai.transforms import Compose, Flip, LoadImage, Transpose  # type: ignore
 from torch.utils.data import Dataset
 from tqdm import tqdm  # type: ignore
 
@@ -76,8 +76,20 @@ class LandmarkDataset(Dataset):
         self.transform = transform
         self.store_imgs = store_imgs
         self.dim_img = dim_img
-        self.image_loader = LoadImage(image_only=True, ensure_channel_first=True)
-
+        if self.spatial_dims == 2:
+            self.image_loader = Compose(
+                [
+                    LoadImage(image_only=True, ensure_channel_first=True),
+                    Transpose(indices=[0, 2, 1]),
+                ]
+            )
+        else:
+            self.image_loader = Compose(
+                [
+                    LoadImage(image_only=True, ensure_channel_first=True),
+                    Transpose(indices=[0, 3, 2, 1]),
+                ]
+            )
         self._init_landmarks(landmarks, class_names)
         self._init_flip_aug(flip_aug_h, flip_aug_v, flip_indices_h, flip_indices_v)
         self._init_imgs(imgs, img_paths)
@@ -401,7 +413,21 @@ class MaskDataset(LandmarkDataset):
         self.dim_img = dim_img
         self.resize_pad = resize_pad
         self.store_masks_imgs = store_masks_imgs
-        self.mask_loader = LoadImage(image_only=True, ensure_channel_first=True)
+        self.spatial_dims = spatial_dims
+        if self.spatial_dims == 2:
+            self.mask_loader = Compose(
+                [
+                    LoadImage(image_only=True, ensure_channel_first=True),
+                    Transpose(indices=[0, 2, 1]),
+                ]
+            )
+        else:
+            self.mask_loader = Compose(
+                [
+                    LoadImage(image_only=True, ensure_channel_first=True),
+                    Transpose(indices=[0, 3, 2, 1]),
+                ]
+            )
         store_imgs = store_masks_imgs
         if self.mask_paths is None and landmarks is not None:
             super().__init__(

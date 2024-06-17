@@ -48,8 +48,6 @@ class HeatmapGenerator(nn.Module):
         self.background = background
         self.all_points = all_points
         self.continuous = continuous
-        self.bound = 3
-        self.epsilon = 1e-2
 
     def set_sigmas(self, sigmas: float | list[float] | torch.Tensor | np.ndarray) -> None:
         """
@@ -125,6 +123,7 @@ class HeatmapGenerator(nn.Module):
     def __call__(
         self, landmarks: torch.Tensor, affine_matrix: torch.Tensor = torch.eye(4)
     ) -> torch.Tensor:
+        affine_matrix = affine_matrix.to(landmarks.device)
         assert affine_matrix.shape[-1] == affine_matrix.shape[-2]
         if len(affine_matrix.shape) == 2:
             affine_matrix = affine_matrix.unsqueeze(0)
