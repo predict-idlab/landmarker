@@ -13,6 +13,7 @@ from landmarker.heatmap.generator import (
     HeatmapGenerator,
     LaplacianHeatmapGenerator,
 )
+from landmarker.models.utils import SoftmaxND
 
 
 class GeneralizedNormalHeatmapLoss(nn.Module):
@@ -88,18 +89,18 @@ class GaussianHeatmapL2Loss(nn.Module):
     Loss function for Gaussian heatmap regression.
     source: http://arxiv.org/abs/2109.09533"""
 
-    def __init__(self, alpha=5, reduction="mean", spatial_dim=2):
+    def __init__(self, alpha=5, reduction="mean", spatial_dims=2):
         super(GaussianHeatmapL2Loss, self).__init__()
         self.alpha = alpha
         self.reduction = reduction
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
-        self.spatial_dim = spatial_dim
-        if spatial_dim not in [2, 3]:
-            raise ValueError("spatial_dim must be 2 or 3")
+        self.spatial_dims = spatial_dims
+        if spatial_dims not in [2, 3]:
+            raise ValueError("spatial_dims must be 2 or 3")
 
     def forward(self, heatmap, sigmas, heatmap_target):
-        if self.spatial_dim == 2:
+        if self.spatial_dims == 2:
             loss = F.mse_loss(heatmap, heatmap_target, reduction="sum") / heatmap.shape[
                 0
             ] + self.alpha * torch.sum((sigmas[:, 0] * sigmas[:, 1]))
@@ -137,7 +138,7 @@ class EuclideanDistanceVarianceReg(nn.Module):
         var_t: float = 1.0,
         reduction: str = "mean",
         eps: float = 1e-6,
-        spatial_dim=2,
+        spatial_dims=2,
     ) -> None:
         super().__init__()
         self.alpha = alpha
@@ -146,9 +147,9 @@ class EuclideanDistanceVarianceReg(nn.Module):
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
         self.eps = eps
-        self.spatial_dim = spatial_dim
-        if spatial_dim not in [2, 3]:
-            raise ValueError("spatial_dim must be 2 or 3")
+        self.spatial_dims = spatial_dims
+        if spatial_dims not in [2, 3]:
+            raise ValueError("spatial_dims must be 2 or 3")
 
     def forward(self, pred: torch.Tensor, cov: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
@@ -157,7 +158,7 @@ class EuclideanDistanceVarianceReg(nn.Module):
             cov (torch.Tensor): Related covariance matrix of the predicted coordinates.
             target (torch.Tensor): Target coordinates.
         """
-        if self.spatial_dim == 2:
+        if self.spatial_dims == 2:
             reg = (cov[..., 0, 0] - self.var_t) ** 2 + (cov[..., 1, 1] - self.var_t) ** 2
         else:
             reg = (
@@ -226,8 +227,8 @@ class EuclideanDistanceJSDivergenceReg(nn.Module):
             raise ValueError(f"Invalid reduction: {reduction}")
         self.eps = eps
         self.heatmap_fun: HeatmapGenerator
-        self.spatial_dim = len(heatmap_size)
-        if self.spatial_dim != 2:
+        self.spatial_dims = len(heatmap_size)
+        if self.spatial_dims != 2:
             raise ValueError("Only 2D heatmaps are supported.")
         if heatmap_fun == "gaussian":
             self.heatmap_fun = GaussianHeatmapGenerator(
@@ -288,13 +289,13 @@ class MultivariateGaussianNLLLoss(nn.Module):
         eps (float, optional): Epsilon value to avoid division by zero. Defaults to 1e-6.
     """
 
-    def __init__(self, reduction: str = "mean", eps: float = 1e-6, spatial_dim: int = 2):
+    def __init__(self, reduction: str = "mean", eps: float = 1e-6, spatial_dims: int = 2):
         super().__init__()
         self.reduction = reduction
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
         self.eps = eps
-        self.spatial_dim = spatial_dim
+        self.spatial_dims = spatial_dims
 
     def forward(self, pred: torch.Tensor, cov: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
@@ -347,7 +348,7 @@ class WingLoss(nn.Module):
     """
 
     def __init__(
-        self, omega: float = 5.0, epsilon: float = 0.5, reduction: str = "mean", spatial_dim=2
+        self, omega: float = 5.0, epsilon: float = 0.5, reduction: str = "mean", spatial_dims=2
     ):
         super().__init__()
         self.omega = omega
@@ -356,8 +357,8 @@ class WingLoss(nn.Module):
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
         self.c = self.omega * (1 - np.log(1 + self.omega / self.epsilon))
-        self.spatial_dim = spatial_dim
-        if self.spatial_dim == 2:
+        self.spatial_dims = spatial_dims
+        if self.spatial_dims == 2:
             raise ValueError("Only 2D heatmaps are supported.")
 
     def forward(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
@@ -415,7 +416,7 @@ class AdaptiveWingLoss(nn.Module):
         alpha: float = 2.1,
         theta: float = 0.5,
         reduction: str = "mean",
-        spatial_dim=2,
+        spatial_dims=2,
     ) -> None:
         super().__init__()
         self.omega = omega
@@ -425,8 +426,8 @@ class AdaptiveWingLoss(nn.Module):
         self.reduction = reduction
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
-        self.spatial_dim = spatial_dim
-        if self.spatial_dim != 2:
+        self.spatial_dims = spatial_dims
+        if self.spatial_dims != 2:
             raise ValueError("Only 2D heatmaps are supported.")
 
     def forward(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
@@ -482,7 +483,7 @@ class StarLoss(nn.Module):
         distance: str = "l2",
         epsilon: float = 1e-5,
         reduction: str = "mean",
-        spatial_dim=2,
+        spatial_dims=2,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -491,7 +492,7 @@ class StarLoss(nn.Module):
         if reduction not in ["mean", "sum", "none"]:
             raise ValueError(f"Invalid reduction: {reduction}")
         self.distance = distance
-        self.spatial_dim = spatial_dim
+        self.spatial_dims = spatial_dims
         if self.distance == "l2":
             self.dist_func = lambda x, y: F.mse_loss(x, y, reduction="sum")
         elif self.distance == "l1":
@@ -512,7 +513,7 @@ class StarLoss(nn.Module):
         eig_values, eig_vecs = torch.linalg.eig(cov)
         eig_values = eig_values.float()
         eig_vecs = eig_vecs.float()
-        if self.spatial_dim == 2:
+        if self.spatial_dims == 2:
             loss = (1 / torch.sqrt(eig_values[..., 0]) + self.epsilon) * self.dist_func(
                 eig_vecs[..., 0].unsqueeze(-2) @ pred.unsqueeze(-1),
                 eig_vecs[..., 0].unsqueeze(-2) @ target.unsqueeze(-1),
@@ -544,6 +545,44 @@ class StarLoss(nn.Module):
         elif self.reduction == "sum":
             loss = torch.sum(loss)
         return loss
+
+
+class NLLLoss(nn.Module):
+    """Negative log-likelihood loss for 2D/3D heatmaps. Assumes that the input is a probability
+    distribution and calculates the negative log-likelihood of the predicted heatmap given the
+    target heatmap.
+
+    Args:
+        spatial_dims (int, optional): Spatial dimension of the heatmaps. Defaults to 2.
+        reduction (str, optional): Specifies the reduction to apply to the output. Defaults to
+            'mean'.
+    """
+
+    def __init__(self, spatial_dims: int = 2, apply_softmax: bool = True, reduction: str = "mean"):
+        super().__init__()
+        self.spatial_dims = spatial_dims
+        self.apply_softmax = apply_softmax
+        if self.apply_softmax:
+            self.softmax = SoftmaxND(spatial_dims)
+        if spatial_dims not in [2, 3]:
+            raise ValueError("spatial_dims must be 2 or 3")
+        self.reduction = reduction
+        if reduction not in ["mean", "sum", "none"]:
+            raise ValueError(f"Invalid reduction: {reduction}")
+
+    def forward(self, output, target):
+        if self.apply_softmax:
+            output = self.softmax(output)
+        nll = -target * torch.log(output.double())
+        if self.spatial_dims == 2:
+            dim = (2, 3)
+        else:
+            dim = (2, 3, 4)
+        if self.reduction == "mean":
+            return torch.mean(torch.sum(nll, dim=dim))
+        if self.reduction == "sum":
+            return torch.sum(torch.sum(nll, dim=dim))
+        return torch.sum(nll, dim=dim)
 
 
 class StackedLoss(nn.Module):

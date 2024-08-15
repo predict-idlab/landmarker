@@ -13,7 +13,7 @@
 [![Testing](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml)
 
 
-Landmarker is a [PyTorch](https://pytorch.org/)-based toolkit for (anatomical) landmark detection in 2D/3D images. It is designed to be easy to use and to provide a flexible framework for state-of-the-art landmark detection algorithms for small and large datasets. Landmarker was developed for landmark detection in medical images. However, it can be used for any type of landmark detection problem.
+Landmarker is a [PyTorch](https://pytorch.org/)-based toolkit for (anatomical) landmark localization in 2D/3D images. It is designed to be easy to use and to provide a flexible framework for state-of-the-art landmark localization algorithms for small and large datasets. Landmarker was developed for landmark detection in medical images. However, it can be used for any type of landmark localization problem.
 
 ## 🛠️ Installation
 

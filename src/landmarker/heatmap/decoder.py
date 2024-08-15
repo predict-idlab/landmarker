@@ -42,7 +42,32 @@ def coord_argmax(heatmap: torch.Tensor, spatial_dims: int = 2) -> torch.Tensor:
 
 
 def coord_local_soft_argmax(
-    heatmap: torch.Tensor, window: int = 3, t: float = 10.0, spatial_dims: int = 2
+    heatmap: torch.Tensor, window: int = 5, t: float = 10.0, spatial_dims: int = 2
+) -> torch.Tensor:
+    """
+    Returns coordiantes through applying the local soft-argmax function on the heatmaps.
+        Source: "Subpixel Heatmap Regression for Facial Landmark Localization" - Bulat et al. (2021)
+
+    Args:
+        heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
+        window (int): local window size
+        t (float ): temperature that controls the resulting probability map
+        spatial_dims (int): number of spatial dimensions (2 or 3)
+
+    Returns:
+        (torch.Tensor): coordinates of shape (B, C, 2)
+    """
+    return coord_local_weighted(
+        heatmap, window=window, spatial_dims=spatial_dims, activation="softmax", t=t
+    )
+
+
+def coord_local_weighted(
+    heatmap: torch.Tensor,
+    window: int = 9,
+    spatial_dims: int = 2,
+    activation: Optional[str] = None,
+    t: float = 1.0,
 ) -> torch.Tensor:
     """
     Returns coordiantes through applying the local soft-argmax function on the heatmaps.
@@ -69,39 +94,17 @@ def coord_local_soft_argmax(
                 for i in range(-(window // 2), (window // 2) + 1):
                     for j in range(-(window // 2), (window // 2) + 1):
                         mask[b1, c1, argmax_coords[b1, c1, 0] + i, argmax_coords[b1, c1, 1] + j] = 1
-        masked_output = F.softmax(t * padded_heatmap[mask > 0].view(b, c, -1), dim=2).view(
-            b, c, window, window
+        masked_output = padded_heatmap[mask > 0].view(b, c, window, window)
+        local_coords = coord_weighted_spatial_mean(
+            masked_output, spatial_dims=spatial_dims, activation=activation, t=t
         )
-        x_values = torch.sum(
-            torch.arange(0, window)
-            .view(1, 1, 1, window)
-            .repeat(b, c, window, 1)
-            .to(padded_heatmap.device)
-            * masked_output,
-            dim=(2, 3),
-        )
-        y_values = torch.sum(
-            torch.arange(0, window)
-            .view(1, 1, window, 1)
-            .repeat(b, c, 1, window)
-            .to(padded_heatmap.device)
-            * masked_output,
-            dim=(2, 3),
-        )
-        return (
-            torch.cat((y_values.unsqueeze(2), x_values.unsqueeze(2)), dim=2)
-            + coord_argmax(heatmap)
-            - torch.tensor([window // 2, window // 2])
-            .to(heatmap.device)
-            .view(1, 1, 2)
-            .repeat(b, c, 1)
-        )
+        return local_coords + (argmax_coords - (window // 2) * 2)
     elif spatial_dims == 3:
         padding = [window // 2] * (2 * spatial_dims)  # Pad all spatial dimensions
         padded_heatmap = F.pad(heatmap, padding)
         b, c, d, h, w = padded_heatmap.shape
 
-        argmax_coords = coord_argmax(heatmap) + window // 2
+        argmax_coords = coord_argmax(heatmap, spatial_dims=3) + window // 2
 
         mask = torch.zeros((b, c, d, h, w))
         for b1 in range(b):
@@ -116,115 +119,58 @@ def coord_local_soft_argmax(
                                 argmax_coords[b1, c1, 1] + i,
                                 argmax_coords[b1, c1, 2] + j,
                             ] = 1
-        masked_output = F.softmax(t * padded_heatmap[mask > 0].view(b, c, -1), dim=2).view(
-            b, c, d, window, window
-        )
+        masked_output = padded_heatmap[mask > 0].view(b, c, window, window, window)
 
-        z_values = torch.sum(
-            torch.arange(0, window)
-            .view(1, 1, 1, 1, window)
-            .repeat(b, c, d, 1, 1)
-            .to(padded_heatmap.device)
-            * masked_output,
-            dim=(3, 4),
+        local_coords = coord_weighted_spatial_mean(
+            masked_output, spatial_dims=spatial_dims, activation=activation, t=t
         )
-        x_values = torch.sum(
-            torch.arange(0, window)
-            .view(1, 1, 1, window, 1)
-            .repeat(b, c, d, 1, 1)
-            .to(padded_heatmap.device)
-            * masked_output,
-            dim=(3, 4),
-        )
-        y_values = torch.sum(
-            torch.arange(0, window)
-            .view(1, 1, 1, window, 1)
-            .repeat(b, c, d, 1, 1)
-            .to(padded_heatmap.device)
-            * masked_output,
-            dim=(3, 4),
-        )
-        return (
-            torch.cat((z_values.unsqueeze(2), y_values.unsqueeze(2), x_values.unsqueeze(2)), dim=2)
-            + coord_argmax(heatmap)
-            - torch.tensor([window // 2] * spatial_dims)
-            .to(heatmap.device)
-            .view(1, 1, spatial_dims)
-            .repeat(b, c, 1)
-        )
+        return local_coords + (argmax_coords - (window // 2) * 2)
     else:
         raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
 
 
+def _activate_norm_heatmap(
+    heatmap: torch.Tensor,
+    spatial_dims: int = 2,
+    activation: Optional[str] = "softmax",
+    t: float = 1.0,
+) -> torch.Tensor:
+    dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -1)
+    if activation is not None:
+        if activation == "softmax":
+            heatmap = t * heatmap
+            heatmap = heatmap / torch.sum(heatmap, dim=dim, keepdim=True)
+        elif activation == "sigmoid":
+            heatmap = torch.sigmoid(heatmap)
+        elif activation == "ReLU":
+            heatmap = F.relu(heatmap)
+        else:
+            raise ValueError(f"Activation function {activation} not implemented.")
+    return heatmap / torch.sum(heatmap, dim=dim, keepdim=True)
+
+
 def coord_weighted_spatial_mean(
-    heatmap: torch.Tensor, eps: float = 1e-5, spatial_dims: int = 2
+    heatmap: torch.Tensor,
+    spatial_dims: int = 2,
+    activation: Optional[str] = None,
+    require_grad: bool = False,
+    t: float = 1.0,
 ) -> torch.Tensor:
     """
-    Returns the spatial weighted mean of the possitive elements
-    of the heatmap by the heatmap values.
+    Returns the spatial weighted mean of the heatmap.
     Source: "UGLLI Face Alignment: Estimating Uncertainty with
         Gaussian Log-Likelihood Loss" - Kumar et al. (2019)
 
     Args:
-        heatmap (torch.Tensor): heatmap of shape (B, C, H, W)
-        eps (float): epsilon to avoid division by zero
+        heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
         spatial_dims (int): number of spatial dimensions (2 or 3)
+        activation (str): activation function to apply to the heatmap
+        require_grad (bool): whether to require gradient for the coordinates
 
     Returns:
         (torch.Tensor): coordinates of shape (B, C, 2) or (B, C, 3)
     """
-    if spatial_dims == 2:
-        b, c, h, w = heatmap.shape
-        xs = torch.arange(0, w, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        ys = torch.arange(0, h, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        xy = (
-            torch.stack(torch.meshgrid(xs, ys, indexing="xy"), dim=2)
-            .view(1, 1, h, w, 2)
-            .repeat(b, c, 1, 1, 1)
-        )
-        heatmap_adj = F.relu(heatmap)
-        heatmap_adj = heatmap_adj / torch.clip(
-            torch.sum(heatmap_adj, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
-        return torch.sum(heatmap_adj.unsqueeze(4) * xy, dim=(2, 3)).flip(-1)
-    elif spatial_dims == 3:
-        b, c, d, h, w = heatmap.shape
-        xs = torch.arange(0, w, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        ys = torch.arange(0, h, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        zs = torch.arange(0, d, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        xyz = (
-            torch.stack(torch.meshgrid(xs, ys, zs, indexing="xyz"), dim=3)
-            .view(1, 1, d, h, w, 3)
-            .repeat(b, c, 1, 1, 1, 1)
-        )
-        heatmap_adj = F.relu(heatmap)
-        heatmap_adj = heatmap_adj / torch.clip(
-            torch.sum(heatmap_adj, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
-        return torch.sum(heatmap_adj.unsqueeze(5) * xyz, dim=(2, 3, 4)).flip(-1)
-    else:
-        raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
-
-
-def coord_soft_argmax(
-    heatmap: torch.Tensor,
-    eps: float = 1e-6,
-    logit_scale: bool = False,
-    require_grad: bool = False,
-    spatial_dims: int = 2,
-) -> torch.Tensor:
-    """
-    Returns the spatial mean over the softmax distribution of the heatmap.
-    Source: “2D/3D Pose Estimation and Action Recognition using Multitask
-        Deep Learning” - Luvizon et al. (2018)
-
-    Args:
-        heatmap (torch.Tensor): heatmap of shape (B, C, H, W)
-        eps (float): epsilon to avoid division by zero
-        logit_scale (bool): whether the input is logit scaled
-        require_grad (bool): whether to require gradient for the coordinates
-        spatial_dims (int): number of spatial dimensions (2 or 3)
-    """
+    heatmap = _activate_norm_heatmap(heatmap, spatial_dims=spatial_dims, activation=activation, t=t)
     if spatial_dims == 2:
         b, c, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
@@ -234,40 +180,24 @@ def coord_soft_argmax(
             .view(1, 1, h, w, 2)
             .repeat(b, c, 1, 1, 1)
         )
-        if not logit_scale:
-            heatmap = heatmap / torch.clip(
-                torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-            )
-            heatmap = heatmap + eps
-            heatmap = torch.logit(heatmap)
-        out = F.softmax(heatmap.view(b, c, -1), dim=2).view(b, c, h, w, 1)
-
-        return torch.sum(out * xy, dim=(2, 3)).flip(-1)
+        return torch.sum(heatmap.unsqueeze(4) * xy, dim=(2, 3)).flip(-1)
     elif spatial_dims == 3:
         b, c, d, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         zs = torch.arange(0, d, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         xyz = (
-            torch.stack(torch.meshgrid(xs, ys, zs, indexing="xyz"), dim=3)
+            torch.stack(torch.meshgrid(zs, ys, xs, indexing="ij"), dim=3)
             .view(1, 1, d, h, w, 3)
             .repeat(b, c, 1, 1, 1, 1)
         )
-        if not logit_scale:
-            heatmap = heatmap / torch.clip(
-                torch.sum(heatmap, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1), min=eps
-            )
-            heatmap = heatmap + eps
-            heatmap = torch.logit(heatmap)
-        out = F.softmax(heatmap.view(b, c, -1), dim=2).view(b, c, d, h, w, 1)
-
-        return torch.sum(out * xyz, dim=(2, 3, 4)).flip(-1)
+        return torch.sum(heatmap.unsqueeze(5) * xyz, dim=(2, 3, 4))
     else:
         raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
 
 
 def coord_soft_argmax_2d(
-    heatmap: torch.Tensor, eps: float = 1e-6, logit_scale: bool = False, require_grad: bool = False
+    heatmap: torch.Tensor, logit_scale: bool = False, require_grad: bool = False
 ) -> torch.Tensor:
     """
     Returns the spatial mean over the softmax distribution of the heatmap,
@@ -275,20 +205,24 @@ def coord_soft_argmax_2d(
 
     Args:
         heatmap (torch.Tensor): heatmap of shape (H, W)
-        eps (float): epsilon to avoid division by zero
         logit_scale (bool): whether the input is logit scaled
         require_grad (bool): whether to require gradient for the coordinates
     """
-    return coord_soft_argmax(
+    activation = "softmax" if not logit_scale else None
+    return coord_weighted_spatial_mean(
         heatmap.unsqueeze(0).unsqueeze(0),
-        eps=eps,
-        logit_scale=logit_scale,
+        spatial_dims=2,
+        activation=activation,
         require_grad=require_grad,
     )[0, 0]
 
 
 def heatmap_to_coord(
-    heatmap: torch.Tensor, offset_coords: int = 0, method: str = "argmax", spatial_dims: int = 2
+    heatmap: torch.Tensor,
+    offset_coords: int = 0,
+    method: str = "argmax",
+    spatial_dims: int = 2,
+    require_grad: bool = False,
 ) -> torch.Tensor:
     """
     Returns the retrieved coordinates via specified method from a heatmap. The offset_coords is used
@@ -300,22 +234,32 @@ def heatmap_to_coord(
         offset_coords (int): number of coordinates to remove
         method (str): method to retrieve the coordinates
         spatial_dims (int): number of spatial dimensions (2 or 3)
+        require_grad (bool): whether to require gradient for the coordinates
 
     Returns:
         (torch.Tensor): coordinates of shape (B, C, 2) or (B, C, 3)
     """
-
     heatmap = heatmap[:, offset_coords:]
     if method == "argmax":
         return coord_argmax(heatmap, spatial_dims=spatial_dims)
     if method == "local_soft_argmax":
         return coord_local_soft_argmax(heatmap, spatial_dims=spatial_dims)
-    if method == "weighted_spatial_mean":
-        return coord_weighted_spatial_mean(heatmap, spatial_dims=spatial_dims)
+    if method == "weighted_spatial_mean_relu":
+        return coord_weighted_spatial_mean(
+            heatmap, spatial_dims=spatial_dims, activation="ReLU", require_grad=require_grad
+        )
     if method == "soft_argmax":
-        return coord_soft_argmax(heatmap, spatial_dims=spatial_dims)
-    if method == "soft_argmax_logit":
-        return coord_soft_argmax(heatmap, logit_scale=True, spatial_dims=spatial_dims)
+        return coord_weighted_spatial_mean(
+            heatmap, spatial_dims=spatial_dims, activation="softmax", require_grad=require_grad
+        )
+    if method == "weighted_spatial_mean":
+        return coord_weighted_spatial_mean(
+            heatmap, spatial_dims=spatial_dims, require_grad=require_grad
+        )
+    if method == "weighted_spatial_mean_sigmoid":
+        return coord_weighted_spatial_mean(
+            heatmap, spatial_dims=spatial_dims, activation="sigmoid", require_grad=require_grad
+        )
     raise ValueError("Method not implemented.")
 
 
@@ -377,7 +321,7 @@ def heatmap_to_coord_enlarge(
             heatmap_scaled = F.interpolate(
                 heatmap, scale_factor=enlarge_factor, mode=enlarge_mode, align_corners=False
             )
-        coords = heatmap_to_coord(heatmap_scaled, method=method)
+        coords = heatmap_to_coord(heatmap_scaled, method=method, spatial_dims=3)
         if enlarge_dim is not None:
             coords = coords / (
                 torch.tensor(enlarge_dim, dtype=torch.float).view((1, 1, 3)).to(heatmap.device)
@@ -392,105 +336,11 @@ def heatmap_to_coord_enlarge(
         raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
 
 
-# def coord_soft_argmax_cov(
-#     heatmap: torch.Tensor,
-#     eps: float = 1e-6,
-#     logit_scale: bool = True,
-#     require_grad: bool = True,
-#     spatial_dims: int = 2,
-# ) -> tuple[torch.Tensor, torch.Tensor]:
-#     """
-#     Returns the spatial mean over the softmax distribution of the heatmap and the covariance matrix.
-#     The covariance matrix is the weigthed sample covariance matrix.
-
-#     Args:
-#         heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
-#         eps (float): epsilon to avoid division by zero
-#         logit_scale (bool): whether the input is logit scaled
-#         require_grad (bool): whether to require gradient for the coordinates
-#         spatial_dims (int): number of spatial dimensions (2 or 3)
-
-#     Returns:
-#         (torch.Tensor): coordinates of shape (B, C, 2) or (B, C, 3)
-#         (torch.Tensor): covariance matrix of shape (B, C, 2, 2) or (B, C, 3, 3)
-#     """
-#     if spatial_dims == 2:
-#         b, c, h, w = heatmap.shape
-#         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-#         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-#         xs, ys = torch.meshgrid(xs, ys, indexing="xy")
-#         yx = torch.stack((ys, xs), dim=2).view(1, 1, h, w, 2).repeat(b, c, 1, 1, 1)
-#         if not logit_scale:
-#             heatmap = heatmap / torch.clip(
-#                 torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-#             )
-#             heatmap = heatmap + eps
-#             heatmap = torch.logit(heatmap)
-#         heatmap = F.softmax(heatmap.view(b, c, -1), dim=2).view(b, c, h, w)
-#         assert heatmap.isnan().sum() == 0
-#         mean_coords = torch.sum(heatmap.unsqueeze(-1) * yx, dim=(2, 3))
-
-#         dist_x = xs - mean_coords[:, :, 1].unsqueeze(-1).unsqueeze(-1)
-#         dist_y = ys - mean_coords[:, :, 0].unsqueeze(-1).unsqueeze(-1)
-#         dist = torch.stack(
-#             (dist_y.flatten(start_dim=-2, end_dim=-1), dist_x.flatten(start_dim=-2, end_dim=-1)),
-#             dim=-1,
-#         )  # (B, C, H*W, 2)
-
-#         covariances = (
-#             (heatmap.flatten(start_dim=-2, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
-#             @ dist
-#         ).view(b, c, 2, 2)
-
-#         v2 = torch.sum(heatmap**2, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1)
-#         # v1 = torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1)
-
-#         covariances = covariances / (1 - v2)
-#         return mean_coords, covariances
-#     elif spatial_dims == 3:
-#         b, c, d, h, w = heatmap.shape
-#         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-#         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-#         zs = torch.arange(0, d, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-#         xs, ys, zs = torch.meshgrid(xs, ys, zs, indexing="xyz")
-#         zyx = torch.stack((zs, ys, xs), dim=3).view(1, 1, d, h, w, 3).repeat(b, c, 1, 1, 1, 1)
-#         if not logit_scale:
-#             heatmap = heatmap / torch.clip(
-#                 torch.sum(heatmap, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1), min=eps
-#             )
-#             heatmap = heatmap + eps
-#             heatmap = torch.logit(heatmap)
-#         heatmap = F.softmax(heatmap.view(b, c, -1), dim=2).view(b, c, d, h, w)
-#         assert heatmap.isnan().sum() == 0
-#         mean_coords = torch.sum(heatmap.unsqueeze(-1) * zyx, dim=(2, 3, 4))
-
-#         dist_x = xs - mean_coords[:, :, 2].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-#         dist_y = ys - mean_coords[:, :, 1].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-#         dist_z = zs - mean_coords[:, :, 0].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
-#         dist = torch.stack(
-#             (
-#                 dist_z.flatten(start_dim=-2, end_dim=-1),
-#                 dist_y.flatten(start_dim=-2, end_dim=-1),
-#                 dist_x.flatten(start_dim=-2, end_dim=-1),
-#             ),
-#             dim=-1,
-#         )  # (B, C, D*H*W, 3)
-
-#         covariances = (
-#             (heatmap.flatten(start_dim=-2, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
-#             @ dist
-#         ).view(b, c, 3, 3)
-
-#         v2 = torch.sum(heatmap**2, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1)
-
-#         covariances = covariances / (1 - v2)
-#         return mean_coords, covariances
-#     else:
-#         raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
-
-
 def coord_weighted_spatial_mean_cov(
-    heatmap: torch.Tensor, eps: float = 1e-5, spatial_dims: int = 2, require_grad: bool = False
+    heatmap: torch.Tensor,
+    spatial_dims: int = 2,
+    require_grad: bool = False,
+    activation: Optional[str] = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Returns the spatial weighted mean and the weighted sample covariance of the possitive elements
@@ -499,27 +349,22 @@ def coord_weighted_spatial_mean_cov(
 
     Args:
         heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
-        eps (float): epsilon to avoid division by zero
+        spatial_dims (int): number of spatial dimensions (2 or 3)
+        require_grad (bool): whether to require gradient for the coordinates
+        activation (str): activation function to apply to the heatmap
 
     Returns:
         (torch.Tensor): coordinates of shape (B, C, 2) or (B, C, 3)
         (torch.Tensor): covariance matrix of shape (B, C, 2, 2) or (B, C, 3, 3)
     """
-    # TODO: The method seems to be kind of unstable. Probably inherent to the method.
-    # TODO: Point close to the edges will proabbly suffer the most (find way to counteract this)
+    heatmap = _activate_norm_heatmap(heatmap, spatial_dims=spatial_dims, activation=activation)
     if spatial_dims == 2:
         b, c, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         xs, ys = torch.meshgrid(xs, ys, indexing="xy")
         yx = torch.stack((ys, xs), dim=2).view(1, 1, h, w, 2).repeat(b, c, 1, 1, 1)
-        heatmap = F.relu(heatmap)
-        heatmap = heatmap / torch.clip(
-            torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
-
         mean_coords = torch.sum(heatmap.unsqueeze(4) * yx, dim=(2, 3))
-
         dist_x = xs - mean_coords[:, :, 1].unsqueeze(-1).unsqueeze(-1)
         dist_y = ys - mean_coords[:, :, 0].unsqueeze(-1).unsqueeze(-1)
         dist = torch.stack(
@@ -533,20 +378,14 @@ def coord_weighted_spatial_mean_cov(
         ).view(b, c, 2, 2)
 
         v2 = torch.sum(heatmap**2, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1)
-        # v1 = torch.clip(torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps)
-
         return mean_coords, covariances / (1 - v2)
     elif spatial_dims == 3:
         b, c, d, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
         zs = torch.arange(0, d, dtype=torch.float32, requires_grad=require_grad).to(heatmap.device)
-        xs, ys, zs = torch.meshgrid(xs, ys, zs, indexing="xyz")
+        zs, ys, xs = torch.meshgrid(zs, ys, xs, indexing="ij")
         zyx = torch.stack((zs, ys, xs), dim=3).view(1, 1, d, h, w, 3).repeat(b, c, 1, 1, 1, 1)
-        heatmap = F.relu(heatmap)
-        heatmap = heatmap / torch.clip(
-            torch.sum(heatmap, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
 
         mean_coords = torch.sum(heatmap.unsqueeze(5) * zyx, dim=(2, 3, 4))
 
@@ -555,15 +394,15 @@ def coord_weighted_spatial_mean_cov(
         dist_z = zs - mean_coords[:, :, 0].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
         dist = torch.stack(
             (
-                dist_z.flatten(start_dim=-2, end_dim=-1),
-                dist_y.flatten(start_dim=-2, end_dim=-1),
-                dist_x.flatten(start_dim=-2, end_dim=-1),
+                dist_z.flatten(start_dim=-3, end_dim=-1),
+                dist_y.flatten(start_dim=-3, end_dim=-1),
+                dist_x.flatten(start_dim=-3, end_dim=-1),
             ),
             dim=-1,
         )
 
         covariances = (
-            (heatmap.flatten(start_dim=-2, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
+            (heatmap.flatten(start_dim=-3, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
             @ dist
         ).view(b, c, 3, 3)
 
@@ -577,8 +416,6 @@ def coord_weighted_spatial_mean_cov(
 def heatmap_to_coord_cov(
     heatmap: torch.Tensor,
     method: str = "soft_argmax",
-    eps: float = 1e-6,
-    logit_scale: bool = True,
     require_grad: bool = True,
     spatial_dims: int = 2,
 ) -> tuple[torch.Tensor, torch.Tensor]:
@@ -588,8 +425,6 @@ def heatmap_to_coord_cov(
     Args:
         heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
         method (str): method to retrieve the coordinates
-        eps (float): epsilon to avoid division by zero
-        logit_scale (bool): whether the input is logit scaled
         require_grad (bool): whether to require gradient for the coordinates
         spatial_dims (int): number of spatial dimensions (2 or 3)
 
@@ -598,23 +433,20 @@ def heatmap_to_coord_cov(
         (torch.Tensor): covariance matrix of shape (B, C, 2, 2) or (B, C, 3, 3)
     """
     if method == "soft_argmax":
-        heatmap_shape = heatmap.shape
-        if not logit_scale:
-            heatmap = heatmap / torch.clip(
-                torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-            )
-            heatmap = torch.logit(heatmap, eps=eps)
         return coord_weighted_spatial_mean_cov(
-            F.softmax(heatmap.view(heatmap_shape[0], heatmap_shape[1], -1), dim=2).view(
-                heatmap_shape
-            ),
-            eps=eps,
-            spatial_dims=spatial_dims,
-            require_grad=require_grad,
+            heatmap, spatial_dims=spatial_dims, require_grad=require_grad, activation="softmax"
         )
     if method == "weighted_spatial_mean":
         return coord_weighted_spatial_mean_cov(
-            heatmap, eps=eps, spatial_dims=spatial_dims, require_grad=require_grad
+            heatmap, spatial_dims=spatial_dims, require_grad=require_grad
+        )
+    if method == "weighted_spatial_mean_sigmoid":
+        return coord_weighted_spatial_mean_cov(
+            heatmap, spatial_dims=spatial_dims, require_grad=require_grad, activation="sigmoid"
+        )
+    if method == "weighted_spatial_mean_relu":
+        return coord_weighted_spatial_mean_cov(
+            heatmap, spatial_dims=spatial_dims, require_grad=require_grad, activation="ReLU"
         )
     raise ValueError("Method not implemented.")
 
@@ -738,6 +570,8 @@ def cov_from_gaussian_ls(
         (torch.Tensor): covariance matrix of shape (B, C, 2, 2)
     """
     # TODO: see if we can use a pytorch implementation (e.g, pytorch-minimize seems to be broken)
+    if spatial_dims != 2:
+        raise ValueError(f"Spatial dimensions must be 2: {spatial_dims}")
     if ls_library == "scipy":
         return cov_from_gaussian_ls_scipy(heatmap, coords, gamma=gamma)
     raise ValueError("Method not implemented.")
@@ -805,70 +639,11 @@ def cov_from_gaussian_ls_scipy(
     return covs
 
 
-# def extract_cov_pytroch(heatmap, mean_coords, gamma=None):
-#     # TODO: fix python implementation
-#     def generate_gaussian(landmarks, heatmap):
-#         """
-#         Returns the gaussian function for the given landmarks, sigma and rotation.
-#         """
-#         gaussian_generator = GaussianHeatmapGenerator(1, gamma=gamma, h
-#                                                       eatmap_size=heatmap.shape[-2:],
-#                                                       device=heatmap.device, learnable=False)
-#         def fun_to_minimize(x):
-#             gaussian_generator.set_sigmas(x[:2])
-#             gaussian_generator.set_rotation(x[2])
-#             return (heatmap -
-#                     gaussian_generator(landmarks.view(1, 1, 2)).view(heatmap.shape)).flatten()
-#         return fun_to_minimize
-#     covs = torch.zeros((heatmap.shape[0], heatmap.shape[1], 2, 2)).to(heatmap.device)
-#     for b in range(heatmap.shape[0]):
-#         for c in range(heatmap.shape[1]):
-#             result = optim.least_squares(generate_gaussian(mean_coords[b, c], heatmap[b, c]),
-#                           torch.cat((torch.ones(2), torch.zeros(1))), method='trf', verbose=2)
-#             x = result.x
-#             rotation = torch.tensor([[np.cos(x[2]), -np.sin(x[2])],
-#                                      [np.sin(x[2]), np.cos(x[2])]])
-#             diagonal = torch.diag(x[:2]**2)
-#             covs[b, c] = torch.mm(torch.mm(rotation, diagonal), rotation.t())
-#     return covs
-
-
-def heatmap_coord_to_weighted_sample_cov(
+def weighted_sample_cov(
     heatmap: torch.Tensor,
     coords: torch.Tensor,
-    eps: float = 1e-6,
-    apply_softmax: bool = False,
     spatial_dims: int = 2,
-) -> torch.Tensor:
-    """
-    Returns the weighted sample covariance matrix from a heatmap and coordinates.
-        source: https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_covariance
-
-    Args:
-        heatmap (torch.Tensor): heatmap of shape (B, C, H, W)
-        coords (torch.Tensor): coordinates of shape (B, C, 2)
-        eps (float): epsilon to avoid division by zero
-        apply_softmax (bool): whether to apply softmax on the heatmap
-        spatial_dims (int): number of spatial dimensions (2 or 3)
-
-    Returns:
-        (torch.Tensor): covariance matrix of shape (B, C, 2, 2) or (B, C, 3, 3)
-    """
-    heatmap_shape = heatmap.shape
-    if apply_softmax:
-        return weighted_sample_cov(
-            F.softmax(heatmap.view(heatmap_shape[0], heatmap_shape[1], -1), dim=2).view(
-                heatmap_shape
-            ),
-            coords,
-            eps=eps,
-            spatial_dims=spatial_dims,
-        )
-    return weighted_sample_cov(heatmap, coords, eps=eps, spatial_dims=spatial_dims)
-
-
-def weighted_sample_cov(
-    heatmap: torch.Tensor, coords: torch.Tensor, eps: float = 1e-6, spatial_dims: int = 2
+    activation: Optional[str] = None,
 ) -> torch.Tensor:
     """
     Calculate the covariance matrix from a heatmap by calculating the mean of the
@@ -878,18 +653,15 @@ def weighted_sample_cov(
     Args:
         heatmap (torch.Tensor): heatmap of shape (B, C, H, W) or (B, C, D, H, W)
         coords (torch.Tensor): coordinates of shape (B, C, 2) or (B, C, 3)
-        eps (float): epsilon to avoid division by zero
+        spatial_dims (int): number of spatial dimensions (2 or 3)
+        activation (str): activation function to apply to the heatmap
 
     Returns:
         (torch.Tensor): covariance matrix of shape (B, C, 2, 2) or (B, C, 3, 3)
     """
+    heatmap = _activate_norm_heatmap(heatmap, spatial_dims=spatial_dims, activation=activation)
     if spatial_dims == 2:
         assert coords.shape[-1] == 2, f"Coordinates must have 2 elements: {coords.shape[-1]}"
-
-        heatmap = F.relu(heatmap)
-        heatmap = heatmap / torch.clip(
-            torch.sum(heatmap, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
         b, c, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=False).to(heatmap.device)
         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=False).to(heatmap.device)
@@ -907,48 +679,47 @@ def weighted_sample_cov(
             @ dist
         ).view(b, c, 2, 2)
 
-        v2 = torch.clip(torch.sum(heatmap**2, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1), min=eps)
+        v2 = torch.sum(heatmap**2, dim=(2, 3)).unsqueeze(-1).unsqueeze(-1)
         assert covariances.shape == (b, c, 2, 2)
         return covariances / (1 - v2)
     elif spatial_dims == 3:
         assert coords.shape[-1] == 3, f"Coordinates must have 3 elements: {coords.shape[-1]}"
-        heatmap = F.relu(heatmap)
-        heatmap = heatmap / torch.clip(
-            torch.sum(heatmap, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1), min=eps
-        )
         b, c, d, h, w = heatmap.shape
         xs = torch.arange(0, w, dtype=torch.float32, requires_grad=False).to(heatmap.device)
         ys = torch.arange(0, h, dtype=torch.float32, requires_grad=False).to(heatmap.device)
         zs = torch.arange(0, d, dtype=torch.float32, requires_grad=False).to(heatmap.device)
-        xs, ys, zs = torch.meshgrid(xs, ys, zs, indexing="xyz")
+        zs, ys, xs = torch.meshgrid(zs, ys, xs, indexing="ij")
 
         dist_x = xs - coords[:, :, 2].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
         dist_y = ys - coords[:, :, 1].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
         dist_z = zs - coords[:, :, 0].unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
         dist = torch.stack(
             (
-                dist_z.flatten(start_dim=-2, end_dim=-1),
-                dist_y.flatten(start_dim=-2, end_dim=-1),
-                dist_x.flatten(start_dim=-2, end_dim=-1),
+                dist_z.flatten(start_dim=-3, end_dim=-1),
+                dist_y.flatten(start_dim=-3, end_dim=-1),
+                dist_x.flatten(start_dim=-3, end_dim=-1),
             ),
             dim=-1,
         )
 
         covariances = (
-            (heatmap.flatten(start_dim=-2, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
+            (heatmap.flatten(start_dim=-3, end_dim=-1).unsqueeze(-1) * dist).transpose(-1, -2)
             @ dist
         ).view(b, c, 3, 3)
 
-        v2 = torch.clip(torch.sum(heatmap**2, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1))
+        v2 = torch.sum(heatmap**2, dim=(2, 3, 4)).unsqueeze(-1).unsqueeze(-1)
         assert covariances.shape == (b, c, 3, 3)
         return covariances / (1 - v2)
     else:
         raise ValueError(f"Spatial dimensions must be 2 or 3: {spatial_dims}")
 
 
-def coord_cov_windowed_weigthed_sample_cov(
-    heatmap: torch.Tensor, spatial_dims: int = 2
-) -> tuple[torch.Tensor, torch.Tensor]:
+def windowed_weigthed_sample_cov(
+    heatmap: torch.Tensor,
+    coords: torch.Tensor,
+    spatial_dims: int = 2,
+    activation: Optional[str] = None,
+) -> torch.Tensor:
     """
     Calculate the covariance matrix from a heatmap by calculating the mean of the
     heatmap values weighted by the heatmap values. The window is determined by the
@@ -957,15 +728,15 @@ def coord_cov_windowed_weigthed_sample_cov(
     Args:
         heatmap (torch.Tensor): heatmap of shape (B, C, H, W)
         coords (torch.Tensor): coordinates of shape (B, C, 2)
+        spatial_dims (int): number of spatial dimensions (2 or 3)
+        activation (str): activation function to apply to the heatmap
 
     Returns:
-        (torch.Tensor): coordinates of shape (B, C, 2)
         (torch.Tensor): covariance matrix of shape (B, C, 2, 2)
     """
     if spatial_dims != 2:
         raise ValueError(f"Spatial dimensions must be 2: {spatial_dims}")
     b, c, h, w = heatmap.shape
-    coords = coord_weighted_spatial_mean(heatmap)
     covs = torch.zeros((b, c, 2, 2)).to(heatmap.device)
     for b in range(b):
         for c in range(c):
@@ -982,8 +753,10 @@ def coord_cov_windowed_weigthed_sample_cov(
                 .unsqueeze(0)
                 .unsqueeze(0),
                 torch.tensor([[[window, window]]], dtype=torch.float),
+                spatial_dims=spatial_dims,
+                activation=activation,
             )
-    return coords, covs
+    return covs
 
 
 def heatmap_to_multiple_coord(

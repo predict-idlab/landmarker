@@ -164,7 +164,7 @@ def test_multivariate_gaussian_nll_loss_3d():
         .repeat(1, 3, 1, 1)
     )
 
-    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -179,7 +179,7 @@ def test_multivariate_gaussian_nll_loss_3d():
         .repeat(4, 5, 1, 1)
     )
 
-    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -188,7 +188,7 @@ def test_multivariate_gaussian_nll_loss_3d():
 
     reduction = "sum"
 
-    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -197,7 +197,7 @@ def test_multivariate_gaussian_nll_loss_3d():
 
     reduction = "none"
 
-    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = MultivariateGaussianNLLLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([4, 5])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -289,7 +289,7 @@ def test_euclidean_distance_variance_reg_3d():
     heatmap_generator = GaussianHeatmapGenerator(3, sigmas=sigma_t, heatmap_size=(64, 64, 64))
     cov_t = heatmap_generator.get_covariance_matrix()
 
-    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dim=3)
+    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(target, cov_t, target)
@@ -309,7 +309,7 @@ def test_euclidean_distance_variance_reg_3d():
     heatmap_generator = GaussianHeatmapGenerator(3, sigmas=sigma_t, heatmap_size=(64, 64, 64))
     cov_t = heatmap_generator.get_covariance_matrix()
 
-    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dim=3)
+    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(target, cov_t, target)
@@ -329,7 +329,7 @@ def test_euclidean_distance_variance_reg_3d():
     heatmap_generator = GaussianHeatmapGenerator(3, sigmas=sigma_t, heatmap_size=(64, 64, 64))
     cov_t = heatmap_generator.get_covariance_matrix()
 
-    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dim=3)
+    loss_fn = EuclideanDistanceVarianceReg(reduction=reduction, var_t=sigma_t**2, spatial_dims=3)
     expected_output_shape = target.shape[:-1]
 
     loss = loss_fn(target, cov_t, target)
@@ -341,7 +341,7 @@ def test_euclidean_distance_variance_reg_3d():
     assert torch.all(loss > 0)
 
     try:
-        loss_fn = EuclideanDistanceVarianceReg(reduction="invalid", var_t=-1, spatial_dim=3)
+        loss_fn = EuclideanDistanceVarianceReg(reduction="invalid", var_t=-1, spatial_dims=3)
         loss = loss_fn(pred, cov_t, target)
         assert False
     except ValueError:
@@ -509,7 +509,7 @@ def test_star_loss_3d():
         .repeat(1, 3, 1, 1)
     )
 
-    loss_fn = StarLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = StarLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -524,7 +524,7 @@ def test_star_loss_3d():
         .repeat(4, 5, 1, 1)
     )
 
-    loss_fn = StarLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = StarLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -533,7 +533,7 @@ def test_star_loss_3d():
 
     reduction = "sum"
 
-    loss_fn = StarLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = StarLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -542,7 +542,7 @@ def test_star_loss_3d():
 
     reduction = "none"
 
-    loss_fn = StarLoss(reduction=reduction, spatial_dim=3)
+    loss_fn = StarLoss(reduction=reduction, spatial_dims=3)
     expected_output_shape = torch.Size([4, 5])
 
     loss = loss_fn(pred, cov_matrix, target)
@@ -550,7 +550,7 @@ def test_star_loss_3d():
     assert loss.shape == expected_output_shape
 
     for distance in ["l1", "l2", "smooth-l1"]:
-        loss_fn = StarLoss(reduction=reduction, distance=distance, spatial_dim=3)
+        loss_fn = StarLoss(reduction=reduction, distance=distance, spatial_dims=3)
         expected_output_shape = torch.Size([4, 5])
 
         loss = loss_fn(pred, cov_matrix, target)

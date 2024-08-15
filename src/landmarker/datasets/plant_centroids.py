@@ -9,6 +9,7 @@ images.
 
 The dataset can be downloaded from http://plantcentroids.cs.uni-freiburg.de/
 """
+
 import os
 import pathlib
 import zipfile
@@ -82,7 +83,9 @@ def get_plant_centroids_dataset(path_dir: str):
     )
 
 
-def get_plant_centroids_mask_datasets(path_dir, **kwargs):
+def get_plant_centroids_mask_datasets(
+    path_dir, train_transform=None, inference_transform=None, **kwargs
+):
     (
         train_mask_paths,
         train_img_rgb_paths,
@@ -98,86 +101,109 @@ def get_plant_centroids_mask_datasets(path_dir, **kwargs):
         C_out_imgs,
     ) = get_plant_centroids_dataset(path_dir)
     test_kwargs = kwargs.copy()
-    test_kwargs["transform"] = None
     return (
-        MaskDataset(train_out_imgs, mask_paths=train_mask_paths, **kwargs),
-        MaskDataset(A_out_imgs, mask_paths=A_W4_mask_paths, **test_kwargs),
-        MaskDataset(B_out_imgs, mask_paths=B_W5_mask_paths, **test_kwargs),
-        MaskDataset(C_out_imgs, mask_paths=C_W8_mask_paths, **test_kwargs),
+        MaskDataset(
+            train_img_rgb_paths, mask_paths=train_mask_paths, transform=train_transform, **kwargs
+        ),
+        MaskDataset(
+            A_W4_img_rgb_paths,
+            mask_paths=A_W4_mask_paths,
+            transform=inference_transform,
+            **test_kwargs,
+        ),
+        MaskDataset(
+            B_W5_img_rgb_paths,
+            mask_paths=B_W5_mask_paths,
+            transform=inference_transform,
+            **test_kwargs,
+        ),
+        MaskDataset(
+            C_W8_img_rgb_paths,
+            mask_paths=C_W8_mask_paths,
+            transform=inference_transform,
+            **test_kwargs,
+        ),
     )
 
 
-def get_plant_centroids_landmark_datasets(path_dir, **kwargs):
+def get_plant_centroids_landmark_datasets(
+    path_dir, train_transform=None, inference_transform=None, **kwargs
+):
     mask_kwargs = kwargs.copy()
     mask_kwargs["dim_img"] = None
-    mask_kwargs["store_masks_imgs"] = False
     try:
         mask_kwargs.pop("store_imgs")
     except KeyError:
         pass
     test_kwargs = kwargs.copy()
-    test_kwargs["transform"] = None
     mask_ds_trian, mask_ds_A, mask_ds_B, mask_ds_C = get_plant_centroids_mask_datasets(
-        path_dir, **mask_kwargs
+        path_dir, store_imgs=False, **mask_kwargs
     )
     return (
         LandmarkDataset(
             imgs=mask_ds_trian.img_paths,
             landmarks=mask_ds_trian.landmarks_original,
+            transform=train_transform,
             **kwargs,
         ),
         LandmarkDataset(
             imgs=mask_ds_A.img_paths,
             landmarks=mask_ds_A.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
         LandmarkDataset(
             imgs=mask_ds_B.img_paths,
             landmarks=mask_ds_B.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
         LandmarkDataset(
             imgs=mask_ds_C.img_paths,
             landmarks=mask_ds_C.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
     )
 
 
-def get_plant_centroids_heatmap_datasets(path_dir, **kwargs):
+def get_plant_centroids_heatmap_datasets(
+    path_dir, train_transform=None, inference_transform=None, **kwargs
+):
     mask_kwargs = kwargs.copy()
     mask_kwargs["dim_img"] = None
-    mask_kwargs["store_masks_imgs"] = False
     mask_kwargs.pop("sigma")
     try:
         mask_kwargs.pop("store_imgs")
     except KeyError:
         pass
     test_kwargs = kwargs.copy()
-    test_kwargs["transform"] = None
     mask_ds_trian, mask_ds_A, mask_ds_B, mask_ds_C = get_plant_centroids_mask_datasets(
-        path_dir, **mask_kwargs
+        path_dir, store_imgs=False, **mask_kwargs
     )
     return (
         HeatmapDataset(
             imgs=mask_ds_trian.img_paths,
             landmarks=mask_ds_trian.landmarks_original,
+            transform=train_transform,
             **kwargs,
         ),
         HeatmapDataset(
             imgs=mask_ds_A.img_paths,
             landmarks=mask_ds_A.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
         HeatmapDataset(
-            imgs=mask_ds_B.imgs,
-            img_paths=mask_ds_B.img_paths,
+            imgs=mask_ds_B.img_paths,
             landmarks=mask_ds_B.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
         HeatmapDataset(
             imgs=mask_ds_C.img_paths,
             landmarks=mask_ds_C.landmarks_original,
+            transform=inference_transform,
             **test_kwargs,
         ),
     )

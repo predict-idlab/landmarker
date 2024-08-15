@@ -67,6 +67,42 @@ def setup_data():
     clear_data()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_data_3d():
+    """Create data 3d for tests."""
+    # Check if data folder exists and create it if not
+    if not os.path.exists("tests/data"):
+        os.makedirs("tests/data")
+    all_landmarks = []
+    all_img_uint8 = []
+    for i in range(NSIM):
+        img_uint8 = (np.random.rand(64, 64, 64) * 256).astype(np.uint8)
+        img_uint16 = (np.random.random((64, 64, 64)) * 65535).astype(np.uint16)
+        np.save(f"tests/data/{i}_img_3d_uint8.npy", img_uint8)
+        np.save(f"tests/data/{i}_img_3d_uint16.npy", img_uint16)
+        landmarks = np.random.rand(8, 3)
+        landmarks = landmarks * 64
+        all_landmarks.append(landmarks)
+
+    all_landmarks = np.stack(all_landmarks)
+
+    np.save("tests/data/landmarks_3d.npy", all_landmarks)
+
+    # define global variables
+    pytest.landmarks_3d = all_landmarks
+    pytest.all_img_uint8_3d = all_img_uint8
+
+    def clear_data():
+        """Remove data for tests."""
+        for i in range(NSIM):
+            os.remove(f"tests/data/{i}_img_3d_uint8.npy")
+            os.remove(f"tests/data/{i}_img_3d_uint16.npy")
+        os.remove("tests/data/landmarks_3d.npy")
+
+    yield
+    clear_data()
+
+
 def test_landmark_dataset_stored_imgs():
     """Test LandmarkDatase with store_imgs=True."""
     dataset = LandmarkDataset(
@@ -350,8 +386,8 @@ def test_mask_landmark_dataset():
         [pytest.landmarks.shape[1], 2]
     )  # landmark
 
-    for i, mask in enumerate(dataset.masks):
-        cv2.imwrite(f"tests/data/{i}_mask.png", mask[0].numpy() * 255)
+    for i, batch in enumerate(dataset):
+        cv2.imwrite(f"tests/data/{i}_mask.png", batch["mask"].sum(dim=0).numpy() * 255)
     dataset = MaskDataset(
         imgs=[f"tests/data/{i}_img_uint8.png" for i in range(NSIM)],
         mask_paths=[f"tests/data/{i}_mask.png" for i in range(NSIM)],
@@ -359,10 +395,10 @@ def test_mask_landmark_dataset():
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 64, 64])  # image
     assert dataset[0]["mask"].shape == torch.Size([1, 64, 64])  # mask
-    assert dataset[0]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[0]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 64, 64])  # image
     assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size([1, 64, 64])  # mask
-    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
 
     dataset = MaskDataset(
         imgs=[f"tests/data/{i}_img_uint8.png" for i in range(NSIM)],
@@ -389,10 +425,10 @@ def test_mask_landmark_dataset():
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 32, 20])  # image
     assert dataset[0]["mask"].shape == torch.Size([1, 32, 20])  # mask
-    assert dataset[0]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[0]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 32, 20])  # image
     assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size([1, 32, 20])  # mask
-    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
 
     dataset = MaskDataset(
         imgs=[f"tests/data/{i}_img_uint8.png" for i in range(NSIM)],
@@ -403,10 +439,10 @@ def test_mask_landmark_dataset():
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 32, 20])  # image
     assert dataset[0]["mask"].shape == torch.Size([1, 32, 20])  # mask
-    assert dataset[0]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[0]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 32, 20])  # image
     assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size([1, 32, 20])  # mask
-    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size([1, 8, 2])  # landmark
 
     # remove masks
     for i in range(NSIM):
@@ -415,7 +451,7 @@ def test_mask_landmark_dataset():
 
 def test_mask_landmark_transforms():
     """Test MaskDataset with transforms."""
-    fn_keys = ("image", "mask")
+    fn_keys = ("image",)
     spatial_transformd = [
         RandAffined(
             fn_keys,
@@ -469,10 +505,10 @@ def test_heatmap_dataset():
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 64, 64])  # image
-    assert dataset[0]["heatmap"].shape == torch.Size([pytest.landmarks.shape[1], 64, 64])  # heatmap
+    assert dataset[0]["mask"].shape == torch.Size([pytest.landmarks.shape[1], 64, 64])  # heatmap
     assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 64, 64])  # image
-    assert dataset[len(pytest.landmarks) - 1]["heatmap"].shape == torch.Size(
+    assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size(
         [pytest.landmarks.shape[1], 64, 64]
     )  # heatmap
     assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
@@ -487,10 +523,10 @@ def test_heatmap_dataset():
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 20, 32])  # image
-    assert dataset[0]["heatmap"].shape == torch.Size([pytest.landmarks.shape[1], 20, 32])  # heatmap
+    assert dataset[0]["mask"].shape == torch.Size([pytest.landmarks.shape[1], 20, 32])  # heatmap
     assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 20, 32])  # image
-    assert dataset[len(pytest.landmarks) - 1]["heatmap"].shape == torch.Size(
+    assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size(
         [pytest.landmarks.shape[1], 20, 32]
     )  # heatmap
     assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
@@ -535,10 +571,10 @@ def test_heatmap_dataset_transforms():
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 64, 64])  # image
-    assert dataset[0]["heatmap"].shape == torch.Size([pytest.landmarks.shape[1], 64, 64])  # heatmap
+    assert dataset[0]["mask"].shape == torch.Size([pytest.landmarks.shape[1], 64, 64])  # heatmap
     assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 64, 64])  # image
-    assert dataset[len(pytest.landmarks) - 1]["heatmap"].shape == torch.Size(
+    assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size(
         [pytest.landmarks.shape[1], 64, 64]
     )  # heatmap
     assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
@@ -554,10 +590,10 @@ def test_heatmap_dataset_transforms():
     )
     assert len(dataset) == len(pytest.landmarks)
     assert dataset[0]["image"].shape == torch.Size([1, 20, 32])  # image
-    assert dataset[0]["heatmap"].shape == torch.Size([pytest.landmarks.shape[1], 20, 32])  # heatmap
+    assert dataset[0]["mask"].shape == torch.Size([pytest.landmarks.shape[1], 20, 32])  # heatmap
     assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
     assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 20, 32])  # image
-    assert dataset[len(pytest.landmarks) - 1]["heatmap"].shape == torch.Size(
+    assert dataset[len(pytest.landmarks) - 1]["mask"].shape == torch.Size(
         [pytest.landmarks.shape[1], 20, 32]
     )  # heatmap
     assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(

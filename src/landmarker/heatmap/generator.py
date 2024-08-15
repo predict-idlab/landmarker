@@ -23,6 +23,7 @@ class HeatmapGenerator(nn.Module):
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
+        na_zero (bool): whether to set the value of the landmarks to zero if they are not available
     """
 
     def __init__(
@@ -36,6 +37,7 @@ class HeatmapGenerator(nn.Module):
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
+        na_zero: bool = False,
     ) -> None:
         super(HeatmapGenerator, self).__init__()
         self.nb_landmarks = nb_landmarks
@@ -48,6 +50,7 @@ class HeatmapGenerator(nn.Module):
         self.background = background
         self.all_points = all_points
         self.continuous = continuous
+        self.na_zero = na_zero
 
     def set_sigmas(self, sigmas: float | list[float] | torch.Tensor | np.ndarray) -> None:
         """
@@ -156,6 +159,8 @@ class HeatmapGenerator(nn.Module):
                 ),
                 1,
             )
+        if self.na_zero:
+            heatmaps[torch.isnan(heatmaps)] = 0
         return heatmaps
 
     @abstractmethod
@@ -389,6 +394,7 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
+        na_zero (bool): whether to set the value of the landmarks to zero if they are not available
     """
 
     def __init__(
@@ -402,6 +408,7 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
+        na_zero: bool = False,
     ) -> None:
         super(GaussianHeatmapGenerator, self).__init__(
             nb_landmarks,
@@ -413,6 +420,7 @@ class GaussianHeatmapGenerator(HeatmapGenerator):
             background,
             all_points,
             continuous,
+            na_zero=na_zero,
         )
 
     def heatmap_fun(
@@ -493,6 +501,7 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         background (bool): whether to add a background channel to the heatmap
         all_points (bool): whether to add a channel with the sum of all the landmarks
         continuous (bool): whether to use continuous or discrete landmarks
+        na_zero (bool): whether to set the value of the landmarks to zero if they are not available
     """
 
     def __init__(
@@ -506,6 +515,7 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
         background: bool = False,
         all_points: bool = False,
         continuous: bool = True,
+        na_zero: bool = False,
     ) -> None:
         super(LaplacianHeatmapGenerator, self).__init__(
             nb_landmarks,
@@ -517,6 +527,7 @@ class LaplacianHeatmapGenerator(HeatmapGenerator):
             background,
             all_points,
             continuous,
+            na_zero=na_zero,
         )
         if self.spatial_dims != 2:
             raise ValueError("Laplacian heatmap generator only works in 2D")

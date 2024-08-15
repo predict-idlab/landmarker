@@ -3,15 +3,16 @@ Losses module for training landmark localization models.
 """
 
 from .losses import (
-    GeneralizedNormalHeatmapLoss,
+    AdaptiveWingLoss,
     EuclideanDistanceJSDivergenceReg,
     EuclideanDistanceVarianceReg,
-    MultivariateGaussianNLLLoss,
-    WingLoss,
-    AdaptiveWingLoss,
-    StarLoss,
-    StackedLoss,
     GaussianHeatmapL2Loss,
+    GeneralizedNormalHeatmapLoss,
+    MultivariateGaussianNLLLoss,
+    NLLLoss,
+    StackedLoss,
+    StarLoss,
+    WingLoss,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "StarLoss",
     "StackedLoss",
     "GaussianHeatmapL2Loss",
+    "NLLLoss",
 ]
