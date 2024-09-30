@@ -38,7 +38,7 @@ def inspection_plot(
         idx = [idx]
 
     fig = plt.figure(figsize=(15, 5 * len(idx)))
-    fig.suptitle(fig_title)
+    # fig.suptitle(fig_title)
 
     # Create len(idx)x1 subfigures
     subfigs = fig.subfigures(len(idx), 1)
@@ -137,7 +137,7 @@ def prediction_inspect_plot(
         idx = [idx]
 
     fig = plt.figure(figsize=(15, 5 * len(idx)))
-    fig.suptitle(fig_title)
+    # fig.suptitle(fig_title)
 
     # Create len(idx)x1 subfigures
     subfigs = fig.subfigures(len(idx), 1)

@@ -2,7 +2,6 @@
 Utils module.
 """
 
-from .dicom import append_files_extension, convert_all_dcm_png
 from .preprocessing import extract_roi, normalize, preprocess_all
 from .utils import (
     all_annotations_to_landmarks,

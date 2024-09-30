@@ -672,6 +672,97 @@ class MaskDataset(LandmarkDataset):
         return landmarks
 
 
+class PatchMaskDataset(PatchDataset):
+    """
+    ``PatchMaskDataset`` is a subclass of ``PatchDataset``. It represents a dataset of images and
+    landmarks. The images can be provided as a list of paths to the images or as a list of numpy
+    arrays or as a numpy array/torch.Tensor. The landmarks can be provided as a list of paths to
+    the masks or as a list of numpy arrays or as a numpy array/torch.Tensor. The masks must be
+    grayscale images with the landmarks represented by different values. The landmarks can be
+    extracted from the masks and stored as a torch.Tensor or they can be genererated from provided
+    landmarks. The images are cropped around the landmarks and stored as torch.Tensor. The landmarks
+    are the landmarks of the cropped images. The offset is randomly generated in a range of
+    [-range_aug_patch, range_aug_patch] and added to the landmarks to create the cropped images.
+    If the cropped images are not of the same size, they are resized to the same size.
+    """
+
+    def __init__(
+        self,
+        imgs: list[str] | list[np.ndarray] | np.ndarray | torch.Tensor,
+        landmarks: np.ndarray | torch.Tensor,
+        index_landmark=0,
+        spatial_dims: int = 2,
+        pixel_spacing: Optional[torch.Tensor] = None,
+        class_names: Optional[list] = None,
+        transform: Optional[Callable] = None,
+        store_imgs: bool = False,
+        dim_patch: tuple[int, ...] = (256, 256),
+        range_aug_patch: int = 64,
+    ) -> None:
+        super().__init__(
+            imgs=imgs,
+            landmarks=landmarks,
+            index_landmark=index_landmark,
+            spatial_dims=spatial_dims,
+            pixel_spacing=pixel_spacing,
+            class_names=class_names,
+            transform=transform,
+            store_imgs=store_imgs,
+            dim_patch=dim_patch,
+            range_aug_patch=range_aug_patch,
+        )
+
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
+        batch = super().__getitem__(idx)
+        mask = self._create_mask(
+            batch["landmark"].unsqueeze(0), batch["image"].shape[-self.spatial_dims :]
+        )
+        return {**batch, "mask": mask}
+
+    def _create_mask(self, landmark: torch.Tensor, dim: tuple[int, ...]) -> torch.Tensor:
+        """
+        Create a mask from a landmark.
+
+        Args:
+            landmark (torch.Tensor): landmark of the image.
+            dim (tuple[int, ...]): dimension of the image.
+
+        Returns:
+            mask (torch.Tensor): mask.
+        """
+        mask = torch.zeros((landmark.shape[0], *dim))
+        for i in range(landmark.shape[0]):
+            if len(landmark.shape) == 3:
+                for j in range(landmark.shape[1]):
+                    if self.spatial_dims == 2:
+                        if 0 <= landmark[i, j, 0] < dim[0] and 0 <= landmark[i, j, 1] < dim[1]:
+                            mask[i, int(landmark[i, j, 0]), int(landmark[i, j, 1])] = 1
+                    else:
+                        if (
+                            landmark[i, j, 0] < dim[0]
+                            and landmark[i, j, 1] < dim[1]
+                            and landmark[i, j, 2] < dim[2]
+                        ):
+                            mask[
+                                i,
+                                int(landmark[i, j, 0]),
+                                int(landmark[i, j, 1]),
+                                int(landmark[i, j, 2]),
+                            ] = 1
+            else:
+                if self.spatial_dims == 2:
+                    if 0 <= landmark[i, 0] < dim[0] and 0 <= landmark[i, 1] < dim[1]:
+                        mask[i, int(landmark[i, 0]), int(landmark[i, 1])] = 1
+                else:
+                    if (
+                        landmark[i, 0] < dim[0]
+                        and landmark[i, 1] < dim[1]
+                        and landmark[i, 2] < dim[2]
+                    ):
+                        mask[i, int(landmark[i, 0]), int(landmark[i, 1]), int(landmark[i, 2])] = 1
+        return mask
+
+
 class HeatmapDataset(LandmarkDataset):
     """
     ``HeatmapDataset`` is a subclass of ``LandmarkDataset``. It represents a dataset of images and
