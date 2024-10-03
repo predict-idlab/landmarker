@@ -13,7 +13,7 @@ from landmarker.heatmap.generator import (
     HeatmapGenerator,
     LaplacianHeatmapGenerator,
 )
-from landmarker.models.utils import SoftmaxND
+from landmarker.models.utils import LogSoftmaxND
 
 
 class GeneralizedNormalHeatmapLoss(nn.Module):
@@ -563,7 +563,7 @@ class NLLLoss(nn.Module):
         self.spatial_dims = spatial_dims
         self.apply_softmax = apply_softmax
         if self.apply_softmax:
-            self.softmax = SoftmaxND(spatial_dims)
+            self.log_softmax = LogSoftmaxND(spatial_dims)
         if spatial_dims not in [2, 3]:
             raise ValueError("spatial_dims must be 2 or 3")
         self.reduction = reduction
@@ -572,7 +572,9 @@ class NLLLoss(nn.Module):
 
     def forward(self, output, target):
         if self.apply_softmax:
-            output = self.softmax(output)
+            output = self.log_softmax(output)
+        else:
+            output = torch.log(output.double())
         nll = -target * torch.log(output.double())
         if self.spatial_dims == 2:
             dim = (2, 3)

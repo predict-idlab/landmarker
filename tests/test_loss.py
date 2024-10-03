@@ -12,6 +12,7 @@ from src.landmarker.losses.losses import (
     EuclideanDistanceVarianceReg,
     GeneralizedNormalHeatmapLoss,
     MultivariateGaussianNLLLoss,
+    NLLLoss,
     StackedLoss,
     StarLoss,
 )
@@ -670,3 +671,30 @@ def test_stacked_loss_3d():
 
     # check that the output is non-negative
     assert (loss >= 0).all()
+
+
+def test_NLLLoss_2d():
+    """Test the NLLLoss class."""
+    reduction = "mean"
+    pred = torch.rand(2, 3, 64, 64)
+    target = torch.rand(2, 3, 64, 64)
+
+    loss_fn = NLLLoss(reduction=reduction)
+    expected_output_shape = torch.Size([])
+    loss = loss_fn(pred, target)
+    assert loss.shape == expected_output_shape
+
+    pred = torch.rand(2, 3, 64, 64)
+    target = torch.rand(2, 3, 64, 64)
+
+    loss_fn = NLLLoss(reduction="sum")
+    expected_output_shape = torch.Size([])
+
+    loss = loss_fn(pred, target)
+    assert loss.shape == expected_output_shape
+
+    loss_fn = NLLLoss(reduction="none")
+    expected_output_shape = torch.Size([2, 3])
+
+    loss = loss_fn(pred, target)
+    assert loss.shape == expected_output_shape
