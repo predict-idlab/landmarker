@@ -3,6 +3,7 @@ This module contains the functions to load the ISBI 2015 cephalometric landmark 
 dataset.
 """
 
+import glob
 import os
 import zipfile
 
@@ -101,19 +102,19 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
             .tolist()
         )
         image_paths_fold1 = [
-            path_dir + f"/ISBI2015/RawImage/TrainingData/{str(i).zfill(3)}.bmp"
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
             for i in indices_fold_1
         ]
         image_paths_fold2 = [
-            path_dir + f"/ISBI2015/RawImage/TrainingData/{str(i).zfill(3)}.bmp"
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
             for i in indices_fold_2
         ]
         image_paths_fold3 = [
-            path_dir + f"/ISBI2015/RawImage/TrainingData/{str(i).zfill(3)}.bmp"
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
             for i in indices_fold_3
         ]
         image_paths_fold4 = [
-            path_dir + f"/ISBI2015/RawImage/TrainingData/{str(i).zfill(3)}.bmp"
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
             for i in indices_fold_4
         ]
         return (
@@ -121,10 +122,10 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
             image_paths_fold2,
             image_paths_fold3,
             image_paths_fold4,
-            landmarks[indices_fold_1],
-            landmarks[indices_fold_2],
-            landmarks[indices_fold_3],
-            landmarks[indices_fold_4],
+            landmarks[[i - 1 for i in indices_fold_1]],
+            landmarks[[i - 1 for i in indices_fold_2]],
+            landmarks[[i - 1 for i in indices_fold_3]],
+            landmarks[[i - 1 for i in indices_fold_4]],
             np.array([[0.1, 0.1]]).repeat(len(image_paths_fold1), axis=0),
             np.array([[0.1, 0.1]]).repeat(len(image_paths_fold2), axis=0),
             np.array([[0.1, 0.1]]).repeat(len(image_paths_fold3), axis=0),
