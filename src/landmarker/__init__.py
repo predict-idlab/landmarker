@@ -2,7 +2,7 @@
 Landmarker
 """
 
-__version__ = "0.1.2-alpha"
+__version__ = "0.1.2-alpha-v2"
 
 __all__ = [
     "data",

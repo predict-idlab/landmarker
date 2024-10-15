@@ -1,18 +1,10 @@
 """Heatmap loss functions."""
 
-from typing import Optional
-
 import numpy as np
 import torch
-from kornia.losses import js_div_loss_2d
 from torch import nn
 from torch.nn import functional as F
 
-from landmarker.heatmap.generator import (
-    GaussianHeatmapGenerator,
-    HeatmapGenerator,
-    LaplacianHeatmapGenerator,
-)
 from landmarker.models.utils import LogSoftmaxND
 
 
@@ -166,105 +158,6 @@ class EuclideanDistanceVarianceReg(nn.Module):
                 + (cov[..., 1, 1] - self.var_t) ** 2
                 + (cov[..., 2, 2] - self.var_t) ** 2
             )
-        loss = _euclidean_distance(pred, target) + self.alpha * reg
-        if self.reduction == "mean":
-            return torch.mean(loss)
-        if self.reduction == "sum":
-            return torch.sum(loss)
-        return loss
-
-
-class EuclideanDistanceJSDivergenceReg(nn.Module):
-    r"""
-    Euclidean distance loss with Jensen-Shannon divergence regularization. The regularization term
-    imposes a Gaussian distribution on the predicted heatmaps and calculates the Jensen-Shannon
-    divergence between the predicted and the target heatmap. The Jensen-Shannon divergence is a
-    method to measure the similarity between two probability distributions. It is a symmetrized
-    and smoothed version of the Kullback-Leibler divergence, and is defined as the average of the
-    Kullback-Leibler divergence between the two distributions and a mixture M of the two
-    distributions:
-        :math:`JSD(P||Q) = 0.5 * KL(P||M) + 0.5 * KL(Q||M)` where :math:`M = 0.5 * (P + Q)`
-    Generalization of regularization term proposed by Nibali et al. (2018), which only considers
-    Multivariate Gaussian distributions, to a generalized Gaussian distribution. (However, now
-    we only consider the Gaussian and the Laplace distribution.)
-
-        source: Numerical Coordinate Regression with Convolutional Neural Networks - Nibali et al.
-            (2018)
-
-    Args:
-        alpha (float, optional): Weight of the regularization term. Defaults to 1.0.
-        sigma_t (float, optional): Target sigma value. Defaults to 1.0.
-        rotation_t (float, optional): Target rotation value. Defaults to 0.0.
-        nb_landmarks (int, optional): Number of landmarks. Defaults to 1.
-        heatmap_fun (str, optional): Specifies the type of heatmap function to use. Defaults to
-            'gaussian'. Possible values are 'gaussian' and 'laplacian'.
-        heatmap_size (tuple[int, int], optional): Size of the heatmap. Defaults to (512, 512).
-        gamma (Optional[float], optional): Gamma value for the Laplace distribution. Defaults to
-            1.0.
-        reduction (str, optional): Specifies the reduction to apply to the output. Defaults to
-            'mean'.
-        eps (float, optional): Epsilon value to avoid division by zero. Defaults to 1e-6.
-    """
-
-    # TODO: Implement generalized Gaussian distribution. (Currently only Gaussian and Laplace)
-
-    def __init__(
-        self,
-        alpha: float = 1.0,
-        sigma_t: float | torch.Tensor = 1.0,
-        rotation_t: float | torch.Tensor = 0.0,
-        nb_landmarks: int = 1,
-        heatmap_fun: str = "gaussian",
-        heatmap_size: tuple[int, ...] = (512, 512),
-        gamma: Optional[float] = 1.0,
-        reduction: str = "mean",
-        eps: float = 1e-6,
-    ) -> None:
-        super().__init__()
-        self.alpha = alpha
-        self.reduction = reduction
-        if reduction not in ["mean", "sum", "none"]:
-            raise ValueError(f"Invalid reduction: {reduction}")
-        self.eps = eps
-        self.heatmap_fun: HeatmapGenerator
-        self.spatial_dims = len(heatmap_size)
-        if self.spatial_dims != 2:
-            raise ValueError("Only 2D heatmaps are supported.")
-        if heatmap_fun == "gaussian":
-            self.heatmap_fun = GaussianHeatmapGenerator(
-                nb_landmarks=nb_landmarks,
-                sigmas=sigma_t,
-                rotation=rotation_t,
-                heatmap_size=heatmap_size,
-                gamma=gamma,
-            )
-        elif heatmap_fun == "laplacian":
-            self.heatmap_fun = LaplacianHeatmapGenerator(
-                nb_landmarks=nb_landmarks,
-                sigmas=sigma_t,
-                rotation=rotation_t,
-                heatmap_size=heatmap_size,
-                gamma=gamma,
-            )
-        else:
-            raise ValueError(f"Invalid heatmap function: {heatmap_fun}")
-
-    def forward(
-        self, pred: torch.Tensor, pred_heatmap: torch.Tensor, target: torch.Tensor
-    ) -> torch.Tensor:
-        """
-        Args:
-            pred (torch.Tensor): Predicted coordinates.
-            pred_heatmap (torch.Tensor): Predicted heatmap.
-            target (torch.Tensor): Target coordinates.
-        """
-        heatmap_t = self.heatmap_fun(target)
-        # Normalize heatmaps to sum to 1
-        heatmap_t = (heatmap_t + self.eps) / (heatmap_t + self.eps).sum(dim=(-2, -1), keepdim=True)
-        pred_heatmap = (pred_heatmap + self.eps) / (
-            pred_heatmap.sum(dim=(-2, -1), keepdim=True) + self.eps
-        )
-        reg = js_div_loss_2d(pred_heatmap, heatmap_t, reduction="none")
         loss = _euclidean_distance(pred, target) + self.alpha * reg
         if self.reduction == "mean":
             return torch.mean(loss)

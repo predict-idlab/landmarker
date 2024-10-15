@@ -3,12 +3,8 @@
 import torch
 import torch.nn as nn
 
-from src.landmarker.heatmap.generator import (
-    GaussianHeatmapGenerator,
-    LaplacianHeatmapGenerator,
-)
+from src.landmarker.heatmap.generator import GaussianHeatmapGenerator
 from src.landmarker.losses.losses import (
-    EuclideanDistanceJSDivergenceReg,
     EuclideanDistanceVarianceReg,
     GeneralizedNormalHeatmapLoss,
     MultivariateGaussianNLLLoss,
@@ -344,98 +340,6 @@ def test_euclidean_distance_variance_reg_3d():
     try:
         loss_fn = EuclideanDistanceVarianceReg(reduction="invalid", var_t=-1, spatial_dims=3)
         loss = loss_fn(pred, cov_t, target)
-        assert False
-    except ValueError:
-        assert True
-
-
-def test_euclidean_distance_js_divergence_reg():
-    """Test the EuclideanDistanceJSDivergenceReg class."""
-    reduction = "mean"
-    # pred = torch.rand(1, 3, 2) * 64
-    # target = torch.rand(1, 3, 2) * 64
-    pred = torch.ones((1, 3, 2)) * (64 // 2)
-    target = torch.ones((1, 3, 2)) * (64 // 2 - 5)
-
-    heatmap_generator = GaussianHeatmapGenerator(3, sigmas=3, heatmap_size=(64, 64), gamma=1.0)
-    heatmap = heatmap_generator(pred)
-    heatmap_target = heatmap_generator(target)
-
-    loss_fn = EuclideanDistanceJSDivergenceReg(
-        reduction=reduction, heatmap_size=(64, 64), gamma=1.0, sigma_t=3, rotation_t=0.0
-    )
-    expected_output_shape = torch.Size([])
-
-    loss = loss_fn(target, heatmap_target, target)
-
-    assert loss.shape == expected_output_shape
-    assert torch.allclose(loss, torch.zeros_like(loss), atol=1e-5)
-
-    loss = loss_fn(pred, heatmap, target)
-    assert torch.all(loss > 0)
-
-    reduction = "mean"
-    # pred = torch.rand(1, 3, 2) * 64
-    # target = torch.rand(1, 3, 2) * 64
-    pred = torch.ones((1, 3, 2)) * (64 // 2)
-    target = torch.ones((1, 3, 2)) * (64 // 2 - 5)
-
-    heatmap_generator = GaussianHeatmapGenerator(3, sigmas=3, heatmap_size=(64, 64), gamma=1.0)
-    heatmap = heatmap_generator(pred)
-    heatmap_target = heatmap_generator(target)
-
-    loss_fn = EuclideanDistanceJSDivergenceReg(
-        reduction=reduction, heatmap_size=(64, 64), gamma=1.0, sigma_t=3, rotation_t=0.0
-    )
-    expected_output_shape = torch.Size([])
-
-    loss = loss_fn(target, heatmap_target, target)
-
-    assert loss.shape == expected_output_shape
-    assert torch.allclose(loss, torch.zeros_like(loss), atol=1e-5)
-
-    loss = loss_fn(pred, heatmap, target)
-    assert torch.all(loss > 0)
-
-    reduction = "none"
-    # pred = torch.rand(1, 3, 2) * 64
-    # target = torch.rand(1, 3, 2) * 64
-    pred = torch.ones((1, 3, 2)) * (64 // 2)
-    target = torch.ones((1, 3, 2)) * (64 // 2 - 5)
-
-    heatmap_generator = LaplacianHeatmapGenerator(3, sigmas=3, heatmap_size=(64, 64), gamma=1.0)
-    heatmap = heatmap_generator(pred)
-    heatmap_target = heatmap_generator(target)
-
-    loss_fn = EuclideanDistanceJSDivergenceReg(
-        reduction=reduction,
-        heatmap_size=(64, 64),
-        gamma=1.0,
-        sigma_t=3,
-        rotation_t=0.0,
-        heatmap_fun="laplacian",
-    )
-    expected_output_shape = pred.shape[:-1]
-
-    loss = loss_fn(target, heatmap_target, target)
-
-    assert loss.shape == expected_output_shape
-    assert torch.allclose(loss, torch.zeros_like(loss), atol=1e-5)
-
-    loss = loss_fn(pred, heatmap, target)
-    assert torch.all(loss > 0)
-
-
-def test_euclidean_distance_js_divergence_reg_3d():
-    """Test the EuclideanDistanceJSDivergenceReg class. For 3D inputs."""
-    try:
-        EuclideanDistanceJSDivergenceReg(
-            reduction="mean",
-            heatmap_size=(64, 64, 64),
-            gamma=1.0,
-            sigma_t=3,
-            rotation_t=0.0,
-        )
         assert False
     except ValueError:
         assert True
