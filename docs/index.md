@@ -48,10 +48,6 @@ reference/visualize
 
 # Landmarker
 
-:::::{caution}
-🚧 Still under construction. 🚧
-:::::
-
 **Version**: {{ version }}
 
 **Useful links**:

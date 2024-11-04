@@ -9,6 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
@@ -18,7 +33,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -U .
-          pdm sync -d --only-keep -G doc
+          pdm sync -d
       - name: Sphinx build
         run: pdm run doc
       - name: Deploy to GitHub Pages

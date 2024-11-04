@@ -1,7 +1,28 @@
 # 🚀 Getting Started
 
+Landmarker is a Python package built on PyTorch that provides a comprehensive toolkit for anatomical landmark localization in 2D/3D medical images. This guide will help you get started with the basic functionality of the package.
+
+## Table of Contents
+- [🚀 Getting Started](#-getting-started)
+  - [Table of Contents](#table-of-contents)
+  - [⚙️ Installation](#️-installation)
+  - [Basic Usage](#basic-usage)
+    - [1. Loading Data](#1-loading-data)
+      - [Option 1: Using LandmarkDataset directly](#option-1-using-landmarkdataset-directly)
+      - [Option 2: Using Built-in Datasets](#option-2-using-built-in-datasets)
+    - [2. Setting Up Heatmap Generation](#2-setting-up-heatmap-generation)
+    - [3. Creating and Training a Model](#3-creating-and-training-a-model)
+    - [4. Visualization and Evaluation](#4-visualization-and-evaluation)
+  - [Supported Features](#supported-features)
+  - [Tips for Best Results](#tips-for-best-results)
+  - [Common Issues and Solutions](#common-issues-and-solutions)
+  - [Next Steps](#next-steps)
+
+---
+
 (installation)=
 ## ⚙️ Installation
+You can install landmarker using pip:
 `````{tab-set}
 ````{tab-item} pip
 ```bash
@@ -9,74 +30,157 @@ pip install landmarker
 ```
 ````
 `````
+The package requires Python 3.10 or higher.
 
-## Overview
-Landmarker provides a simple API for training and evaluating landmark detection models. The API is designed to be easy to use and to be flexible such that it can be used intertwined with other libraries or custom code. Landmarker can also act as utility library for certain components of landmark detection algorithms. For example, it provides a set of loss functions and heatmap decoding operations that can be used in combination with other PyTorch-based libraries.
+## Basic Usage
 
-In the following sections, we provide a brief overview of the library and the API. For more specific details, we refer to the [API reference](../reference/index).
+### 1. Loading Data
 
-### 📦 Modules
+There are two main ways to load your data into landmarker:
 
-#### Data Loading, Preprocessing, and Augmentation
-The [**landmarker.data**](../reference/data) module contains classes for loading and preprocessing
-data. All classes inherit from the
-[`Dataset`](https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset) class such that they
-can be used with PyTorch's
-[`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) class. There
-are three types of datasets:
-* [`LandmarkDataset`](../reference/data/#landmark_dataset): A dataset of images and corresponding
-    landmarks (landmark coordinates). Is constructed from images and landmarks pairs.
-* [`HeatmapDataset`](../reference/data/#heatmap_dataset): A dataset of images and corresponding
-    heatmaps representing the associated landmark. Is constructed from images and landmarks pairs.
-* [`MaskDataset`](../reference/data/#mask_dataset): A dataset of images and corresponding masks
-    (i.e., binary segmentation masks indiciating the location of the landmarks). Can be
-    constructed from specified image and landmarks pairs, or from images and masks pairs, because
-    often that is how the data is distributed.
+#### Option 1: Using LandmarkDataset directly
 
-Both the `HeatmapDataset` and `MaskDataset` inherit from the `LandmarkDataset` class, and thus also
-contain information about the landmarks. The `MaskDataset` can be constructed from specified image
-and landmarks pairs, or from images and masks pairs, because often that is how the data is
-distributed. The `HeatmapDataset` can be constructed from images and landmarks pairs.
+```python
+from landmarker.data import LandmarkDataset
 
-For all three types of datasets images can be provided as a list of paths to stored images, or as a a numpy
-arary, torch tensor, list of numpy  arrays or list of torch tensors. Landmarks can be as numpy arrays or torch tensors.
-The landmarks are assumed to be in the range of the dimensions of the image. For example, if the image is 256x256, the values of the landmarks are assumed to
-be in the range [0, 256].
-These landmarks can be provided in three different shapes:
-1) (N, D) where N is the number of samples and D is the number of dimensions
-2) (N, C, D) where C is the number of landmark classes
-3) (N, C, I, D) where I is the number of instances per landmark class, if less than I instances are
-    provided, the remaining instances are filled with NaNs.
+# Initialize dataset
+dataset = LandmarkDataset(
+    imgs=image_paths,          # List of paths to your images
+    landmarks=landmarks_array, # NumPy array of shape (N, C, D)
+                             # N = number of samples
+                             # C = number of landmark classes
+                             # D = spatial dimensions (2 or 3)
+    spatial_dims=2,          # 2 for 2D images, 3 for 3D
+    transform=transforms,    # MONAI transforms for preprocessing
+    dim_img=(512, 512),     # Target image dimensions
+    class_names=names       # List of landmark class names
+)
+```
 
-##### Preprocessing
-If the images are provided as a list of paths, the images loaded from these paths and their values
-are normalized to the range [0, 1]. If the images are provided as numpy arrays or torch tensors,
-they are assumed to be normalized to the range [0, 1]. When a dim argument is provided, the images
-and landmarks are rescaled to the specified dimensions. The original dimensions and original
-landmarksare stored in the `original_dims` and `original_landmarks` attributes of the dataset. By
-default the rescalling is done such that the aspect ratio is preserved, i.e., padding is added to
-the image such that the aspect ratio is preserved. If `resize_pad` is set to `False`, the image is
-rescaled without preserving the aspect ratio.
+#### Option 2: Using Built-in Datasets
 
-##### Augmentation
-All datasets can be augmented using the `transforms` argument. Currently the transforms needs to
-follow the [monai](https://docs.monai.io/en/latest/transforms.html), and more specifically they need
-to be in a compose function.
+```python
+from landmarker.dataset import get_cepha_landmark_datasets
 
-#### Datasets
-Comming soon...
+# Load the ISBI2015 cephalometric dataset
+data_dir = "path/to/data"
+train_ds, test1_ds, test2_ds = get_cepha_landmark_datasets(data_dir)
+```
 
-#### Heatmap Generation and Decoding
-Comming soon...
+### 2. Setting Up Heatmap Generation
 
-#### Loss Functions
-Comming soon...
+For heatmap-based landmark detection, you'll need to set up a heatmap generator:
 
-#### Model Architectures
-Comming soon...
+```python
+from landmarker.heatmap import GaussianHeatmapGenerator
 
-#### Training and Evaluation
-Comming soon...
+generator = GaussianHeatmapGenerator(
+    nb_landmarks=19,        # Number of landmarks
+    sigmas=3,              # Standard deviation for Gaussian distribution
+    learnable=True,        # Enable adaptive heatmap parameters
+    heatmap_size=(512, 512) # Output heatmap dimensions
+)
+```
 
-#### Utilities
-Comming soon...
+***Note:** you could also use the heatmapdataset to generate static heatmaps.*
+
+### 3. Creating and Training a Model
+
+Here's an example using the SpatialConfigurationNetwork:
+
+```python
+import torch
+from landmarker.models import OriginalSpatialConfigurationNet
+from landmarker.losses import GaussianHeatmapL2Loss
+from torch.utils.data import DataLoader
+
+# Initialize model
+model = OriginalSpatialConfigurationNet(
+    in_channels=1,    # Number of input channels
+    out_channels=19   # Number of landmarks
+)
+
+# Set up optimizer
+optimizer = torch.optim.SGD([
+    {'params': model.parameters(), "weight_decay": 1e-3},
+    {'params': heatmap_generator.sigmas},
+    {'params': heatmap_generator.rotation}
+], lr=1e-6, momentum=0.99, nesterov=True)
+
+# Define loss function
+criterion = GaussianHeatmapL2Loss(alpha=5)
+
+# Create data loader
+train_loader = DataLoader(
+    dataset,
+    batch_size=1,
+    shuffle=True,
+    num_workers=0
+)
+
+# Training loop
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
+
+for epoch in range(100):
+    model.train()
+    for batch in train_loader:
+        images = batch["image"].to(device)
+        landmarks = batch["landmark"].to(device)
+
+        optimizer.zero_grad()
+        outputs = model(images)
+        heatmaps = heatmap_generator(landmarks)
+        loss = criterion(outputs, heatmap_generator.sigmas, heatmaps)
+
+        loss.backward()
+        optimizer.step()
+```
+
+### 4. Visualization and Evaluation
+
+Landmarker provides tools for visualizing your data and model predictions:
+
+```python
+from landmarker.visualize import inspection_plot, prediction_inspect_plot
+
+# Visualize dataset samples
+inspection_plot(dataset, range(3), heatmap_generator=generator)
+
+# Visualize model predictions
+prediction_inspect_plot(test_dataset, model, test_dataset.indices[:3])
+```
+
+## Supported Features
+
+- Multiple dataset types: `LandmarkDataset`, `HeatmapDataset`, `MaskDataset`, `PatchDataset`
+- Various image formats: NIfTI, DICOM, PNG, JPG, BMP, NPY/NPZ
+- Preprocessing and data augmentation through MONAI transformations
+- Multiple heatmap generation methods and decoding operations
+- Built-in models and loss functions
+- Comprehensive evaluation metrics and visualization tools
+
+## Tips for Best Results
+
+1. **Data Preprocessing**: Use MONAI's transformations to normalize and augment your data appropriately for your specific use case.
+
+2. **Model Selection**: Choose between coordinate regression and heatmap regression based on your requirements. Heatmap regression generally yields better performance.
+
+3. **Hyperparameter Tuning**: Experiment with different heatmap parameters (e.g., sigma values) and learning rates to optimize performance.
+
+4. **Validation**: Use the visualization tools regularly during training to ensure your model is learning correctly.
+
+## Common Issues and Solutions
+
+- If your images have different dimensions, make sure to specify `dim_img` in the dataset initialization to resize them consistently.
+- For 3D images, remember to set `spatial_dims=3` in the dataset initialization.
+- When using learnable heatmap parameters, ensure they're included in the optimizer parameter groups.
+
+## Next Steps
+
+- Explore the [documentation](../reference/index) for detailed API references
+- Check out the examples directory in the GitHub repository
+- Join the community and contribute to the project
+
+For questions or issues, please contact jef.jonkers@ugent.be or visit the [GitHub repository](https://github.com/predict-idlab/landmarker).
+```

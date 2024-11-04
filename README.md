@@ -1,11 +1,19 @@
 <p align="center">
     <a href="https://predict-idlab.github.io/landmarker">
-        <img alt="landmarker" src="/docs/_static/images/logo.svg" width="66%">
+        <img alt="landmarker" src="https://raw.githubusercontent.com/predict-idlab/landmarker/main/docs/_static/images/logo.svg" width="66%">
     </a>
 </p>
 
+[![PyPI Latest Release](https://img.shields.io/pypi/v/landmarker.svg)](https://pypi.org/project/landmarker/)
+[![support-version](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)](https://pypi.org/project/landmarker/)
+[![codecov](https://img.shields.io/codecov/c/github/predict-idlab/landmarker?logo=codecov)](https://codecov.io/gh/predict-idlab/landmarker)
+[![CodeQL](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?)](http://makeapullrequest.com)
+[![Documentation](https://github.com/predict-idlab/landmarker/actions/workflows/documentation.yml/badge.svg)](https://predict-idlab.github.io/landmarker/)
+[![Testing](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/tests.yml)
 
-Landmarker is a [PyTorch](https://pytorch.org/)-based toolkit for (anatomical) landmark detection in images. It is designed to be easy to use and to provide a flexible framework for state-of-the-art landmark detection algorithms for small and large datasets. Landmarker was developed for landmark detection in medical images. However, it can be used for any type of landmark detection problem.
+
+Landmarker is a [PyTorch](https://pytorch.org/)-based toolkit for (anatomical) landmark localization in 2D/3D images. It is designed to be easy to use and to provide a flexible framework for state-of-the-art landmark localization algorithms for small and large datasets. Landmarker was developed for landmark detection in medical images. However, it can be used for any type of landmark localization problem.
 
 ## 🛠️ Installation
 
@@ -20,13 +28,11 @@ Technical documentation is available at [documentation](https://predict-idlab.gi
 Examples and tutorials are available at [examples](https://predict-idlab.github.io/landmarker/examples/index.html)
 
 ## ✨ Features
-- **Modular**: Landmarker is designed to be modular. It is easy to add new models, datasets, and loss functions.
-- **Flexible**: Landmarker provides a flexible framework for landmark detection. It is easy to customize the training and evaluation process.
-- **Easy to use**: Landmarker is easy to use. It provides a simple API for training and evaluation.
+- **Modular**: Landmarker is designed to be modular. Almost all components can be used independently.
+- **Flexible**: Landmarker provides a flexible framework for landmark detection, allowing you to easily customize your model, loss function, and data loaders.
 - **State-of-the-art**: Landmarker provides state-of-the-art landmark detection models and loss functions.
 
 ## 📈 Future Work
-- Extension to 3D landmark detection.
 - Extension to landmark detection in videos.
 - Add uncertainty estimation.
 - ...
@@ -41,7 +47,7 @@ If you use Landmarker in your research, please cite the following paper:
 SCIENTIFIC PAPER UNDER REVIEW
 
 ## 📝 License
-Landmark is licensed under the IMEC [license](LICENSE).
+Landmark is licensed under the MIT [license](LICENSE).
 
 ---
 

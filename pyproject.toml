@@ -6,7 +6,7 @@ authors = [
     {name = "Jef Jonkers", email = "jef.jonkers@ugent.be"},
 ]
 dependencies = [
-    "opencv-python>=4.8.1.78",
+    "opencv-python-headless>=4.8.1.78",
     "monai>=1.3.0",
     "torch>=2.0.0",
     "torchvision>=0.15.0",
@@ -16,14 +16,13 @@ dependencies = [
     "opendatasets>=0.1.22",
     "rarfile>=4.1",
     "scipy>=1.9.3",
-    "kornia>=0.7.0",
     "pydicom>=2.4.3",
     "matplotlib>=3.7.4",
     "seaborn>=0.13.0",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "README.md"
-license = {text = "IMEC"}
+license = {text = "MIT"}
 
 [tool.pdm.version]
 source = "file"
@@ -31,7 +30,6 @@ path = "src/landmarker/__init__.py"
 
 [tool.pdm.scripts]
 test = "pytest"
-coverage = "pytest --cov=src/landmarker --cov-report=term-missing"
 tox = "tox"
 type = "mypy src/landmarker"
 lint = "flake8 src/landmarker"
@@ -69,7 +67,8 @@ doc = [
     "furo",
     "myst-nb",
     "sphinx-togglebutton",
-    "sphinx-collections"
+    "sphinx-collections",
+    "GitPython"
 ]
 type = [
     "mypy>=1.7.1",
@@ -86,6 +85,10 @@ filterwarnings = [
 testpaths = [
     "tests/",
 ]
+addopts = ["--cov=src/landmarker", "--cov-report=term-missing", "--cov-report=xml"]
+
+[tool.coverage.run]
+omit = ["*/datasets/*"]
 
 [tool.mypy]
 exclude = "tests/"

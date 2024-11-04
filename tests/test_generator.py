@@ -1,14 +1,14 @@
 import numpy as np
-import torch
 import pytest
+import torch
 
+from src.landmarker.heatmap.decoder import coord_argmax
 from src.landmarker.heatmap.generator import (
     GaussianHeatmapGenerator,
     LaplacianHeatmapGenerator,
     from_2by2_to_4by4,
     from_3by3_to_4by4,
 )
-from src.landmarker.heatmap.decoder import coord_argmax
 
 landmarks = torch.tensor([[[10, 20], [30, 40], [50, 60]]], dtype=torch.int)
 landmarks_batch = torch.tensor(
@@ -151,7 +151,6 @@ def test_gaussian_heatmap_generator():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -203,7 +202,6 @@ def test_gaussian_heatmap_generator_multiple_instances():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -255,7 +253,6 @@ def test_gaussian_heatmap_generator_multiple_instances_with_nan():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -284,71 +281,6 @@ def test_gaussian_heatmap_generator_multiple_instances_with_nan():
                 )
 
 
-# def test_gaussian_heatmap_generator_no_full_map():
-#     generator = GaussianHeatmapGenerator(nb_landmarks=landmarks.shape[1], sigmas=1.0, heatmap_size=(64, 64), learnable=False,
-#                                             gamma=None, device="cpu", full_map=False)
-
-#     # Call the generator method
-#     heatmaps = generator(landmarks)
-
-#     # Check that the output has the correct shape
-#     assert heatmaps.shape == (1, 3, 64, 64)
-
-#     # Check that the output values are within the expected range
-#     assert torch.all(heatmaps >= 0.0) # No negative values
-#     assert torch.all(heatmaps <= 1.0) # Because gamma is None
-
-#     # Check that the output values are non-zero where expected
-#     # Because gamma = None and we don't deal with subpixel accuracy, we expect the heatmap to be 1 at the center of the
-#     # landmark.
-#     for i in range(3):
-#         assert heatmaps[0, i, landmarks[0, i, 0], landmarks[0, i, 1]] == 1
-
-#     # Call the generator method
-#     heatmaps = generator(landmarks_batch)
-
-#     # Check that the output has the correct shape
-#     assert heatmaps.shape == (4, 3, 64, 64)
-
-#     # Check that the output values are within the expected range
-#     assert torch.all(heatmaps >= 0.0) # No negative values
-#     assert torch.all(heatmaps <= 1.0) # Because gamma is None
-
-
-#     # Check that the output values are non-zero where expected
-#     for i in range(4):
-#         for j in range(landmarks_batch.shape[1]):
-#             assert heatmaps[i, j, landmarks_batch[i, j, 0], landmarks_batch[i, j, 1]] == 1
-
-
-def test_gaussian_heatmap_generator_subpixel():
-    landmarks_batch_ = landmarks_batch + torch.rand(landmarks_batch.shape)
-
-    # Create a generator
-    generator = GaussianHeatmapGenerator(
-        nb_landmarks=landmarks_batch_.shape[1],
-        sigmas=1.0,
-        heatmap_size=(64, 64),
-        learnable=False,
-        gamma=None,
-        device="cpu",
-    )
-
-    # Call the generator method
-    heatmaps = generator(landmarks_batch_)
-
-    # Check that the output has the correct shape
-    assert heatmaps.shape == (4, 3, 64, 64)
-
-    # Check that the output values are within the expected range
-    assert torch.all(heatmaps >= 0.0)  # No negative values
-    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
-
-    # Check that the output values are non-zero where expected
-    pred_landmarks_discrete = coord_argmax(heatmaps)
-    assert torch.equal(landmarks_batch_.round(), pred_landmarks_discrete)
-
-
 def test_gaussian_heatmap_generator_learnable():
     # Create a generator
     generator = GaussianHeatmapGenerator(
@@ -357,7 +289,6 @@ def test_gaussian_heatmap_generator_learnable():
         heatmap_size=(64, 64),
         learnable=True,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -385,7 +316,6 @@ def test_gaussian_heatmap_generator_background():
         learnable=True,
         gamma=None,
         background=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -417,7 +347,6 @@ def test_gaussian_heatmap_generator_all_points():
         gamma=None,
         background=False,
         all_points=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -450,7 +379,6 @@ def test_gaussian_heatmap_generator_not_continuous():
         learnable=False,
         gamma=None,
         continuous=False,
-        device="cpu",
     )
 
     # Call the generator method
@@ -485,7 +413,6 @@ def test_gaussian_heatmap_generator_assymetric_sigmas():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -544,7 +471,6 @@ def test_gaussian_heatmap_generator_rotation():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -604,7 +530,6 @@ def test_gaussian_heatmap_generator_adaptive():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Change sigmas and rotation
@@ -652,7 +577,6 @@ def test_gaussian_heatmap_generator_affine():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Set affine matrix
@@ -767,6 +691,485 @@ def test_gaussian_heatmap_generator_affine():
             assert heatmaps[i, j, landmarks_batch[i, j, 0], landmarks_batch[i, j, 1]] == 1
 
 
+def test_gaussian_heatmap_generator_3d():
+    landmarks_3d = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+        ],
+        dtype=torch.float,
+    )
+
+    assert landmarks_3d.shape == (2, 3, 3)
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=1.0,
+    )
+
+    # Call generator method
+    heatmaps = generator(landmarks_3d)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (2, 3, 64, 64, 64)
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    sum_heatmaps = heatmaps.sum(dim=(2, 3, 4))
+    assert torch.allclose(sum_heatmaps, torch.ones_like(sum_heatmaps))  # Because gamma is 1
+
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    heatmaps = generator(landmarks_3d)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (2, 3, 64, 64, 64)
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    for i in range(2):
+        for j in range(3):
+            assert heatmaps[
+                i,
+                j,
+                landmarks_3d[i, j, 0].int(),
+                landmarks_3d[i, j, 1].int(),
+                landmarks_3d[i, j, 2].int(),
+            ]
+
+
+def test_gaussian_heatmap_generator_multiple_instances_3d():
+    landmarks_3d = torch.tensor(
+        [
+            [
+                [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+                [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            ],
+            [
+                [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+                [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+            ],
+        ],
+        dtype=torch.float,
+    )
+
+    assert landmarks_3d.shape == (2, 2, 3, 3)
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    # Call generator method
+    heatmaps = generator(landmarks_3d)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (2, 2, 64, 64, 64)
+
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+
+    for b in range(2):
+        for c in range(2):
+            for i in range(3):
+                assert (
+                    heatmaps[
+                        b,
+                        c,
+                        landmarks_3d[b, c, i, 0].int(),
+                        landmarks_3d[b, c, i, 1].int(),
+                        landmarks_3d[b, c, i, 2].int(),
+                    ]
+                    == 1
+                )
+
+
+def test_gaussian_heatmap_generator_multiple_instances_with_nan_3d():
+    landmarks_3d = torch.tensor(
+        [
+            [
+                [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+                [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            ],
+            [
+                [[12, 22, 32], [22, 32, 42], [torch.nan, torch.nan, torch.nan]],
+                [[13, 23, 33], [25, 41, 16], [torch.nan, torch.nan, torch.nan]],
+            ],
+        ],
+        dtype=torch.float,
+    )
+    assert landmarks_3d.shape == (2, 2, 3, 3)
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    # Call generator method
+    heatmaps = generator(landmarks_3d)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (2, 2, 64, 64, 64)
+
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+
+    for b in range(2):
+        for c in range(2):
+            for i in range(2):
+                if torch.isnan(landmarks_3d[b, c, i, 0]):
+                    continue
+                assert (
+                    heatmaps[
+                        b,
+                        c,
+                        landmarks_3d[b, c, i, 0].int(),
+                        landmarks_3d[b, c, i, 1].int(),
+                        landmarks_3d[b, c, i, 2].int(),
+                    ]
+                    == 1
+                )
+
+
+def test_gaussian_heatmap_generator_learnable_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.float,
+    )
+
+    assert landmarks_3d_batch.shape == (4, 3, 3)
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=True,
+        gamma=None,
+    )
+
+    # Call the generator method
+    heatmaps = generator(landmarks_3d_batch)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, 3, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check that the output values are non-zero where expected
+    for i in range(4):
+        for j in range(3):
+            assert (
+                heatmaps[
+                    i,
+                    j,
+                    landmarks_3d_batch[i, j, 0].int(),
+                    landmarks_3d_batch[i, j, 1].int(),
+                    landmarks_3d_batch[i, j, 2].int(),
+                ]
+                == 1
+            )
+
+
+def test_gaussian_heatmap_generator_background_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.float,
+    )
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+        background=True,
+    )
+
+    # Call the generator method
+    heatmaps = generator(landmarks_3d_batch)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, 4, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check that the output values are non-zero where expected
+    for i in range(4):
+        for j in range(3):
+            assert (
+                heatmaps[
+                    i,
+                    j + 1,
+                    landmarks_3d_batch[i, j, 0].int(),
+                    landmarks_3d_batch[i, j, 1].int(),
+                    landmarks_3d_batch[i, j, 2].int(),
+                ]
+                == 1
+            )
+        assert torch.allclose(heatmaps[i, 0], 1 - heatmaps[i, 1:].sum(dim=0))
+
+
+def test_gaussian_heatmap_generator_all_points_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.float,
+    )
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+        all_points=True,
+    )
+
+    # Call the generator method
+    heatmaps = generator(landmarks_3d_batch)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, landmarks_3d_batch.shape[1] + 1, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check if all_points is first channel
+    assert torch.equal(heatmaps[:, 0], heatmaps[:, 1:].sum(dim=1))
+
+    # Check that the output values are non-zero where expected
+    for i in range(4):
+        for j in range(3):
+            assert (
+                heatmaps[
+                    i,
+                    j + 1,
+                    landmarks_3d_batch[i, j, 0].int(),
+                    landmarks_3d_batch[i, j, 1].int(),
+                    landmarks_3d_batch[i, j, 2].int(),
+                ]
+                == 1
+            )
+
+
+def test_gaussian_heatmap_generator_not_continuous_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.float,
+    )
+
+    landmarks_3d_batch_ = landmarks_3d_batch + torch.rand(landmarks_3d_batch.shape)
+
+    assert landmarks_3d_batch.shape == (4, 3, 3)
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=1.0,
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    # Call the generator method
+    heatmaps = generator(landmarks_3d_batch_)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, 3, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check that the output values are non-zero where expected
+    pred_landmarks_discrete = coord_argmax(heatmaps, spatial_dims=3)
+    assert torch.equal(landmarks_3d_batch_.round(), pred_landmarks_discrete)
+
+
+def test_gaussian_heatmap_generator_asymmetric_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.int32,
+    )
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=np.array([[1, 0.5, 1], [0.5, 1, 1], [1.5, 2.1, 1]]),
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    # Call the generator method
+    heatmaps = generator(landmarks_3d_batch)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, 3, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check that the output values are non-zero where expected
+    for i in range(4):
+        for j in range(3):
+            assert (
+                heatmaps[
+                    i,
+                    j,
+                    landmarks_3d_batch[i, j, 0].int(),
+                    landmarks_3d_batch[i, j, 1].int(),
+                    landmarks_3d_batch[i, j, 2].int(),
+                ]
+                == 1
+            )
+
+    # Check the assymetry
+    for i in range(4):
+        assert (
+            heatmaps[
+                i,
+                0,
+                landmarks_3d_batch[i, 0, 0] + 1,
+                landmarks_3d_batch[i, 0, 1],
+                landmarks_3d_batch[i, 0, 2],
+            ]
+            > heatmaps[
+                i,
+                0,
+                landmarks_3d_batch[i, 0, 0],
+                landmarks_3d_batch[i, 0, 1] + 1,
+                landmarks_3d_batch[i, 0, 2],
+            ]
+        )
+        assert (
+            heatmaps[
+                i,
+                1,
+                landmarks_3d_batch[i, 1, 0] + 1,
+                landmarks_3d_batch[i, 1, 1],
+                landmarks_3d_batch[i, 1, 2],
+            ]
+            < heatmaps[
+                i,
+                1,
+                landmarks_3d_batch[i, 1, 0],
+                landmarks_3d_batch[i, 1, 1] + 1,
+                landmarks_3d_batch[i, 1, 2],
+            ]
+        )
+        assert (
+            heatmaps[
+                i,
+                2,
+                landmarks_3d_batch[i, 2, 0] + 1,
+                landmarks_3d_batch[i, 2, 1],
+                landmarks_3d_batch[i, 2, 2],
+            ]
+            < heatmaps[
+                i,
+                2,
+                landmarks_3d_batch[i, 2, 0],
+                landmarks_3d_batch[i, 2, 1] + 1,
+                landmarks_3d_batch[i, 2, 2],
+            ]
+        )
+
+
+def test_gaussian_heatmap_generator_affine_3d():
+    landmarks_3d_batch = torch.tensor(
+        [
+            [[10, 20, 30], [20, 30, 40], [30, 15, 20]],
+            [[11, 21, 31], [23, 39, 14], [20, 30, 30]],
+            [[12, 22, 32], [22, 32, 42], [32, 17, 22]],
+            [[13, 23, 33], [25, 41, 16], [22, 32, 32]],
+        ],
+        dtype=torch.int32,
+    )
+
+    # Create a generator
+    generator = GaussianHeatmapGenerator(
+        nb_landmarks=landmarks_3d_batch.shape[1],
+        sigmas=np.array([[1, 0.5, 1], [0.5, 1, 1], [1.5, 2.1, 1]]),
+        heatmap_size=(64, 64, 64),
+        learnable=False,
+        gamma=None,
+    )
+
+    # Set affine matrix
+    affine_matrix = torch.tensor(
+        [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]], dtype=torch.float
+    )
+
+    # Call generator method
+    heatmaps = generator(landmarks_3d_batch, affine_matrix=affine_matrix)
+
+    # Check that the output has the correct shape
+    assert heatmaps.shape == (4, 3, 64, 64, 64)
+
+    # Check that the output values are within the expected range
+    assert torch.all(heatmaps >= 0.0)  # No negative values
+    assert torch.all(heatmaps <= 1.0)  # Because gamma is None
+
+    # Check that the output values are non-zero where expected
+    for i in range(4):
+        for j in range(3):
+            assert (
+                heatmaps[
+                    i,
+                    j,
+                    landmarks_3d_batch[i, j, 0].int(),
+                    landmarks_3d_batch[i, j, 1].int(),
+                    landmarks_3d_batch[i, j, 2].int(),
+                ]
+                == 1
+            )
+
+
 def test_laplacian_heatmap_generator():
     # Create a generator
     generator = LaplacianHeatmapGenerator(
@@ -775,7 +1178,6 @@ def test_laplacian_heatmap_generator():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -818,7 +1220,6 @@ def test_laplacian_heatmap_generator_with_gamma():
             heatmap_size=(64, 64),
             learnable=False,
             gamma=gamma,
-            device="cpu",
         )
 
         # Call the generator method
@@ -859,43 +1260,6 @@ def test_laplacian_heatmap_generator_with_gamma():
                 ) == (gamma / ((2 / 3) * torch.pi) * np.exp(-np.sqrt(3)))
 
 
-# def test_laplacian_heatmap_generator_no_full_map():
-#     generator = LaplacianHeatmapGenerator(nb_landmarks=landmarks.shape[1], sigmas=1.0, heatmap_size=(64, 64), learnable=False,
-#                                             gamma=None, device="cpu", full_map=False)
-
-#     # Call the generator method
-#     heatmaps = generator(landmarks)
-
-#     # Check that the output has the correct shape
-#     assert heatmaps.shape == (1, 3, 64, 64)
-
-#     # Check that the output values are within the expected range
-#     assert torch.all(heatmaps >= 0.0) # No negative values
-#     assert torch.all(heatmaps <= 1.0) # Because gamma is None
-
-#     # Check that the output values are non-zero where expected
-#     # Because gamma = None and we don't deal with subpixel accuracy, we expect the heatmap to be 1 at the center of the
-#     # landmark.
-#     for i in range(3):
-#         assert heatmaps[0, i, landmarks[0, i, 0], landmarks[0, i, 1]] == 1
-
-#     # Call the generator method
-#     heatmaps = generator(landmarks_batch)
-
-#     # Check that the output has the correct shape
-#     assert heatmaps.shape == (4, 3, 64, 64)
-
-#     # Check that the output values are within the expected range
-#     assert torch.all(heatmaps >= 0.0) # No negative values
-#     assert torch.all(heatmaps <= 1.0) # Because gamma is None
-
-
-#     # Check that the output values are non-zero where expected
-#     for i in range(4):
-#         for j in range(landmarks_batch.shape[1]):
-#             assert heatmaps[i, j, landmarks_batch[i, j, 0], landmarks_batch[i, j, 1]] == 1
-
-
 def test_laplacian_heatmap_generator_subpixel():
     landmarks_batch_ = landmarks_batch + torch.rand(landmarks_batch.shape)
 
@@ -906,7 +1270,6 @@ def test_laplacian_heatmap_generator_subpixel():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -932,7 +1295,6 @@ def test_laplacian_heatmap_generator_learnable():
         heatmap_size=(64, 64),
         learnable=True,
         gamma=None,
-        device="cpu",
     )
 
     # Call the generator method
@@ -960,7 +1322,6 @@ def test_laplacian_heatmap_generator_background():
         learnable=True,
         gamma=None,
         background=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -992,7 +1353,6 @@ def test_laplacian_heatmap_generator_all_points():
         gamma=None,
         background=False,
         all_points=True,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1025,7 +1385,6 @@ def test_laplacian_heatmap_generator_not_continuous():
         learnable=False,
         gamma=None,
         continuous=False,
-        device="cpu",
     )
 
     # Call the generator method
@@ -1060,7 +1419,6 @@ def test_laplacian_heatmap_generator_assymetric_sigmas():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -1119,7 +1477,6 @@ def test_laplacian_heatmap_generator_rotation():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Call generator method
@@ -1179,7 +1536,6 @@ def test_laplacian_heatmap_generator_adaptive():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Change sigmas and rotation
@@ -1227,7 +1583,6 @@ def test_laplacian_heatmap_generator_affine():
         heatmap_size=(64, 64),
         learnable=False,
         gamma=None,
-        device="cpu",
     )
 
     # Set affine matrix

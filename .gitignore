@@ -29,10 +29,11 @@ test_notebooks
 .idea
 .vscode
 tags
+junit
 
 # Unittest and coverage
 htmlcov/*
-.coverage
+.coverage*
 .tox
 junit.xml
 coverage.xml
@@ -48,3 +49,11 @@ docs/_build/*
 cover/*
 MANIFEST
 .pdm-python
+
+# example files
+examples/configs/*
+examples/datasets/*
+examples/lightning_logs/*
+examples/lightning_models/*
+examples/main.py
+*model_checkpoints/*

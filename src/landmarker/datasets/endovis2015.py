@@ -149,7 +149,11 @@ def get_endovis2015_dataset(
 
 
 def get_endovis2015_landmark_datasets(
-    path_dir: str, class_names: list[str] = ["LeftClasperPoint", "RightClasperPoint"], **kwargs
+    path_dir: str,
+    class_names: list[str] = ["LeftClasperPoint", "RightClasperPoint"],
+    train_transform=None,
+    inference_transform=None,
+    **kwargs,
 ) -> tuple[LandmarkDataset, LandmarkDataset]:
     (
         train_image_paths,
@@ -157,19 +161,27 @@ def get_endovis2015_landmark_datasets(
         train_landmarks_torch,
         test_landmarks_torch,
     ) = get_endovis2015_dataset(path_dir, class_names)
-    test_kwargs = kwargs.copy()
-    test_kwargs["transform"] = None
     return LandmarkDataset(
-        train_image_paths, train_landmarks_torch, class_names=class_names, **kwargs
+        train_image_paths,
+        train_landmarks_torch,
+        class_names=class_names,
+        transform=train_transform,
+        **kwargs,
     ), LandmarkDataset(
-        test_image_paths, test_landmarks_torch, class_names=class_names, **test_kwargs
+        test_image_paths,
+        test_landmarks_torch,
+        class_names=class_names,
+        transform=inference_transform,
+        **kwargs,
     )
 
 
 def get_endovis2015_heatmap_datasets(
     path_dir: str,
     class_names: list[str] = ["LeftClasperPoint", "RightClasperPoint"],
-    sigma: float = 1,
+    sigma: float = 1.0,
+    train_transform=None,
+    inference_transform=None,
     **kwargs,
 ):
     (
@@ -178,17 +190,21 @@ def get_endovis2015_heatmap_datasets(
         train_landmarks_torch,
         test_landmarks_torch,
     ) = get_endovis2015_dataset(path_dir, class_names)
-    test_kwargs = kwargs.copy()
-    test_kwargs["transform"] = None
     return (
         HeatmapDataset(
-            train_image_paths, train_landmarks_torch, class_names=class_names, sigma=sigma, **kwargs
+            train_image_paths,
+            train_landmarks_torch,
+            class_names=class_names,
+            sigma=sigma,
+            transform=train_transform,
+            **kwargs,
         ),
         HeatmapDataset(
             test_image_paths,
             test_landmarks_torch,
             class_names=class_names,
             sigma=sigma,
-            **test_kwargs,
+            transform=inference_transform,
+            **kwargs,
         ),
     )

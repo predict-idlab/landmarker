@@ -2,8 +2,7 @@
 Landmark transforms.
 """
 
-
-from typing import Optional, Sequence
+from typing import Optional
 
 import torch
 
@@ -94,54 +93,4 @@ def elastic_deform_landmarks(
         "Elastic deformation not implemented yet. MONAI does not"
         " support backtracking the grid sample and affine transform."
     )
-    return landmarks
-
-
-def flip_landmarks_with_affine(
-    landmarks: torch.Tensor,
-    affine_matrix: torch.Tensor,
-    flip_indices: Sequence[int],
-):
-    """
-    Flip landmarks.
-
-    Args:
-        landmarks (torch.Tensor): landmarks to flip.
-        affine_matrix (torch.Tensor): affine matrix to apply to the landmarks.
-        flip_indices (Sequence[int]): indices of the landmarks to flip.
-
-    Returns:
-        landmarks (torch.Tensor): flipped landmarks.
-    """
-    t_landmarks = affine_landmarks(landmarks, affine_matrix)
-    return t_landmarks[..., flip_indices]
-
-
-def flip_landmarks(
-    landmarks: torch.Tensor,
-    flip_code: int,
-    flip_indices_v: Optional[Sequence[int]] = None,
-    flip_indices_h: Optional[Sequence[int]] = None,
-):
-    """
-    Flip landmarks.
-
-    Args:
-        landmarks (torch.Tensor): landmarks to flip.
-        flip_code (int): flip code (0, 1, 2, 3) to apply to the landmarks. 0 is no flip. 1 is
-            horizontal flip. 2 is vertical flip. 3 is horizontal and vertical flip.
-        flip_indices_v (Sequence[int]): indices of the landmarks to flip vertically.
-        flip_indices_h (Sequence[int]): indices of the landmarks to flip horizontally.
-
-    Returns:
-        landmarks (torch.Tensor): flipped landmarks.
-    """
-    if flip_indices_h is None:
-        flip_indices_h = [i for i in range(landmarks.shape[1])]
-    if flip_indices_v is None:
-        flip_indices_v = [i for i in range(landmarks.shape[1])]
-    if flip_code == 1 or flip_code == 3:
-        return landmarks[..., flip_indices_h]
-    if flip_code == 2 or flip_code == 3:
-        return landmarks[..., flip_indices_v]
     return landmarks

@@ -3,66 +3,21 @@ This module contains the functions to load the ISBI 2015 cephalometric landmark 
 dataset.
 """
 
+import glob
 import os
 import zipfile
-from typing import Callable, Optional
 
 import numpy as np
 import opendatasets as od  # type: ignore
 import pandas as pd  # type: ignore
 import rarfile  # type: ignore
 
-from landmarker.data.landmark_dataset import HeatmapDataset, LandmarkDataset
-
-
-def get_cepha_dataset_kaggle(path_dir: str):
-    """
-    Returns the paths to the images and the landmarks of the cephalogram dataset.
-
-    Args:
-        path_dir (str): The path to the directory where the dataset should be stored.
-    """
-    if not os.path.exists(path_dir + "/ISBI2015-kaggle/train_senior.csv"):
-        od.download("https://www.kaggle.com/datasets/jiahongqian/cephalometric-landmarks", path_dir)
-        # Change the name of the folder to ISBI2015-kaggle
-        os.rename(path_dir + "/cephalometric-landmarks", path_dir + "/ISBI2015-kaggle")
-    df_train_senior = pd.read_csv(path_dir + "/ISBI2015-kaggle/train_senior.csv")
-    df_train_senior["image_path"] = (
-        path_dir + "/ISBI2015-kaggle/cepha400/cepha400/" + df_train_senior["image_path"]
-    )
-    landmarks_train = np.flip(
-        df_train_senior.drop(columns=["image_path"]).to_numpy().reshape(-1, 19, 2), axis=-1
-    )
-    df_test1_senior = pd.read_csv(path_dir + "/ISBI2015-kaggle/test1_senior.csv")
-    df_test1_senior["image_path"] = (
-        path_dir + "/ISBI2015-kaggle/cepha400/cepha400/" + df_test1_senior["image_path"]
-    )
-    landmarks_test1 = np.flip(
-        df_test1_senior.drop(columns=["image_path"]).to_numpy().reshape(-1, 19, 2), axis=-1
-    )
-    df_test2_senior = pd.read_csv(path_dir + "/ISBI2015-kaggle/test2_senior.csv")
-    df_test2_senior["image_path"] = (
-        path_dir + "/ISBI2015-kaggle/cepha400/cepha400/" + df_test2_senior["image_path"]
-    )
-    landmarks_test2 = np.flip(
-        df_test2_senior.drop(columns=["image_path"]).to_numpy().reshape(-1, 19, 2), axis=-1
-    )
-
-    pixel_spacings_train = np.array([[0.1, 0.1]]).repeat(len(landmarks_train), axis=0)
-    pixel_spacings_test1 = np.array([[0.1, 0.1]]).repeat(len(landmarks_test1), axis=0)
-    pixel_spacings_test2 = np.array([[0.1, 0.1]]).repeat(len(landmarks_test2), axis=0)
-
-    return (
-        df_train_senior["image_path"].to_list(),
-        df_test1_senior["image_path"].to_list(),
-        df_test2_senior["image_path"].to_list(),
-        landmarks_train,
-        landmarks_test1,
-        landmarks_test2,
-        pixel_spacings_train,
-        pixel_spacings_test1,
-        pixel_spacings_test2,
-    )
+from landmarker.data.landmark_dataset import (
+    HeatmapDataset,
+    LandmarkDataset,
+    MaskDataset,
+    PatchDataset,
+)
 
 
 def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
@@ -97,14 +52,13 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
         os.remove(path_dir + "/ISBI2015/AnnotationsByMD.rar")
         os.remove(path_dir + "/ISBI2015/RawImage.rar")
         os.remove(path_dir + "/ISBI2015/EvaluationCode.rar")
-        if cv:
-            os.mkdir(path_dir + "/ISBI2015/cv_payer")
-            for i in range(1, 5):
-                od.download(
-                    "https://raw.githubusercontent.com/christianpayer/MedicalDataAugmentationTool"
-                    + f"-HeatmapUncertainty/main/setup_ann/all_landmarks/cv/{i}.txt",
-                    path_dir + "/ISBI2015/cv_payer",
-                )
+        os.mkdir(path_dir + "/ISBI2015/cv_payer")
+        for i in range(1, 5):
+            od.download(
+                "https://raw.githubusercontent.com/christianpayer/MedicalDataAugmentationTool"
+                + f"-HeatmapUncertainty/main/setup_ann/all_landmarks/cv/{i}.txt",
+                path_dir + "/ISBI2015/cv_payer",
+            )
 
     if junior:
         annotator = "junior"
@@ -121,6 +75,63 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
         )
     landmarks = np.concatenate(landmarks_list, axis=0).reshape((-1, 19, 2))
     landmarks = np.flip(landmarks, axis=-1)
+
+    if cv:
+        indices_fold_1 = (
+            pd.read_table(path_dir + f"/ISBI2015/cv_payer/{1}.txt", header=None)
+            .to_numpy()
+            .flatten()
+            .tolist()
+        )
+        indices_fold_2 = (
+            pd.read_table(path_dir + f"/ISBI2015/cv_payer/{2}.txt", header=None)
+            .to_numpy()
+            .flatten()
+            .tolist()
+        )
+        indices_fold_3 = (
+            pd.read_table(path_dir + f"/ISBI2015/cv_payer/{3}.txt", header=None)
+            .to_numpy()
+            .flatten()
+            .tolist()
+        )
+        indices_fold_4 = (
+            pd.read_table(path_dir + f"/ISBI2015/cv_payer/{4}.txt", header=None)
+            .to_numpy()
+            .flatten()
+            .tolist()
+        )
+        image_paths_fold1 = [
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
+            for i in indices_fold_1
+        ]
+        image_paths_fold2 = [
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
+            for i in indices_fold_2
+        ]
+        image_paths_fold3 = [
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
+            for i in indices_fold_3
+        ]
+        image_paths_fold4 = [
+            glob.glob(path_dir + f"/ISBI2015/RawImage/*/{str(i).zfill(3)}.bmp")[0]
+            for i in indices_fold_4
+        ]
+        return (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks[[i - 1 for i in indices_fold_1]],
+            landmarks[[i - 1 for i in indices_fold_2]],
+            landmarks[[i - 1 for i in indices_fold_3]],
+            landmarks[[i - 1 for i in indices_fold_4]],
+            np.array([[0.1, 0.1]]).repeat(len(image_paths_fold1), axis=0),
+            np.array([[0.1, 0.1]]).repeat(len(image_paths_fold2), axis=0),
+            np.array([[0.1, 0.1]]).repeat(len(image_paths_fold3), axis=0),
+            np.array([[0.1, 0.1]]).repeat(len(image_paths_fold4), axis=0),
+        )
+
     image_paths_train = [
         path_dir + f"/ISBI2015/RawImage/TrainingData/{str(i).zfill(3)}.bmp" for i in range(1, 151)
     ]
@@ -151,27 +162,74 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
 
 def get_cepha_landmark_datasets(
     path_dir: str,
-    transform: Optional[Callable] = None,
+    train_transform=None,
+    inference_transform=None,
     store_imgs=True,
     dim_img=None,
-    kaggle=False,
     junior=False,
     single_dataset=False,
-) -> LandmarkDataset | tuple[LandmarkDataset, LandmarkDataset, LandmarkDataset]:
+    cv=False,
+) -> (
+    LandmarkDataset
+    | tuple[LandmarkDataset, LandmarkDataset, LandmarkDataset]
+    | tuple[LandmarkDataset, LandmarkDataset, LandmarkDataset, LandmarkDataset]
+):
     """Returns a LandmarkDataset objects with the CEPH dataset, a combination of the ISBI 2014 &
     2015 challenges. The dataset is split into train, test1 and test2. The same approach as in
     "CephaNN: A Multi-Head Attention Network for Cephalometric Landmark Detection" - JIAHOONG QIAN
         et al. is used.
     """
-    if junior and kaggle:
-        raise ValueError("Junior annotator is not available for the kaggle dataset.")
-    if kaggle:
-        retrieve_data = get_cepha_dataset_kaggle
-    else:
-
-        def retrieve_data(path):
-            return get_cepha_dataset(path, junior=junior)
-
+    if single_dataset and cv:
+        raise ValueError("Cannot have single dataset and cross validation at the same time.")
+    if cv:
+        (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks_fold1,
+            landmarks_fold2,
+            landmarks_fold3,
+            landmarks_fold4,
+            pixel_spacings_fold1,
+            pixel_spacings_fold2,
+            pixel_spacings_fold3,
+            pixel_spacings_fold4,
+        ) = get_cepha_dataset(path_dir, junior=junior, cv=True)
+        return (
+            LandmarkDataset(
+                image_paths_fold1,
+                landmarks_fold1,
+                pixel_spacing=pixel_spacings_fold1,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                dim_img=dim_img,
+            ),
+            LandmarkDataset(
+                image_paths_fold2,
+                landmarks_fold2,
+                pixel_spacing=pixel_spacings_fold2,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                dim_img=dim_img,
+            ),
+            LandmarkDataset(
+                image_paths_fold3,
+                landmarks_fold3,
+                pixel_spacing=pixel_spacings_fold3,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                dim_img=dim_img,
+            ),
+            LandmarkDataset(
+                image_paths_fold4,
+                landmarks_fold4,
+                pixel_spacing=pixel_spacings_fold4,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                dim_img=dim_img,
+            ),
+        )
     (
         image_paths_train,
         image_paths_test1,
@@ -182,7 +240,7 @@ def get_cepha_landmark_datasets(
         pixel_spacings_train,
         pixel_spacings_test1,
         pixel_spacings_test2,
-    ) = retrieve_data(path_dir)
+    ) = get_cepha_dataset(path_dir, junior=junior, cv=False)
     if single_dataset:
         return LandmarkDataset(
             image_paths_train + image_paths_test1 + image_paths_test2,
@@ -190,7 +248,7 @@ def get_cepha_landmark_datasets(
             pixel_spacing=np.concatenate(
                 [pixel_spacings_train, pixel_spacings_test1, pixel_spacings_test2], axis=0
             ),
-            transform=transform,
+            transform=train_transform,
             store_imgs=store_imgs,
             dim_img=dim_img,
         )
@@ -199,7 +257,7 @@ def get_cepha_landmark_datasets(
             image_paths_train,
             landmarks_train,
             pixel_spacing=pixel_spacings_train,
-            transform=transform,
+            transform=train_transform,
             store_imgs=store_imgs,
             dim_img=dim_img,
         ),
@@ -207,7 +265,7 @@ def get_cepha_landmark_datasets(
             image_paths_test1,
             landmarks_test1,
             pixel_spacing=pixel_spacings_test1,
-            transform=None,
+            transform=inference_transform,
             store_imgs=store_imgs,
             dim_img=dim_img,
         ),
@@ -215,7 +273,7 @@ def get_cepha_landmark_datasets(
             image_paths_test2,
             landmarks_test2,
             pixel_spacing=pixel_spacings_test2,
-            transform=None,
+            transform=inference_transform,
             store_imgs=store_imgs,
             dim_img=dim_img,
         ),
@@ -224,37 +282,85 @@ def get_cepha_landmark_datasets(
 
 def get_cepha_heatmap_datasets(
     path_dir: str,
-    transform: Optional[Callable] = None,
+    train_transform=None,
+    inference_transform=None,
     sigma: float = 1,
-    kaggle: bool = True,
     junior: bool = False,
     single_dataset: bool = False,
+    cv: bool = False,
     **kwargs,
-) -> HeatmapDataset | tuple[HeatmapDataset, HeatmapDataset, HeatmapDataset]:
+) -> (
+    HeatmapDataset
+    | tuple[HeatmapDataset, HeatmapDataset, HeatmapDataset]
+    | tuple[HeatmapDataset, HeatmapDataset, HeatmapDataset, HeatmapDataset]
+):
     """Returns a HeatmapDataset with the ISBI 2015 cephalogram challenge dataset. The dataset is
     split into train, test1 and test2. The same approach as in "CephaNN: A Multi-Head Attention
     Network for Cephalometric Landmark Detection" - JIAHOONG QIAN et al. is used.
 
     Args:
         path_dir (str): The path to the directory where the dataset should be stored.
-        transform (Optional[Callable], optional): A transformation to apply to the images and
-            heatmaps. Defaults to None.
+        train_transform (Optional[Callable], optional): A transformation to apply to the images and
+            landmarks during training. Defaults to None.
+        inference_transform (Optional[Callable], optional): A transformation to apply to the images
+            and landmarks during inference. Defaults to None.
         sigma (int, optional): The sigma value for the gaussian kernel. Defaults to 1.
-        kaggle (bool, optional): Whether to use the kaggle dataset. Defaults to True.
         junior (bool, optional): Whether to use the junior or senior annotator. Defaults to False.
         single_dataset (bool, optional): Whether to return a single dataset with all images and
             landmarks. Defaults to False.
         **kwargs: Additional keyword arguments for the HeatmapDataset.
     """
-    if junior and kaggle:
-        raise ValueError("Junior annotator is not available for the kaggle dataset.")
-    if kaggle:
-        retrieve_data = get_cepha_dataset_kaggle
-    else:
-
-        def retrieve_data(path):
-            return get_cepha_dataset(path, junior=junior)
-
+    if single_dataset and cv:
+        raise ValueError("Cannot have single dataset and cross validation at the same time.")
+    if cv:
+        (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks_fold1,
+            landmarks_fold2,
+            landmarks_fold3,
+            landmarks_fold4,
+            pixel_spacings_fold1,
+            pixel_spacings_fold2,
+            pixel_spacings_fold3,
+            pixel_spacings_fold4,
+        ) = get_cepha_dataset(path_dir, junior=junior, cv=True)
+        return (
+            HeatmapDataset(
+                image_paths_fold1,
+                landmarks_fold1,
+                pixel_spacing=pixel_spacings_fold1,
+                transform=train_transform,
+                sigma=sigma,
+                **kwargs,
+            ),
+            HeatmapDataset(
+                image_paths_fold2,
+                landmarks_fold2,
+                pixel_spacing=pixel_spacings_fold2,
+                transform=train_transform,
+                sigma=sigma,
+                **kwargs,
+            ),
+            HeatmapDataset(
+                image_paths_fold3,
+                landmarks_fold3,
+                pixel_spacing=pixel_spacings_fold3,
+                transform=train_transform,
+                sigma=sigma,
+                **kwargs,
+            ),
+            HeatmapDataset(
+                image_paths_fold4,
+                landmarks_fold4,
+                pixel_spacing=pixel_spacings_fold4,
+                transform=train_transform,
+                sigma=sigma,
+                **kwargs,
+            ),
+        )
     (
         image_paths_train,
         image_paths_test1,
@@ -265,7 +371,7 @@ def get_cepha_heatmap_datasets(
         pixel_spacings_train,
         pixel_spacings_test1,
         pixel_spacings_test2,
-    ) = retrieve_data(path_dir)
+    ) = get_cepha_dataset(path_dir, junior=junior, cv=False)
     if single_dataset:
         return HeatmapDataset(
             image_paths_train + image_paths_test1 + image_paths_test2,
@@ -273,7 +379,7 @@ def get_cepha_heatmap_datasets(
             pixel_spacing=np.concatenate(
                 [pixel_spacings_train, pixel_spacings_test1, pixel_spacings_test2], axis=0
             ),
-            transform=transform,
+            transform=train_transform,
             sigma=sigma,
             **kwargs,
         )
@@ -282,7 +388,7 @@ def get_cepha_heatmap_datasets(
             image_paths_train,
             landmarks_train,
             pixel_spacing=pixel_spacings_train,
-            transform=transform,
+            transform=train_transform,
             sigma=sigma,
             **kwargs,
         ),
@@ -290,7 +396,7 @@ def get_cepha_heatmap_datasets(
             image_paths_test1,
             landmarks_test1,
             pixel_spacing=pixel_spacings_test1,
-            transform=None,
+            transform=inference_transform,
             sigma=sigma,
             **kwargs,
         ),
@@ -298,8 +404,254 @@ def get_cepha_heatmap_datasets(
             image_paths_test2,
             landmarks_test2,
             pixel_spacing=pixel_spacings_test2,
-            transform=None,
+            transform=inference_transform,
             sigma=sigma,
+            **kwargs,
+        ),
+    )
+
+
+def get_cepha_mask_datasets(
+    path_dir: str,
+    train_transform=None,
+    inference_transform=None,
+    junior: bool = False,
+    single_dataset: bool = False,
+    cv: bool = False,
+    **kwargs,
+) -> (
+    MaskDataset
+    | tuple[MaskDataset, MaskDataset, MaskDataset]
+    | tuple[MaskDataset, MaskDataset, MaskDataset, MaskDataset]
+):
+    """Returns a MaskDataset with the ISBI 2015 cephalogram challenge dataset. The dataset is
+    split into train, test1 and test2. The same approach as in "CephaNN: A Multi-Head Attention
+    Network for Cephalometric Landmark Detection" - JIAHOONG QIAN et al. is used.
+
+    Args:
+        path_dir (str): The path to the directory where the dataset should be stored.
+        train_transform (Optional[Callable], optional): A transformation to apply to the images and
+            masks during training. Defaults to None.
+        inference_transform (Optional[Callable], optional): A transformation to apply to the images
+            and masks during inference. Defaults to None.
+        junior (bool, optional): Whether to use the junior or senior annotator. Defaults to False.
+        single_dataset (bool, optional): Whether to return a single dataset with all images and
+            landmarks. Defaults to False.
+        **kwargs: Additional keyword arguments for the MaskDataset.
+    """
+    if single_dataset and cv:
+        raise ValueError("Cannot have single dataset and cross validation at the same time.")
+    if cv:
+        (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks_fold1,
+            landmarks_fold2,
+            landmarks_fold3,
+            landmarks_fold4,
+            pixel_spacings_fold1,
+            pixel_spacings_fold2,
+            pixel_spacings_fold3,
+            pixel_spacings_fold4,
+        ) = get_cepha_dataset(path_dir, junior=junior, cv=True)
+        return (
+            MaskDataset(
+                image_paths_fold1,
+                landmarks_fold1,
+                pixel_spacing=pixel_spacings_fold1,
+                transform=train_transform,
+                **kwargs,
+            ),
+            MaskDataset(
+                image_paths_fold2,
+                landmarks_fold2,
+                pixel_spacing=pixel_spacings_fold2,
+                transform=train_transform,
+                **kwargs,
+            ),
+            MaskDataset(
+                image_paths_fold3,
+                landmarks_fold3,
+                pixel_spacing=pixel_spacings_fold3,
+                transform=train_transform,
+                **kwargs,
+            ),
+            MaskDataset(
+                image_paths_fold4,
+                landmarks_fold4,
+                pixel_spacing=pixel_spacings_fold4,
+                transform=train_transform,
+                **kwargs,
+            ),
+        )
+    (
+        image_paths_train,
+        image_paths_test1,
+        image_paths_test2,
+        landmarks_train,
+        landmarks_test1,
+        landmarks_test2,
+        pixel_spacings_train,
+        pixel_spacings_test1,
+        pixel_spacings_test2,
+    ) = get_cepha_dataset(path_dir, junior=junior, cv=False)
+    if single_dataset:
+        return MaskDataset(
+            image_paths_train + image_paths_test1 + image_paths_test2,
+            np.concatenate([landmarks_train, landmarks_test1, landmarks_test2], axis=0),
+            pixel_spacing=np.concatenate(
+                [pixel_spacings_train, pixel_spacings_test1, pixel_spacings_test2], axis=0
+            ),
+            transform=train_transform,
+            **kwargs,
+        )
+    return (
+        MaskDataset(
+            image_paths_train,
+            landmarks_train,
+            pixel_spacing=pixel_spacings_train,
+            transform=train_transform,
+            **kwargs,
+        ),
+        MaskDataset(
+            image_paths_test1,
+            landmarks_test1,
+            pixel_spacing=pixel_spacings_test1,
+            transform=inference_transform,
+            **kwargs,
+        ),
+        MaskDataset(
+            image_paths_test2,
+            landmarks_test2,
+            pixel_spacing=pixel_spacings_test2,
+            transform=inference_transform,
+            **kwargs,
+        ),
+    )
+
+
+def get_cepha_patch_datasets(
+    path_dir: str,
+    index_landmark: int = 0,
+    train_transform=None,
+    inference_transform=None,
+    store_imgs=True,
+    junior=False,
+    single_dataset=False,
+    cv=False,
+    **kwargs,
+):
+    """Returns a PatchDataset objects with the CEPH dataset, a combination of the ISBI 2014 &
+    2015 challenges. The dataset is split into train, test1 and test2. The same approach as in
+    "CephaNN: A Multi-Head Attention Network for Cephalometric Landmark Detection" - JIAHOONG QIAN
+        et al. is used.
+    """
+    if single_dataset and cv:
+        raise ValueError("Cannot have single dataset and cross validation at the same time.")
+    if cv:
+        (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks_fold1,
+            landmarks_fold2,
+            landmarks_fold3,
+            landmarks_fold4,
+            pixel_spacings_fold1,
+            pixel_spacings_fold2,
+            pixel_spacings_fold3,
+            pixel_spacings_fold4,
+        ) = get_cepha_dataset(path_dir, junior=junior, cv=True)
+        return (
+            PatchDataset(
+                image_paths_fold1,
+                landmarks_fold1,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold1,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchDataset(
+                image_paths_fold2,
+                landmarks_fold2,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold2,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchDataset(
+                image_paths_fold3,
+                landmarks_fold3,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold3,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchDataset(
+                image_paths_fold4,
+                landmarks_fold4,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold4,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+        )
+    (
+        image_paths_train,
+        image_paths_test1,
+        image_paths_test2,
+        landmarks_train,
+        landmarks_test1,
+        landmarks_test2,
+        pixel_spacings_train,
+        pixel_spacings_test1,
+        pixel_spacings_test2,
+    ) = get_cepha_dataset(path_dir, junior=junior, cv=False)
+    if single_dataset:
+        return PatchDataset(
+            image_paths_train + image_paths_test1 + image_paths_test2,
+            np.concatenate([landmarks_train, landmarks_test1, landmarks_test2], axis=0),
+            index_landmark=index_landmark,
+            pixel_spacing=np.concatenate(
+                [pixel_spacings_train, pixel_spacings_test1, pixel_spacings_test2], axis=0
+            ),
+            transform=train_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        )
+    return (
+        PatchDataset(
+            image_paths_train,
+            landmarks_train,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_train,
+            transform=train_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        ),
+        PatchDataset(
+            image_paths_test1,
+            landmarks_test1,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_test1,
+            transform=inference_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        ),
+        PatchDataset(
+            image_paths_test2,
+            landmarks_test2,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_test2,
+            transform=inference_transform,
+            store_imgs=store_imgs,
             **kwargs,
         ),
     )

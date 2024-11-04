@@ -152,17 +152,28 @@ class OriginalSpatialConfigurationNet(nn.Module):
         out_channels: int = 4,
         la_channels: int = 128,
         la_depth: int = 3,
-        la_kernel_size: int | tuple[int, int] = 3,
+        la_kernel_size: int | tuple[int, ...] = 3,
         la_dropout: float = 0.5,
         sp_channels: int = 128,
         sp_kernel_size: int = 11,
         sp_downsample: int = 16,
         init_weigths: bool = False,
+        spatial_dim: int = 2,
     ) -> None:
         super().__init__()
         self.init_weights = init_weigths
+        if spatial_dim == 2:
+            conv = nn.Conv2d  # type: ignore
+            avg_pool = nn.AvgPool2d  # type: ignore
+            mode = "bilinear"
+        elif spatial_dim == 3:
+            conv = nn.Conv3d  # type: ignore
+            avg_pool = nn.AvgPool3d  # type: ignore
+            mode = "trilinear"
+        else:
+            raise ValueError(f"spatial_dim must be 2 or 3, got {spatial_dim}.")
         self.first_conv = nn.Sequential(
-            nn.Conv2d(
+            conv(
                 in_channels=in_channels,
                 out_channels=la_channels,
                 kernel_size=la_kernel_size,
@@ -180,6 +191,7 @@ class OriginalSpatialConfigurationNet(nn.Module):
                     out_channels=la_channels,
                     dropout=la_dropout,
                     kernel_size=la_kernel_size,
+                    spatial_dim=spatial_dim,
                 )
                 for _ in range(la_depth)
             ]
@@ -187,20 +199,23 @@ class OriginalSpatialConfigurationNet(nn.Module):
         self.up_layers = nn.ModuleList(
             [
                 UpLayer(
-                    in_channels=la_channels, out_channels=la_channels, kernel_size=la_kernel_size
+                    in_channels=la_channels,
+                    out_channels=la_channels,
+                    kernel_size=la_kernel_size,
+                    spatial_dim=spatial_dim,
                 )
                 for _ in range(la_depth)
             ]
         )
         self.bottleneck_layer = nn.Sequential(
-            nn.Conv2d(
+            conv(
                 in_channels=la_channels,
                 out_channels=la_channels,
                 kernel_size=la_kernel_size,
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2d(
+            conv(
                 in_channels=la_channels,
                 out_channels=la_channels,
                 kernel_size=la_kernel_size,
@@ -208,40 +223,40 @@ class OriginalSpatialConfigurationNet(nn.Module):
             ),
             nn.LeakyReLU(negative_slope=0.1),
         )
-        self.last_layer = nn.Conv2d(
+        self.last_layer = conv(
             in_channels=la_channels, out_channels=out_channels, kernel_size=1, padding="same"
         )
 
         self.sc_net = nn.Sequential(
-            nn.AvgPool2d(kernel_size=sp_downsample),
-            nn.Conv2d(
+            avg_pool(kernel_size=sp_downsample),
+            conv(
                 in_channels=out_channels,
                 out_channels=sp_channels,
                 kernel_size=sp_kernel_size,
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2d(
+            conv(
                 in_channels=sp_channels,
                 out_channels=sp_channels,
                 kernel_size=sp_kernel_size,
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2d(
+            conv(
                 in_channels=sp_channels,
                 out_channels=sp_channels,
                 kernel_size=sp_kernel_size,
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
-            nn.Conv2d(
+            conv(
                 in_channels=sp_channels,
                 out_channels=out_channels,
                 kernel_size=sp_kernel_size,
                 padding="same",
             ),
-            nn.Upsample(scale_factor=sp_downsample, mode="bicubic", align_corners=False),
+            nn.Upsample(scale_factor=sp_downsample, mode=mode, align_corners=False),
             nn.Tanh(),
         )
         if self.init_weights:
@@ -285,10 +300,21 @@ class DownLayer(nn.Module):
         dropout: float,
         kernel_size: int | tuple[int, int] = 3,
         bias: bool = True,
+        spatial_dim: int = 2,
     ) -> None:
         super().__init__()
+        if spatial_dim == 2:
+            conv = nn.Conv2d
+            avg_pool = nn.AvgPool2d
+            dropout_func = nn.Dropout2d
+        elif spatial_dim == 3:
+            conv = nn.Conv3d
+            avg_pool = nn.AvgPool3d
+            dropout_func = nn.Dropout3d
+        else:
+            raise ValueError(f"spatial_dim must be 2 or 3, got {spatial_dim}.")
         self.conv1 = nn.Sequential(
-            nn.Conv2d(
+            conv(
                 in_channels=in_channels,
                 out_channels=out_channels,
                 kernel_size=kernel_size,
@@ -298,9 +324,9 @@ class DownLayer(nn.Module):
             ),
             nn.LeakyReLU(negative_slope=0.1),
         )
-        self.dropout = nn.Dropout2d(p=dropout)
+        self.dropout = dropout_func(p=dropout)
         self.conv2 = nn.Sequential(
-            nn.Conv2d(
+            conv(
                 in_channels=out_channels,
                 out_channels=out_channels,
                 kernel_size=kernel_size,
@@ -310,7 +336,7 @@ class DownLayer(nn.Module):
             ),
             nn.LeakyReLU(negative_slope=0.1),
         )
-        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.pool = avg_pool(kernel_size=2, stride=2)
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         r"""
@@ -338,11 +364,19 @@ class UpLayer(nn.Module):
         out_channels: int,
         kernel_size: int | tuple[int, int] = 3,
         bias: bool = True,
-        upsample_mode: str = "bilinear",
+        spatial_dim: int = 2,
     ):
         super().__init__()
+        if spatial_dim == 2:
+            conv = nn.Conv2d
+            mode = "bilinear"
+        elif spatial_dim == 3:
+            conv = nn.Conv3d
+            mode = "trilinear"
+        else:
+            raise ValueError(f"spatial_dim must be 2 or 3, got {spatial_dim}.")
         self.conv1 = nn.Sequential(
-            nn.Conv2d(
+            conv(
                 in_channels=in_channels,
                 out_channels=out_channels,
                 kernel_size=kernel_size,
@@ -352,7 +386,7 @@ class UpLayer(nn.Module):
             ),
             nn.LeakyReLU(negative_slope=0.1),
         )
-        self.upsample = nn.Upsample(scale_factor=2, mode=upsample_mode, align_corners=False)
+        self.upsample = nn.Upsample(scale_factor=2, mode=mode, align_corners=False)
 
     def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
         """
@@ -364,6 +398,42 @@ class UpLayer(nn.Module):
             torch.Tensor: output tensor of shape (batch_size, out_channels, *img_dims)
         """
         return self.upsample(x) + self.conv1(skip)
+
+
+class OriginalSpatialConfigurationNet3d(OriginalSpatialConfigurationNet):
+    """
+    Implementation of the Spatial Configuration Network (SCN) from the paper
+    "Integrating spatial configuration into heatmap regression based CNNs for landmark localization"
+    by Payer et al. (2019).
+    https://www.sciencedirect.com/science/article/pii/S1361841518305784
+
+    This is the 3D version of the original SCN.
+    """
+
+    def __init__(
+        self,
+        in_channels: int = 1,
+        out_channels: int = 4,
+        la_channels: int = 64,
+        la_depth: int = 3,
+        la_kernel_size: int | tuple[int, ...] = 3,
+        la_dropout: float = 0.5,
+        sp_channels: int = 64,
+        sp_kernel_size: int = 7,
+        sp_downsample: int = 4,
+    ):
+        super().__init__(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            la_channels=la_channels,
+            la_depth=la_depth,
+            la_kernel_size=la_kernel_size,
+            la_dropout=la_dropout,
+            sp_channels=sp_channels,
+            sp_kernel_size=sp_kernel_size,
+            sp_downsample=sp_downsample,
+            spatial_dim=3,
+        )
 
 
 class ProbSpatialConfigurationNet(nn.Module):
