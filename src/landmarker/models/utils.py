@@ -5,7 +5,7 @@ from torch import nn
 class SoftmaxND(nn.Module):
     def __init__(self, spatial_dims):
         super().__init__()
-        self.dim = (2, 3) if spatial_dims == 2 else (2, 3, 4)
+        self.dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -2)
 
     def forward(self, x):
         out = torch.exp(x)
@@ -15,7 +15,7 @@ class SoftmaxND(nn.Module):
 class LogSoftmaxND(nn.Module):
     def __init__(self, spatial_dims):
         super().__init__()
-        self.dim = (2, 3) if spatial_dims == 2 else (2, 3, 4)
+        self.dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -1)
         self.spatial_dims = spatial_dims
 
     def forward(self, x):

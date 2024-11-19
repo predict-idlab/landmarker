@@ -752,7 +752,7 @@ def windowed_weigthed_sample_cov(
                 ]
                 .unsqueeze(0)
                 .unsqueeze(0),
-                torch.tensor([[[window, window]]], dtype=torch.float),
+                torch.tensor([[[window, window]]], dtype=torch.float).to(heatmap.device),
                 spatial_dims=spatial_dims,
                 activation=activation,
             )
