@@ -139,7 +139,6 @@ def _activate_norm_heatmap(
     if activation is not None:
         if activation == "softmax":
             heatmap = torch.exp(t * heatmap)
-            heatmap = heatmap / torch.sum(heatmap, dim=dim, keepdim=True)
         elif activation == "sigmoid":
             heatmap = torch.sigmoid(heatmap)
         elif activation == "ReLU":

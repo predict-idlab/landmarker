@@ -8,7 +8,7 @@ class SoftmaxND(nn.Module):
         self.dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -2)
 
     def forward(self, x):
-        out = torch.exp(x)
+        out = torch.exp(x - torch.max(x, dim=self.dim, keepdim=True)[0])
         return out / torch.sum(out, dim=self.dim, keepdim=True)
 
 
