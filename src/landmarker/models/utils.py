@@ -5,10 +5,13 @@ from torch import nn
 class SoftmaxND(nn.Module):
     def __init__(self, spatial_dims):
         super().__init__()
-        self.dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -2)
+        self.dim = (-2, -1) if spatial_dims == 2 else (-3, -2, -1)
 
     def forward(self, x):
-        out = torch.exp(x - torch.max(x, dim=self.dim, keepdim=True)[0])
+        max_val = x
+        for d in self.dim:
+            max_val, _ = torch.max(max_val, dim=d, keepdim=True)
+        out = torch.exp(x - max_val)
         return out / torch.sum(out, dim=self.dim, keepdim=True)
 
 

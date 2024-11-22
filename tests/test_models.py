@@ -15,6 +15,7 @@ from landmarker.models.spatial_configuration_net import (
     ProbSpatialConfigurationNet,
     SpatialConfigurationNet,
 )
+from landmarker.models.utils import LogSoftmaxND, SoftmaxND
 
 
 def test_original_spatial_configuration_net():
@@ -267,3 +268,37 @@ def test_coord_conv_layer_coord_channels_range():
     # check that the output values are within the range [-1, 1]
     assert out.shape == torch.Size([2, 5, 64, 64])
     assert (-1 <= out[:, 3:]).all() and (out[:, 3:] <= 1).all()
+
+
+def test_softmax_nd():
+    """Test the SoftmaxND class."""
+    # Test for 2D case
+    softmax_2d = SoftmaxND(spatial_dims=2)
+    x = torch.randn(1, 3, 4, 4)
+    output = softmax_2d(x)
+    assert output.shape == x.shape
+    assert torch.allclose(torch.sum(output, dim=(-2, -1)), torch.ones(1, 3))
+
+    # Test for 3D case
+    softmax_3d = SoftmaxND(spatial_dims=3)
+    x = torch.randn(1, 3, 4, 4, 4)
+    output = softmax_3d(x)
+    assert output.shape == x.shape
+    assert torch.allclose(torch.sum(output, dim=(-3, -2, -1)), torch.ones(1, 3))
+
+
+def test_log_softmax_nd():
+    """Test the LogSoftmaxND class."""
+    # Test for 2D case
+    log_softmax_2d = LogSoftmaxND(spatial_dims=2)
+    x = torch.randn(1, 3, 4, 4)
+    output = log_softmax_2d(x)
+    assert output.shape == x.shape
+    assert torch.allclose(torch.sum(torch.exp(output), dim=(-2, -1)), torch.ones(1, 3))
+
+    # Test for 3D case
+    log_softmax_3d = LogSoftmaxND(spatial_dims=3)
+    x = torch.randn(1, 3, 4, 4, 4)
+    output = log_softmax_3d(x)
+    assert output.shape == x.shape
+    assert torch.allclose(torch.sum(torch.exp(output), dim=(-3, -2, -1)), torch.ones(1, 3))
