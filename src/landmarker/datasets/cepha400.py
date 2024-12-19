@@ -27,7 +27,7 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
 
     Args:
         path_dir (str): The path to the directory where the dataset should be stored.
-        junior (bool, optional): Whether to use the junior or senior annotator. Defaults to False.
+        junior (bool, optional): Whether to use the junior or the average of senior and junior annotator. Defaults to False.
         cv (bool, optional): Whether to use the cross validation splits from the paper. Defaults to
             True.
     """
@@ -60,21 +60,32 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
                 path_dir + "/ISBI2015/cv_payer",
             )
 
-    if junior:
-        annotator = "junior"
-    else:
-        annotator = "senior"
     landmarks_list = []
     for i in range(400):
         landmarks_list.append(
             pd.read_csv(
-                path_dir + f"/ISBI2015/400_{annotator}/{str(i+1).zfill(3)}.txt",
+                path_dir + f"/ISBI2015/400_junior/{str(i+1).zfill(3)}.txt",
                 sep=",",
                 header=None,
             )[:19].to_numpy()
         )
-    landmarks = np.concatenate(landmarks_list, axis=0).reshape((-1, 19, 2))
-    landmarks = np.flip(landmarks, axis=-1)
+    junior_landmarks = np.concatenate(landmarks_list, axis=0).reshape((-1, 19, 2))
+    junior_landmarks = np.flip(junior_landmarks, axis=-1)
+    if junior:
+        landmarks = junior_landmarks
+    else:
+        landmarks_list = []
+        for i in range(400):
+            landmarks_list.append(
+                pd.read_csv(
+                    path_dir + f"/ISBI2015/400_senior/{str(i+1).zfill(3)}.txt",
+                    sep=",",
+                    header=None,
+                )[:19].to_numpy()
+            )
+        senior_landmarks = np.concatenate(landmarks_list, axis=0).reshape((-1, 19, 2))
+        senior_landmarks = np.flip(senior_landmarks, axis=-1)
+        landmarks = (junior_landmarks + senior_landmarks) / 2
 
     if cv:
         indices_fold_1 = (
