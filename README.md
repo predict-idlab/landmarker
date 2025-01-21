@@ -44,7 +44,7 @@ We welcome contributions to Landmarker. Please read the [contributing guidelines
 ## 📖 Citation
 If you use landmarker in your research, please cite the following paper:
 
-J. Jonkers, L. Duchateau, G. V. Wallendael, and S. V. Hoecke, **“landmarker: a Toolkit for Anatomical Landmark Localization in 2D/3D Images,”** Jan. 17, 2025, arXiv: arXiv:2501.10098. doi: 10.48550/arXiv.2501.10098.
+J. Jonkers, L. Duchateau, G. V. Wallendael, and S. V. Hoecke, [**“landmarker: a Toolkit for Anatomical Landmark Localization in 2D/3D Images,”**](https://arxiv.org/abs/2501.10098) Jan. 17, 2025, arXiv: arXiv:2501.10098. doi: 10.48550/arXiv.2501.10098.
 
 ## 📝 License
 Landmark is licensed under the MIT [license](LICENSE).
