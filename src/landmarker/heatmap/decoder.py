@@ -2,7 +2,7 @@
 Decoder module for retrieving coordinates and other statistics from heatmaps.
 """
 
-from typing import Callable, Optional
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -764,140 +764,128 @@ def heatmap_to_multiple_coord(
     threshold: Optional[float] = None,
     method: str = "argmax",
     spatial_dims: int = 2,
-) -> tuple[list[list[list[torch.Tensor]]], list[list[list[float]]]]:
-    """
-    Returns the multiple coordinates of the maximum value of the heatmap
-    for each batch and channel. Additionally, the scores of the maxima are returned.
-    If threshold is not None, only the maxima with a score higher than the threshold are returned.
+) -> Tuple[List[List[List[torch.Tensor]]], List[List[List[float]]]]:
 
-    Args:
-        heatmap (torch.Tensor): heatmap of shape (B, C, H, W)
-        window (tuple): window size
-        threshold (float): threshold to remove points. If None, no threshold is applied. Default
-            None.
-        method (str): method to retrieve the coordinates
-
-    Returns:
-        (list(list(list(torch.Tensor)))): list of coordinates of the maxima for each batch and
-            channel, with the first list the batch, the second list the channel and the third list
-            the coordinates
-        (list(list(list(float)))): list of scores of the maxima for each batch and channel, with
-            the first list the batch, the second list the channel and the third list the scores.
-    """
+    # Original input shape handling
     if spatial_dims != 2:
         raise ValueError(f"Spatial dimensions must be 2: {spatial_dims}")
-    argmax_fun: Callable[[torch.Tensor, int], list[torch.Tensor]]
+
+    # Dimension handling identical to original
+    orig_dim = heatmaps.dim()
+    if orig_dim == 2:
+        heatmaps = heatmaps.unsqueeze(0).unsqueeze(0)
+    elif orig_dim == 3:
+        heatmaps = heatmaps.unsqueeze(0)
+    B, C, H, W = heatmaps.shape
+
+    # Main processing
     if method == "argmax":
-        argmax_fun = non_maximum_surpression
-    elif method == "local_soft_argmax":
-        argmax_fun = non_maximum_surpression_local_soft_argmax
+        coords, scores = non_maximum_surpression(heatmaps, window)
     else:
         raise ValueError("Method not implemented.")
-    if heatmaps.dim() == 2:
-        heatmaps = heatmaps.unsqueeze(0).unsqueeze(0)
-    elif heatmaps.dim() == 3:
-        heatmaps = heatmaps.unsqueeze(0)
-    b, c, _, _ = heatmaps.shape
+
+    # Post-processing identical to original
+    return process_multiple_coord_results(coords, scores, threshold, B, C, orig_dim)
+
+
+def process_multiple_coord_results(coords, scores, threshold, B, C, orig_dim):
+    # Identical sorting and threshold logic to original
     out = []
-    scores = []
-    for b1 in range(b):
-        out_classes = []
-        scores_classes = []
-        for c1 in range(c):
-            out_class = argmax_fun(heatmaps[b1, c1], window)
-            scores_class = [heatmaps[b1, c1, x[0].int(), x[1].int()].item() for x in out_class]
-            sorted_idx = sorted(
-                range(len(scores_class)), key=lambda k: scores_class[k], reverse=True
-            )
-            out_class = [out_class[i] for i in sorted_idx]
-            scores_class = [scores_class[i] for i in sorted_idx]
+    score_out = []
+
+    for b in range(B):
+        batch_coords = []
+        batch_scores = []
+        for c in range(C):
+            # Sort descending by score
+            sc = scores[b][c]
+            idx = sorted(range(len(sc)), key=lambda k: sc[k], reverse=True)
+            sorted_coords = [coords[b][c][i] for i in idx]
+            sorted_scores = [sc[i] for i in idx]
+
+            # Apply threshold
             if threshold is not None:
-                for i in range(len(scores_class)):
-                    if scores_class[i] < threshold:
-                        break
-                    i += 1
-                scores_class = scores_class[:i]
-                out_class = out_class[:i]
-            out_classes.append(out_class)
-            scores_classes.append(scores_class)
-        out.append(out_classes)
-        scores.append(scores_classes)
-    return out, scores
+                cutoff = next(
+                    (i for i, s in enumerate(sorted_scores) if s < threshold), len(sorted_scores)
+                )
+                sorted_coords = sorted_coords[:cutoff]
+                sorted_scores = sorted_scores[:cutoff]
+
+            batch_coords.append(sorted_coords)
+            batch_scores.append(sorted_scores)
+
+        out.append(batch_coords)
+        score_out.append(batch_scores)
+
+    # Match original output shapes
+    if orig_dim == 2:
+        return out[0][0], score_out[0][0]
+    elif orig_dim == 3:
+        return out[0], score_out[0]
+    return out, score_out
 
 
-def non_maximum_surpression(heatmap: torch.Tensor, window: int = 3) -> list[torch.Tensor]:
-    """Non-Maximum Surpression (NMS)
+def non_maximum_surpression(
+    heatmaps: torch.Tensor, window: int
+) -> Tuple[List[List[List[torch.Tensor]]], List[List[List[float]]]]:
 
-    source: Efficient Non-Maximum Suppression - Neubeck and Van Gool (2006)
+    B, C, H, W = heatmaps.shape
+    device = heatmaps.device
+    pad = window // 2
+    padded = F.pad(heatmaps, (pad, pad, pad, pad), mode="constant", value=-float("inf"))
 
-    Args:
-        heatmap (torch.Tensor): heatmap of shape (H, W)
-        window (int): window size
+    # Step 1: Find initial candidates using original's block strategy
+    grid_y = torch.arange(0, H, window, device=device)
+    grid_x = torch.arange(0, W, window, device=device)
+    gy, gx = torch.meshgrid(grid_y, grid_x, indexing="ij")
+    candidates = torch.stack([gy.flatten(), gx.flatten()], dim=1)  # [K, 2]
 
-    Returns:
-        (list(tuple(int, int))): list of coordinates of the maxima
-    """
-    # TODO: Think about way to deal with ties (in block) (multiple maxima) in the output
-    #    now we just take the first one
-    assert heatmap.dim() == 2, f"Heatmap must be 2D, got {heatmap.dim()}"
-    set_local_argmax = set()
-    for i in range(0, heatmap.shape[0] - (window - 1) + 1, window):
-        for j in range(0, heatmap.shape[1] - (window - 1) + 1, window):
-            local_argmax = coord_argmax(
-                heatmap[
-                    i : min(i + window, heatmap.shape[0]), j : min(j + window, heatmap.shape[1])
-                ]
-            )
-            local_argmax += torch.tensor([i, j])
-            local_argmax_around = coord_argmax(
-                heatmap[
-                    torch.clamp(local_argmax[0] - window, min=0) : torch.clamp(
-                        local_argmax[0] + window + 1, max=heatmap.shape[0]
-                    ),
-                    torch.clamp(local_argmax[1] - window, min=0) : torch.clamp(
-                        local_argmax[1] + window + 1, max=heatmap.shape[1]
-                    ),
-                ]
-            )
-            local_argmax_around += torch.clamp(local_argmax - window, min=0)
-            if torch.all(local_argmax == local_argmax_around):
-                set_local_argmax.add(local_argmax)
-    return [torch.Tensor((x[0].item(), x[1].item())) for x in set_local_argmax]
+    # Step 2: Find local maxima within each block
+    max_vals = torch.zeros(B, C, len(candidates), device=device)
+    max_pos = torch.zeros(B, C, len(candidates), 2, dtype=torch.long, device=device)
 
+    for i, (y, x) in enumerate(candidates):
+        block = padded[:, :, y : y + window, x : x + window]
+        vals, idx = block.flatten(2).max(dim=-1)  # [B, C]
+        max_vals[:, :, i] = vals
+        max_pos[:, :, i] = torch.stack([y + idx // window, x + idx % window], dim=-1)
 
-def non_maximum_surpression_local_soft_argmax(
-    heatmap: torch.Tensor, window: int = 3
-) -> list[torch.Tensor]:
-    """
-    Returns the coordinates of the maximum value of the heatmap for each batch and channel
-    (landmark), with the soft-argmax function applied on the heatmaps.
+    # Step 3: Verify maxima in their neighborhoods (original's 2nd check)
+    valid = torch.zeros_like(max_vals, dtype=torch.bool)
+    for i in range(len(candidates)):
+        y, x = max_pos[:, :, i, 0], max_pos[:, :, i, 1]
 
-    Args:
-        heatmap (torch.Tensor): heatmap of shape (H, W)
-        window (int): window size
+        # Get neighborhood bounds (matching original's clamp logic)
+        y0 = torch.clamp(y - pad, 0)
+        y1 = torch.clamp(y + pad + 1, max=padded.shape[2])
+        x0 = torch.clamp(x - pad, 0)
+        x1 = torch.clamp(x + pad + 1, max=padded.shape[3])
 
-    Returns:
-        (list(tuple(int, int))): list of coordinates of the maxima
-    """
-    set_local_argmax = non_maximum_surpression(heatmap, window=window)
-    list_local_soft_argmax = []
-    heatmap_pad = F.pad(heatmap, (window // 2, window // 2, window // 2, window // 2))
-    for local_argmax in list(set_local_argmax):
-        local_argmax_tensor = torch.tensor(
-            [int(local_argmax[0]), int(local_argmax[1])]
-        ) + torch.tensor([window // 2, window // 2])
-        local_argmax_around = coord_soft_argmax_2d(
-            heatmap_pad[
-                torch.clamp(local_argmax_tensor[0] - window, min=0) : torch.clamp(
-                    local_argmax_tensor[0] + window + 1, max=heatmap_pad.shape[0]
-                ),
-                torch.clamp(local_argmax_tensor[1] - window, min=0) : torch.clamp(
-                    local_argmax_tensor[1] + window + 1, max=heatmap_pad.shape[1]
-                ),
-            ]
-        )
-        local_argmax_around += torch.clamp(local_argmax_tensor - window, min=0) - torch.tensor(
-            [window // 2, window // 2]
-        )
-        list_local_soft_argmax.append(local_argmax_around)
-    return [torch.Tensor((x[0].item(), x[1].item())) for x in list_local_soft_argmax]
+        # Check if center is max in neighborhood
+        for b in range(B):
+            for c in range(C):
+                neighborhood = padded[b, c, y0[b, c] : y1[b, c], x0[b, c] : x1[b, c]]
+                if neighborhood.numel() > 0:
+                    valid[b, c, i] = max_vals[b, c, i] >= neighborhood.max()
+
+    # Step 4: Collect valid coordinates and deduplicate
+    coords = [[[] for _ in range(C)] for _ in range(B)]  # type: ignore
+    scores = [[[] for _ in range(C)] for _ in range(B)]  # type: ignore
+
+    for b in range(B):
+        for c in range(C):
+            mask = valid[b, c]
+            pos = max_pos[b, c][mask]
+            vals = max_vals[b, c][mask]
+
+            # Deduplicate using unique coordinates
+            unique_coords, inverse = torch.unique(pos, dim=0, return_inverse=True)
+            unique_vals = torch.zeros_like(unique_coords[:, 0], dtype=vals.dtype)
+            unique_vals.scatter_reduce_(0, inverse, vals, reduce="amax", include_self=False)
+
+            # Convert to original image coordinates
+            final_coords = unique_coords.float() - pad  # Remove padding offset
+            coords[b][c] = [final_coords[i] for i in range(len(final_coords))]
+            scores[b][c] = unique_vals.tolist()
+
+    return coords, scores

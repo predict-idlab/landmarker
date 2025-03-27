@@ -40,8 +40,7 @@ def inspection_plot(
     fig = plt.figure(figsize=(15, 5 * len(idx)))
     # fig.suptitle(fig_title)
 
-    # Create len(idx)x1 subfigures
-    subfigs = fig.subfigures(len(idx), 1)
+    subfigs = fig.subfigures(len(idx), 1, squeeze=False).flatten()
     for row, subfig in enumerate(subfigs):
         ds_idx = idx[row]
         batch = ds[ds_idx]
@@ -49,7 +48,6 @@ def inspection_plot(
         landmarks_original = ds.landmarks_original[ds_idx]
         img_t = batch["image"]
         img = ds.image_loader(ds.img_paths[ds_idx])  # type: ignore
-
         if not isinstance(ds, (HeatmapDataset, MaskDataset)):
             batch = ds[ds_idx]
             if heatmap_generator:
@@ -65,6 +63,7 @@ def inspection_plot(
         if img_t.shape[0] == 1:
             img_t = img_t[0]
             img = img[0]
+            img = (img - img.min()) / (img.max() - img.min()) * 255
         else:
             img_t = img_t.permute(1, 2, 0)
             img = img.permute(1, 2, 0)
@@ -74,7 +73,10 @@ def inspection_plot(
             axs[0].imshow(img_t)
             axs[1].imshow(img_t)
             axs[1].imshow(heatmap.detach().numpy().sum(axis=0), cmap="jet", alpha=0.5)
-            axs[2].imshow(img)
+            if len(img.shape) == 2:
+                axs[2].imshow(img, cmap="gray")
+            else:
+                axs[2].imshow(img)
             if len(landmark.shape) == 3:  # If multiple instances
                 for i in range(landmark.shape[0]):
                     axs[0].scatter(landmark[i, :, 1], landmark[i, :, 0], c="r", s=5)
@@ -105,7 +107,7 @@ def inspection_plot(
                 axs[1].scatter(landmarks_original[:, 1], landmarks_original[:, 0], c="r", s=5)
             axs[0].set_title("Transformed w/ landmarks")
             axs[1].set_title("Original w/ landmarks")
-        subfig.suptitle(f"Image {ds_idx}")
+        # subfig.suptitle(f"Image {ds_idx}")
     if save_path:
         plt.savefig(save_path)
     plt.show()
@@ -140,7 +142,7 @@ def prediction_inspect_plot(
     # fig.suptitle(fig_title)
 
     # Create len(idx)x1 subfigures
-    subfigs = fig.subfigures(len(idx), 1)
+    subfigs = fig.subfigures(len(idx), 1, squeeze=False).flatten()
     for row, subfig in enumerate(subfigs):
         ds_idx = idx[row]
         batch = ds[ds_idx]
@@ -165,6 +167,7 @@ def prediction_inspect_plot(
         if img_t.shape[0] == 1:
             img_t = img_t[0]
             img = img[0]
+            img = (img - img.min()) / (img.max() - img.min()) * 255
         else:
             img_t = img_t.permute(1, 2, 0)
             img = img.permute(1, 2, 0)
@@ -182,7 +185,10 @@ def prediction_inspect_plot(
         )
         axs[1].imshow(img_t)
         axs[1].imshow(heatmap.detach().numpy().sum(axis=0), cmap="jet", alpha=0.5)
-        axs[2].imshow(img)
+        if len(img.shape) == 2:
+            axs[2].imshow(img, cmap="gray")
+        else:
+            axs[2].imshow(img)
         axs[2].scatter(landmarks_original[:, 1], landmarks_original[:, 0], c="b", s=5)
         axs[2].scatter(
             pred_landmarks.detach().numpy()[:, 1], pred_landmarks.detach().numpy()[:, 0], c="r", s=5
@@ -191,7 +197,7 @@ def prediction_inspect_plot(
         axs[0].set_title("Transformed w/ landmarks")
         axs[1].set_title("Transformed w/ heatmap")
         axs[2].set_title("Original w/ landmarks")
-        subfig.suptitle(f"Image {ds_idx}")
+        # subfig.suptitle(f"Image {ds_idx}")
     fig.legend(["True", "Predicted"])
     if save_path:
         plt.savefig(save_path)
@@ -215,7 +221,7 @@ def prediction_inspect_plot_multi_instance(
     fig.suptitle(fig_title)
 
     # Create len(idx)x1 subfigures
-    subfigs = fig.subfigures(len(idx), 1)
+    subfigs = fig.subfigures(len(idx), 1, squeeze=False).flatten()
     for row, subfig in enumerate(subfigs):
         ds_idx = idx[row]
         img = ds.image_loader(ds.img_paths[ds_idx])  # type: ignore
@@ -268,6 +274,7 @@ def prediction_inspect_plot_multi_instance(
         if img_t.shape[0] == 1:
             img_t = img_t[0]
             img = img[0]
+            img = (img - img.min()) / (img.max() - img.min()) * 255
         else:
             img_t = img_t.permute(1, 2, 0)
             img = img.permute(1, 2, 0)
@@ -277,7 +284,10 @@ def prediction_inspect_plot_multi_instance(
         axs[0].imshow(img_t)
         axs[1].imshow(img_t)
         axs[1].imshow(heatmap.detach().numpy().sum(axis=0), cmap="jet", alpha=0.5)
-        axs[2].imshow(img)
+        if len(img.shape) == 2:
+            axs[2].imshow(img, cmap="gray")
+        else:
+            axs[2].imshow(img)
         for c in range(len(true_landmarks_t)):
             for i in range(max(len(true_landmarks_t[c]), len(pred_landmarks_t[c]))):
                 if i < len(true_landmarks_t[c]):
@@ -295,7 +305,7 @@ def prediction_inspect_plot_multi_instance(
         axs[0].set_title("Transformed w/ landmarks")
         axs[1].set_title("Transformed w/ heatmap")
         axs[2].set_title("Original w/ landmarks")
-        subfig.suptitle(f"Image {ds_idx}")
+        # subfig.suptitle(f"Image {ds_idx}")
     fig.legend(["True", "Predicted"])
     if save_path:
         plt.savefig(save_path)

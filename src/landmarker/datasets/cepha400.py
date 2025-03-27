@@ -17,6 +17,7 @@ from landmarker.data.landmark_dataset import (
     LandmarkDataset,
     MaskDataset,
     PatchDataset,
+    PatchMaskDataset,
 )
 
 
@@ -657,6 +658,131 @@ def get_cepha_patch_datasets(
             **kwargs,
         ),
         PatchDataset(
+            image_paths_test2,
+            landmarks_test2,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_test2,
+            transform=inference_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        ),
+    )
+
+
+def get_cepha_patch_mask_datasets(
+    path_dir: str,
+    index_landmark: int = 0,
+    train_transform=None,
+    inference_transform=None,
+    store_imgs=True,
+    junior=False,
+    single_dataset=False,
+    cv=False,
+    **kwargs,
+):
+    """Returns a PatchMaskDataset objects with the CEPH dataset, a combination of the ISBI 2014 &
+    2015 challenges. The dataset is split into train, test1 and test2. The same approach as in
+    "CephaNN: A Multi-Head Attention Network for Cephalometric Landmark Detection" - JIAHOONG QIAN
+        et al. is used.
+    """
+    if single_dataset and cv:
+        raise ValueError("Cannot have single dataset and cross validation at the same time.")
+    if cv:
+        (
+            image_paths_fold1,
+            image_paths_fold2,
+            image_paths_fold3,
+            image_paths_fold4,
+            landmarks_fold1,
+            landmarks_fold2,
+            landmarks_fold3,
+            landmarks_fold4,
+            pixel_spacings_fold1,
+            pixel_spacings_fold2,
+            pixel_spacings_fold3,
+            pixel_spacings_fold4,
+        ) = get_cepha_dataset(path_dir, junior=junior, cv=True)
+        return (
+            PatchMaskDataset(
+                image_paths_fold1,
+                landmarks_fold1,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold1,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchMaskDataset(
+                image_paths_fold2,
+                landmarks_fold2,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold2,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchMaskDataset(
+                image_paths_fold3,
+                landmarks_fold3,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold3,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+            PatchMaskDataset(
+                image_paths_fold4,
+                landmarks_fold4,
+                index_landmark=index_landmark,
+                pixel_spacing=pixel_spacings_fold4,
+                transform=train_transform,
+                store_imgs=store_imgs,
+                **kwargs,
+            ),
+        )
+    (
+        image_paths_train,
+        image_paths_test1,
+        image_paths_test2,
+        landmarks_train,
+        landmarks_test1,
+        landmarks_test2,
+        pixel_spacings_train,
+        pixel_spacings_test1,
+        pixel_spacings_test2,
+    ) = get_cepha_dataset(path_dir, junior=junior, cv=False)
+    if single_dataset:
+        return PatchMaskDataset(
+            image_paths_train + image_paths_test1 + image_paths_test2,
+            np.concatenate([landmarks_train, landmarks_test1, landmarks_test2], axis=0),
+            index_landmark=index_landmark,
+            pixel_spacing=np.concatenate(
+                [pixel_spacings_train, pixel_spacings_test1, pixel_spacings_test2], axis=0
+            ),
+            transform=train_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        )
+    return (
+        PatchMaskDataset(
+            image_paths_train,
+            landmarks_train,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_train,
+            transform=train_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        ),
+        PatchMaskDataset(
+            image_paths_test1,
+            landmarks_test1,
+            index_landmark=index_landmark,
+            pixel_spacing=pixel_spacings_test1,
+            transform=inference_transform,
+            store_imgs=store_imgs,
+            **kwargs,
+        ),
+        PatchMaskDataset(
             image_paths_test2,
             landmarks_test2,
             index_landmark=index_landmark,

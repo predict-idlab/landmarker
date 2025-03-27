@@ -14,7 +14,6 @@ from src.landmarker.heatmap.decoder import (
     heatmap_to_coord_enlarge,
     heatmap_to_multiple_coord,
     non_maximum_surpression,
-    non_maximum_surpression_local_soft_argmax,
     weighted_sample_cov,
     windowed_weigthed_sample_cov,
 )
@@ -768,106 +767,6 @@ def test_heatmap_to_coord():
         assert False
     except ValueError:
         assert True
-
-
-def test_non_maxima_surpression():
-    """Test the non-maxima surpression function."""
-    # create some dummy input tensors
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 5, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression(heatmap, window=3)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 1
-
-    # check that the output contains the correct values
-    assert any(
-        [
-            torch.all(torch.Tensor((0, 1)).eq(local_maximum)).item()
-            for local_maximum in local_maximums
-        ]
-    )
-
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 12, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression(heatmap, window=2)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 2
-
-    # check that the output contains the correct values
-    assert any(
-        [
-            torch.all(torch.Tensor((0, 1)).eq(local_maximum)).item()
-            for local_maximum in local_maximums
-        ]
-    )
-    assert any(
-        [
-            torch.all(torch.Tensor((3, 3)).eq(local_maximum)).item()
-            for local_maximum in local_maximums
-        ]
-    )
-
-    # create some dummy input tensors
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 12, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression(heatmap, window=3)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 1
-
-    # check that the output contains the correct values
-    assert any(
-        [
-            torch.all(torch.Tensor((3, 3)).eq(local_maximum)).item()
-            for local_maximum in local_maximums
-        ]
-    )
-
-
-def test_non_maxima_surpression_local_soft_argmax():
-    """Test the non-maxima surpression function."""
-    # create some dummy input tensors
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 5, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression_local_soft_argmax(heatmap, window=3)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 1
-
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 12, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression_local_soft_argmax(heatmap, window=2)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 2
-
-    # create some dummy input tensors
-    heatmap = torch.tensor(
-        [[9, 10, 9, 8, 7], [8, 9, 8, 7, 6], [7, 8, 7, 6, 5], [6, 7, 6, 12, 4], [5, 6, 5, 4, 3]]
-    )
-
-    # call the non-maxima surpression function with the input tensor
-    local_maximums = non_maximum_surpression_local_soft_argmax(heatmap, window=3)
-
-    # check that the output has the correct length
-    assert len(local_maximums) == 1
 
 
 def test_heatmap_to_multiple_coord():

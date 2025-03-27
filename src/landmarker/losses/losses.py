@@ -467,8 +467,8 @@ class NLLLoss(nn.Module):
         if self.apply_softmax:
             output = self.log_softmax(output)
         else:
-            output = torch.log(output.double())
-        nll = -target * output.double()
+            output = torch.log(output)
+        nll = -target * output
         if self.spatial_dims == 2:
             dim = (2, 3)
         else:

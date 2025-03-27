@@ -14,7 +14,6 @@ from .decoder import (
     heatmap_to_coord_enlarge,
     heatmap_to_multiple_coord,
     non_maximum_surpression,
-    non_maximum_surpression_local_soft_argmax,
     weighted_sample_cov,
     windowed_weigthed_sample_cov,
 )
