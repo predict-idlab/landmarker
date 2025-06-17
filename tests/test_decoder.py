@@ -13,7 +13,6 @@ from src.landmarker.heatmap.decoder import (
     heatmap_to_coord_cov,
     heatmap_to_coord_enlarge,
     heatmap_to_multiple_coord,
-    non_maximum_surpression,
     weighted_sample_cov,
     windowed_weigthed_sample_cov,
 )
