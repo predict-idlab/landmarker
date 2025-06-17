@@ -19,6 +19,7 @@ dependencies = [
     "pydicom>=2.4.3",
     "matplotlib>=3.7.4",
     "seaborn>=0.13.0",
+    "scikit-image>=0.21.0",
 ]
 requires-python = ">=3.10,<3.12"
 readme = "README.md"
