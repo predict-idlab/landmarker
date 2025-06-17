@@ -282,6 +282,63 @@ def test_landmark_dataset():
     assert dataset[0]["image"].shape == torch.Size([3, 32, 20])  # image
     assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
 
+    all_img_uint8_tensor_list = [torch.Tensor(img) for img in pytest.all_img_uint8]
+    dataset = LandmarkDataset(
+        imgs=all_img_uint8_tensor_list,
+        landmarks=pytest.landmarks,
+        store_imgs=False,
+    )
+    assert len(dataset) == len(pytest.landmarks)
+    assert dataset[0]["image"].shape == torch.Size([1, 64, 64])  # image
+    assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 64, 64])  # image
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
+        [pytest.landmarks.shape[1], 2]
+    )  # landmark
+
+    all_img_uint8_tensor_list = [torch.Tensor(img) for img in pytest.all_img_uint8]
+    dataset = LandmarkDataset(
+        imgs=torch.stack(all_img_uint8_tensor_list),
+        landmarks=torch.Tensor(pytest.landmarks),
+        store_imgs=False,
+    )
+    assert len(dataset) == len(pytest.landmarks)
+    assert dataset[0]["image"].shape == torch.Size([1, 64, 64])  # image
+    assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 64, 64])  # image
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
+        [pytest.landmarks.shape[1], 2]
+    )  # landmark
+
+    dataset = LandmarkDataset(
+        imgs=pytest.all_img_uint8,
+        landmarks=pytest.landmarks,
+        dim_img=(32, 20),
+        store_imgs=False,
+    )
+    assert len(dataset) == len(pytest.landmarks)
+    assert dataset[0]["image"].shape == torch.Size([1, 32, 20])  # image
+    assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 32, 20])  # image
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
+        [pytest.landmarks.shape[1], 2]
+    )  # landmark
+
+    dataset = LandmarkDataset(
+        imgs=pytest.all_img_uint8,
+        landmarks=pytest.landmarks,
+        dim_img=(32, 32),
+        resize_pad=False,
+        store_imgs=False,
+    )
+    assert len(dataset) == len(pytest.landmarks)
+    assert dataset[0]["image"].shape == torch.Size([1, 32, 32])  # image
+    assert dataset[0]["landmark"].shape == torch.Size([pytest.landmarks.shape[1], 2])  # landmark
+    assert dataset[len(pytest.landmarks) - 1]["image"].shape == torch.Size([1, 32, 32])  # image
+    assert dataset[len(pytest.landmarks) - 1]["landmark"].shape == torch.Size(
+        [pytest.landmarks.shape[1], 2]
+    )  # landmark
+
 
 def test_landmark_dataset_transforms():
     """Test LandmarkDataset with transforms."""
