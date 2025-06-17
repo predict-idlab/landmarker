@@ -195,7 +195,10 @@ class LandmarkDataset(Dataset):
 
     def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         if not self.store_imgs:
-            img = self.image_loader(self.img_paths[idx])  # type: ignore
+            if not hasattr(self, "image_loader"):
+                img = self.imgs[idx]  # type: ignore
+            else:
+                img = self.image_loader(self.img_paths[idx])  # type: ignore
             dim_original = torch.tensor(img.shape[-self.spatial_dims :]).float()
             if self.dim_img is not None:
                 if self.resize_pad:
@@ -502,7 +505,10 @@ class MaskDataset(LandmarkDataset):
 
     def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         if not self.store_imgs:
-            img = self.image_loader(self.img_paths[idx])  # type: ignore
+            if not hasattr(self, "image_loader"):
+                img = self.imgs[idx]  # type: ignore
+            else:
+                img = self.image_loader(self.img_paths[idx])  # type: ignore
             dim_original = torch.tensor(img.shape[-self.spatial_dims :]).float()
             if self.dim_img is not None:
                 if self.resize_pad:
@@ -897,7 +903,10 @@ class HeatmapDataset(LandmarkDataset):
             padding = self.paddings[idx]
             dim_original = self.dim_original[idx]
         else:
-            img = self.image_loader(self.img_paths[idx])  # type: ignore
+            if not hasattr(self, "image_loader"):
+                img = self.imgs[idx]  # type: ignore
+            else:
+                img = self.image_loader(self.img_paths[idx])  # type: ignore
             dim_original = torch.tensor(img.shape[-self.spatial_dims :]).float()
             if self.dim_img is not None:
                 if self.resize_pad:
