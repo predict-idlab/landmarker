@@ -34,7 +34,6 @@ Examples and tutorials are available at [examples](https://predict-idlab.github.
 
 ## 📈 Future Work
 - Extension to landmark detection in videos.
-- Add uncertainty estimation.
 - ...
 
  ## 👪 Contributing
@@ -44,7 +43,11 @@ We welcome contributions to Landmarker. Please read the [contributing guidelines
 ## 📖 Citation
 If you use landmarker in your research, please cite the following paper:
 
-J. Jonkers, L. Duchateau, G. V. Wallendael, and S. V. Hoecke, [**“landmarker: a Toolkit for Anatomical Landmark Localization in 2D/3D Images,”**](https://arxiv.org/abs/2501.10098) Jan. 17, 2025, arXiv: arXiv:2501.10098. doi: 10.48550/arXiv.2501.10098.
+J. Jonkers, L. Duchateau, G. Van Wallendael, and S. Van Hoecke, “landmarker: A Toolkit for Anatomical Landmark Localization in 2D/3D Images,” SoftwareX, vol. 30, p. 102165, May 2025, doi: 10.1016/j.softx.2025.102165.
+
+J. Jonkers, F. Coopman, L. Duchateau, G. V. Wallendael, and S. V. Hoecke, “Reliable uncertainty quantification for 2D/3D anatomical landmark localization using multi-output conformal prediction,” Mar. 18, 2025, arXiv: arXiv:2503.14106. doi: 10.48550/arXiv.2503.14106.
+
+
 
 ## 📝 License
 Landmark is licensed under the MIT [license](LICENSE).
