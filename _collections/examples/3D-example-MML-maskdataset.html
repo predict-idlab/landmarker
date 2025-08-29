@@ -1,0 +1,1096 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Training and Evaluating One-hot Encoded (Mask) Regression Model for Landmark Localizatioin on MML (3D)" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="_collections/examples/3D-example-MML-maskdataset.html" />
+<meta property="og:site_name" content="Landmarker" />
+<meta property="og:description" content="In this tutorial, we will train and evaluate an one-hot encoded (mask) regression model for landmark localization on MML. The Mandibular Molar Landmarking (MML) dataset, which consists of 658 annot..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary__collections_examples_3D-example-MML-maskdataset_03781d27.png" />
+<meta property="og:image:alt" content="In this tutorial, we will train and evaluate an one-hot encoded (mask) regression model for landmark localization on MML. The Mandibular Molar Landmarking (M..." />
+<meta name="description" content="In this tutorial, we will train and evaluate an one-hot encoded (mask) regression model for landmark localization on MML. The Mandibular Molar Landmarking (MML) dataset, which consists of 658 annot..." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <link rel="shortcut icon" href="../../_static/favicon_landmarker.svg"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Training and Evaluating One-hot Encoded (Mask) Regression Model for Landmark Localizatioin on MML (3D) - Landmarker Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Landmarker Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../../_static//images/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../../_static//images/logo-dark-mode.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">Landmarker Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">🚀 Getting Started</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">🔦 Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 🔦 Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/index.html">📖 API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 📖 API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/data.html">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/losses.html">Losses Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/models.html">Models Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/train.html">Train Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/uncertainty.html">Uncertainty Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/utils.html">Utils Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/visualize.html">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contributing.html">🤝 Contributing to <code class="docutils literal notranslate"><span class="pre">landmarker</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/changelog.html">📈 Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/code_of_conduct.html">🫶 Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/license.html">📝 License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/data.html">Data Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/losses.html">Losses Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/models.html">Models Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/train.html">Train Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/utils.html">Utils Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/visualize.html">Visualize Module</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/predict-idlab/landmarker/edit/main/docs/_collections/examples/3D-example-MML-maskdataset.ipynb" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <p align="center">
+    <a href="https://predict-idlab.github.io/landmarker">
+        <img alt="landmarker" src="https://raw.githubusercontent.com/predict-idlab/landmarker/main/docs/_static/images/logo.svg" width="66%">
+    </a>
+</p>
+<section id="training-and-evaluating-one-hot-encoded-mask-regression-model-for-landmark-localizatioin-on-mml-3d">
+<h1>Training and Evaluating One-hot Encoded (Mask) Regression Model for Landmark Localizatioin on MML (3D)<a class="headerlink" href="#training-and-evaluating-one-hot-encoded-mask-regression-model-for-landmark-localizatioin-on-mml-3d" title="Link to this heading">#</a></h1>
+<p>In this tutorial, we will train and evaluate an one-hot encoded (mask) regression model for landmark
+localization on MML. The Mandibular Molar Landmarking (MML) dataset, which consists of 658
+annotated CT volumes of the skull. The CT volumes are transformed to a uniform scale of 512 × 512 × 256. Multiple
+junior and senior clinicians annotated the CT volumes. It includes 14 mandibular landmarks, specifically, 4 crowns, 8
+roots of the second and third mandibular molars, and 2 cups of cuspids. Note that the number of landmarks in a single CT
+volume is arbitrary, i.e., some landmarks are absent in the images. We filter out all CT volumes where not all landmarks are present, reducing the dataset size to 399.</p>
+<p>We will go through the following steps:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#Loading-the-dataset"><span class="xref myst">Loading the dataset</span></a></p></li>
+<li><p><a class="reference internal" href="#Inspecting-the-dataset"><span class="xref myst">Inspecting the dataset</span></a></p></li>
+<li><p><a class="reference internal" href="#Training-the-model"><span class="xref myst">Training and initializing the UNet model</span></a></p></li>
+<li><p><a class="reference internal" href="#Evaluating-the-model"><span class="xref myst">Evaluating the model</span></a></p></li>
+</ul>
+<a target="_blank" href="https://colab.research.google.com/github/predict-idlab/landmarker/examples/3D-example-MML-maskdataset.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a><section id="setup-environment">
+<h2>Setup environment<a class="headerlink" href="#setup-environment" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># !python -c &quot;import landmarker&quot; || pip install landmarker</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;../src/&quot;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">landmarker</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setup-imports-and-variables">
+<h2>Setup imports and variables<a class="headerlink" href="#setup-imports-and-variables" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;mps&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="loading-the-dataset">
+<h2>Loading the dataset<a class="headerlink" href="#loading-the-dataset" title="Link to this heading">#</a></h2>
+<section id="short-description-of-the-data-and-dataset-module">
+<h3>Short description of the data and dataset module<a class="headerlink" href="#short-description-of-the-data-and-dataset-module" title="Link to this heading">#</a></h3>
+<p>The <a class="reference external" href="https://github.com/predict-idlab/landmarker">landmarker</a> package has several built-in
+datasets in the <code class="docutils literal notranslate"><span class="pre">landmarker.datasets</span></code> module, as well as utility classes for building your own
+datasets in the <code class="docutils literal notranslate"><span class="pre">landmarker.data</span></code> module. There are three types of datasets: ‘LandmarkDataset’,
+‘HeatmapDataset’, and ‘MaskDataset’. The ‘LandmarkDataset’ is a dataset of images with landmarks,
+the ‘HeatmapDataset’ is a dataset of images with heatmaps, and the ‘MaskDataset’ is a dataset of
+images with masks (i.e., binary segmentation masks indiciating the location of the landmarks). The
+‘HeatmapDataset’ and ‘MaskDataset’ both inherit from the ‘LandmarkDataset’ class, and thus also
+contain information about the landmarks. The ‘MaskDataset’ can be constructed from specified image
+and landmarks pairs, or from images and masks pairs, because often that is how the data is
+distributed. The ‘HeatmapDataset’ can be constructed from images and landmarks pairs.</p>
+<p>Images can be provided as a list of paths to stored images, or as a a numpy arary, torch tensor,
+list of numpy  arrays or list of torch tensors. Landmarks can be as numpy arrays or torch tensors.
+These landmarks can be provided in three different shapes: (1) (N, D) where N is the number of
+samples and D is the number of dimensions, (2) (N, C, D) where C is the number of landmark
+classes, (3) (N, C, I, D) where I is the number of instances per landmark class, if less than I
+instances are provided, the remaining instances are filled with NaNs.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Compose</span><span class="p">,</span> <span class="n">ScaleIntensityd</span><span class="p">)</span>
+
+<span class="n">fn_keys</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">)</span>
+<span class="n">spatial_transformd</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">train_transformd</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">([</span>
+                            <span class="n">ScaleIntensityd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">)),</span>  <span class="c1"># Scale intensity</span>
+                        <span class="p">]</span> <span class="o">+</span> <span class="n">spatial_transformd</span><span class="p">)</span>
+
+<span class="n">inference_transformd</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">([</span>
+    <span class="n">ScaleIntensityd</span><span class="p">((</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="p">)),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+<span class="n">path_data</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
+
+<span class="c1"># Warning ensure that lists of paths for volumes, landmarks, and pixel_spacings</span>
+
+<span class="c1"># volume paths</span>
+<span class="n">volume_paths_train</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/train/*_volume.npy&quot;</span><span class="p">))</span>
+<span class="n">volume_paths_val</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/val/*_volume.npy&quot;</span><span class="p">))</span>
+<span class="n">volume_paths_test</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/test/*_volume.npy&quot;</span><span class="p">))</span>
+
+<span class="c1"># landmark paths and transform to single numpy arrays for each set</span>
+<span class="n">landmarks_paths_train</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/train/*_label.npy&quot;</span><span class="p">))</span>
+<span class="n">landmarks_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">landmarks_paths_train</span><span class="p">])</span>
+<span class="n">landmarks_paths_val</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/val/*_label.npy&quot;</span><span class="p">))</span>
+<span class="n">landmarks_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">landmarks_paths_val</span><span class="p">])</span>
+<span class="n">landmarks_paths_test</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/test/*_label.npy&quot;</span><span class="p">))</span>
+<span class="n">landmarks_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">landmarks_paths_test</span><span class="p">])</span>
+
+<span class="c1"># voxel spacing paths and transform to single numpy arrays for each set</span>
+<span class="n">spacing_paths_train</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/train/*_spacing.npy&quot;</span><span class="p">))</span>
+<span class="n">pixel_spacings_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">spacing_paths_train</span><span class="p">])</span>
+<span class="n">spacing_paths_val</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/val/*_spacing.npy&quot;</span><span class="p">))</span>
+<span class="n">pixel_spacings_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">spacing_paths_val</span><span class="p">])</span>
+<span class="n">spacing_paths_test</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_data</span><span class="si">}</span><span class="s2">/test/*_spacing.npy&quot;</span><span class="p">))</span>
+<span class="n">pixel_spacings_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">spacing_paths_test</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dim_img</span> <span class="o">=</span> <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.data</span> <span class="kn">import</span> <span class="n">MaskDataset</span>
+
+<span class="n">ds_train</span> <span class="o">=</span> <span class="n">MaskDataset</span><span class="p">(</span>
+    <span class="n">imgs</span><span class="o">=</span><span class="n">volume_paths_train</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="o">=</span><span class="n">landmarks_train</span><span class="p">,</span>
+    <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_train</span><span class="p">,</span>
+    <span class="n">transform</span><span class="o">=</span><span class="n">train_transformd</span><span class="p">,</span>
+    <span class="n">store_imgs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">dim_img</span><span class="o">=</span><span class="n">dim_img</span>
+<span class="p">)</span>
+
+<span class="n">ds_val</span> <span class="o">=</span> <span class="n">MaskDataset</span><span class="p">(</span>
+    <span class="n">imgs</span><span class="o">=</span><span class="n">volume_paths_val</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="o">=</span><span class="n">landmarks_val</span><span class="p">,</span>
+    <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_val</span><span class="p">,</span>
+    <span class="n">transform</span><span class="o">=</span><span class="n">inference_transformd</span><span class="p">,</span>
+    <span class="n">store_imgs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">dim_img</span><span class="o">=</span><span class="n">dim_img</span>
+<span class="p">)</span>
+
+<span class="n">ds_test</span> <span class="o">=</span> <span class="n">MaskDataset</span><span class="p">(</span>
+    <span class="n">imgs</span><span class="o">=</span><span class="n">volume_paths_test</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="o">=</span><span class="n">landmarks_test</span><span class="p">,</span>
+    <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_test</span><span class="p">,</span>
+    <span class="n">transform</span><span class="o">=</span><span class="n">inference_transformd</span><span class="p">,</span>
+    <span class="n">store_imgs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">dim_img</span><span class="o">=</span><span class="n">dim_img</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="inspecting-the-dataset">
+<h2>Inspecting the dataset<a class="headerlink" href="#inspecting-the-dataset" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span> <span class="o">=</span> <span class="n">ds_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># %pip install &#39;napari[all]&#39;</span>
+<span class="c1"># %pip install &#39;ipyvolume&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="visualize-3d-image-landmarks">
+<h3>Visualize 3D Image + Landmarks<a class="headerlink" href="#visualize-3d-image-landmarks" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">napari</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">napari</span><span class="o">.</span><span class="n">Viewer</span><span class="p">(</span><span class="n">ndisplay</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Add landmarks (as points layer)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span>
+    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;landmark&quot;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">face_color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;landmarks&quot;</span>
+<span class="p">)</span>
+
+<span class="n">napari</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ipyvolume</span> <span class="k">as</span> <span class="nn">ipv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Show volume</span>
+<span class="n">ipv</span><span class="o">.</span><span class="n">quickvolshow</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">level</span><span class="o">=</span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.03</span><span class="p">)</span>
+
+<span class="c1"># Extract xyz coords</span>
+<span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;landmark&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+
+<span class="c1"># Plot landmarks</span>
+<span class="n">ipv</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;sphere&quot;</span><span class="p">)</span>
+
+<span class="n">ipv</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/vision/lib/python3.10/site-packages/ipyvolume/serialize.py:102: RuntimeWarning: invalid value encountered in cast
+  subdata[..., i] = ((gradient[i][zindex] / 2.0 + 0.5) * 255).astype(np.uint8)
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0147eec59a07456baf4bed1bf3f914a4", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+</section>
+<section id="visualize-3d-image-masks-landmarks">
+<h3>Visualize 3D Image + Masks + Landmarks<a class="headerlink" href="#visualize-3d-image-masks-landmarks" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">napari</span>
+
+<span class="c1"># Launch viewer</span>
+<span class="n">viewer</span> <span class="o">=</span> <span class="n">napari</span><span class="o">.</span><span class="n">Viewer</span><span class="p">(</span><span class="n">ndisplay</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Add base volume</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;volume&quot;</span><span class="p">)</span>
+
+<span class="c1"># Add landmarks (as points layer)</span>
+<span class="n">viewer</span><span class="o">.</span><span class="n">add_points</span><span class="p">(</span>
+    <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;landmark&quot;</span><span class="p">],</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">face_color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;landmarks&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Add each channel as a label layer (colored mask)</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">):</span>
+    <span class="n">viewer</span><span class="o">.</span><span class="n">add_labels</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">][</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;landmark_</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">napari</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="training-and-initializing-the-unet-model">
+<h2>Training and initializing the Unet model<a class="headerlink" href="#training-and-initializing-the-unet-model" title="Link to this heading">#</a></h2>
+<section id="initializing-the-model-optimizer-and-loss-function">
+<h3>Initializing the model, optimizer and loss function<a class="headerlink" href="#initializing-the-model-optimizer-and-loss-function" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">monai.networks.nets</span> <span class="kn">import</span> <span class="n">FlexibleUNet</span>
+<span class="kn">from</span> <span class="nn">landmarker.losses</span> <span class="kn">import</span> <span class="n">NLLLoss</span>
+<span class="kn">from</span> <span class="nn">landmarker.models.utils</span> <span class="kn">import</span> <span class="n">SoftmaxND</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">FlexibleUNet</span><span class="p">(</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="c1"># nb of landmarks</span>
+                    <span class="n">backbone</span><span class="o">=</span><span class="s2">&quot;efficientnet-b0&quot;</span><span class="p">,</span>
+                    <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">decoder_channels</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span>
+                    <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+                    <span class="n">act</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+                    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                    <span class="n">decoder_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">upsample</span><span class="o">=</span><span class="s2">&quot;nontrainable&quot;</span><span class="p">,</span>
+                    <span class="n">pre_conv</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+                    <span class="n">interp_mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+                    <span class="n">is_pad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of learnable parameters: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)))</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">60</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()},</span>
+            <span class="p">],</span>
+            <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">NLLLoss</span><span class="p">(</span><span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">decoder_method</span> <span class="o">=</span> <span class="s2">&quot;argmax&quot;</span>
+
+<span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">ReduceLROnPlateau</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                                          <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cooldown</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of learnable parameters: 10630738
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="setting-the-data-loaders">
+<h3>Setting the data loaders<a class="headerlink" href="#setting-the-data-loaders" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">val_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_val</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="training-the-model">
+<h3>Training the model<a class="headerlink" href="#training-the-model" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.heatmap.decoder</span> <span class="kn">import</span> <span class="n">heatmap_to_coord</span>
+<span class="kn">from</span> <span class="nn">landmarker.metrics</span> <span class="kn">import</span> <span class="n">point_error</span>
+
+<span class="k">def</span> <span class="nf">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="n">running_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">masks</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">10000.0</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">val_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;argmax&quot;</span><span class="p">):</span>
+    <span class="n">eval_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">eval_mpe</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)):</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="n">dim_orig</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;dim_original&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;spacing&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">padding</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;padding&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">masks</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">landmarks</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;landmark&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">masks</span><span class="p">)</span>
+            <span class="n">pred_landmarks</span> <span class="o">=</span> <span class="n">heatmap_to_coord</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">eval_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">eval_mpe</span> <span class="o">+=</span> <span class="n">point_error</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:],</span> <span class="n">dim_orig</span><span class="p">,</span>
+                                    <span class="n">pixel_spacing</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">eval_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">),</span> <span class="n">eval_mpe</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">)):</span>
+        <span class="n">train_loss</span> <span class="o">=</span> <span class="n">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="n">val_loss</span><span class="p">,</span> <span class="n">val_mpe</span> <span class="o">=</span> <span class="n">val_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">epochs</span><span class="si">}</span><span class="s2"> - Train loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> - Val loss: </span><span class="si">{</span><span class="n">val_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> - Val mpe: </span><span class="si">{</span><span class="n">val_mpe</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span>
+      <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "9d41890bdf414fa3b8d43d9c5676f710", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b5b07fb9aaf1438e83c25eab6c469c4f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "097f5f18c16e49a08a750e2e59bfc9cd", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1/60 - Train loss: 13.6618 - Val loss: 13.8672 - Val mpe: 61.5504
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "556ee93720ef4042828fc19c087494ab", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "815857a3ff234c70932a755927677d4d", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 2/60 - Train loss: 13.0834 - Val loss: 13.8411 - Val mpe: 65.8023
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0e26945f3c1849b8a3e48c53620389dc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "72f698c62bc648b1901afb6b096fd680", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 3/60 - Train loss: 12.6250 - Val loss: 13.2749 - Val mpe: 31.9457
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "799d792f83a34e10834fea4e1ead6560", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "2f0d119810c945a7b027c0da14b1b216", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 4/60 - Train loss: 12.0499 - Val loss: 11.4506 - Val mpe: 25.9390
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d2c19cec6b2e423bb554a67601c9c4ad", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "90d428d6939a4f6685ca88faf7dde912", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 5/60 - Train loss: 11.1521 - Val loss: 9.7715 - Val mpe: 20.8436
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f624ab5cb33d4608b58dbe40d8a9ee3d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "63829635fa58495ca05ab3192289a186", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 6/60 - Train loss: 10.0226 - Val loss: 8.4791 - Val mpe: 13.2843
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "787422d5352648558f37573e5b7d2005", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "152458a4795e45a5946acfffbf6dde02", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 7/60 - Train loss: 9.1855 - Val loss: 7.8617 - Val mpe: 11.9547
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "51a297339bf147c5ad412cae49dbf0eb", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "909a24f0191f4331a11aae703635b38d", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 8/60 - Train loss: 8.7283 - Val loss: 7.6428 - Val mpe: 11.1689
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7be85a7136404800bd05d7df6046a889", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d29bf60b24c74ff3bac9b7ed2bd626dd", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 9/60 - Train loss: 8.4043 - Val loss: 7.2731 - Val mpe: 9.5265
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "a0c30e16028747969eb12cd9aa9a07cf", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e4bd25bdaf3e40b686b344b985b28e6a", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 10/60 - Train loss: 8.2231 - Val loss: 7.1468 - Val mpe: 8.4783
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6ba9a1cbe881402aac88de82039a6b51", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9ff06b7b9e67463885bf3c22e86c9528", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 11/60 - Train loss: 7.9650 - Val loss: 6.9264 - Val mpe: 6.8929
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "05a74f2e79994e1a9b9cb78b4b66d4ef", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8d2ed0ccfdc04ce6a45d9201527f77fe", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 12/60 - Train loss: 7.7510 - Val loss: 6.7333 - Val mpe: 6.3739
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f8ad4fb38d6c4e2b858f6659cf68911a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9c6b6cb843fa4ef786902966d4deb033", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 13/60 - Train loss: 7.5878 - Val loss: 6.5279 - Val mpe: 4.9365
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "171ab1be7bc849d3aae2957143fa1b41", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fc51b42eca1a4cf993729e4289fcfde0", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 14/60 - Train loss: 7.4038 - Val loss: 6.3934 - Val mpe: 4.3503
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "9af712698da0494f95c4c0e31d70ea07", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "4a16336325624cb9ac6ce5de8f0f048d", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 15/60 - Train loss: 7.2421 - Val loss: 6.3310 - Val mpe: 4.1600
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0abb0d53a3db42f59f4c152e8963daf3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8acf2780fe3b4172a6c9b69e7aa55d6b", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 16/60 - Train loss: 7.1283 - Val loss: 6.2296 - Val mpe: 3.7022
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b3eb0b3f99fe41b4a5ea98f4fca37fdc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9851181a2b5745b383e3b43ff9b0f911", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 17/60 - Train loss: 6.9824 - Val loss: 6.0946 - Val mpe: 3.4488
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "67a0b9183a0d40a4a1431a15159e2ff3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "43687688b0a9417580b40d1f5693d072", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 18/60 - Train loss: 6.9375 - Val loss: 6.0371 - Val mpe: 3.1495
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "bc28851dd15c4af785cae18fbb4e1f4b", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e66694f9a76a487f8c8d9ebed3e67092", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 19/60 - Train loss: 6.7439 - Val loss: 5.9845 - Val mpe: 3.0110
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "daaf457ef4204741934c3cfb0b6cbc9a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "091ad0c525b1474ea7c3bbac858bf42b", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 20/60 - Train loss: 6.6657 - Val loss: 5.9516 - Val mpe: 2.9364
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "84bce482a92b4e75af37cb3a1daf60fc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9602a2f5fb9145a488bd013fa2eab4e9", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 21/60 - Train loss: 6.5495 - Val loss: 5.8250 - Val mpe: 2.7313
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cc6f8ad04adf45eb94914fbdb47c4bfb", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3bd7036faa314b6290d4ef62f8f5f398", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 22/60 - Train loss: 6.4666 - Val loss: 5.8044 - Val mpe: 2.7353
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "32a61f9f674b4e849ebfd24b86002bef", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e965e87a49f84528a5ccb0797984ce10", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 23/60 - Train loss: 6.3349 - Val loss: 5.7169 - Val mpe: 2.6575
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "80b298dab36e42849942dc416ef843e2", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b7144e29436b4039877bab81db4f9da9", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 24/60 - Train loss: 6.3021 - Val loss: 5.6797 - Val mpe: 2.6324
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "82cc3715730746dc800dbddd90366e57", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "67965849dbd74e56a20d0c4d4a2b3dbc", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 25/60 - Train loss: 6.2152 - Val loss: 5.6592 - Val mpe: 2.6078
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2fc23d0b173844068129f73ad3e9d5c7", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3b609a27b2354987a650e8236dbadced", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 26/60 - Train loss: 6.1469 - Val loss: 5.6394 - Val mpe: 2.7124
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ae0fefadf4034875a8c45275992bd9c9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5efb2e514dd84509a8daad844bf5fccc", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 27/60 - Train loss: 6.0800 - Val loss: 5.5844 - Val mpe: 2.5731
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "928a675ab9a64dcfa6fba2f44f4d108e", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d9edebc9f54b4715bd54ba935cf7d659", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 28/60 - Train loss: 6.0143 - Val loss: 5.5765 - Val mpe: 2.5272
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ca20faf0a42f4e7aac758bbdd2e37b3c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "be12e62fff004a51b14747ff63826602", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 29/60 - Train loss: 5.9978 - Val loss: 5.5436 - Val mpe: 2.4605
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b10c2dadd9f944e798e959425ae4d744", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bda06fcb2b22420b96500461f3eada7c", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 30/60 - Train loss: 5.9355 - Val loss: 5.5833 - Val mpe: 2.5290
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ed3162a0579f40f4a11153e8f053adf2", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "727d18a3a966468381937ac1bde99647", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 31/60 - Train loss: 5.8256 - Val loss: 5.4766 - Val mpe: 2.3692
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3879833fff34470f8076be13e22065cd", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8f7c86574e554f71b9b991254045bb2f", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 32/60 - Train loss: 5.8370 - Val loss: 5.4891 - Val mpe: 2.4370
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "66b305327e0f44b88700dfd772f623c9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5aba6a85aea740a7897fa259e7c9f1ff", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 33/60 - Train loss: 5.7940 - Val loss: 5.4510 - Val mpe: 2.3741
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "741ee34df88a489a92c18f525b66ff62", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a02e06ccaddf4f089b4ad9261c7043d0", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 34/60 - Train loss: 5.6998 - Val loss: 5.4596 - Val mpe: 2.4630
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ab71301cec88403bab41c0a11362ed77", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "39ba6507616e46bda9a3e1d345bd218b", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 35/60 - Train loss: 5.6500 - Val loss: 5.4451 - Val mpe: 2.4061
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "916817cccf3f4aeeb95f7d6a625d8277", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e6a3243b778f44c894f2359b6f4a3d3a", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 36/60 - Train loss: 5.5799 - Val loss: 5.4039 - Val mpe: 2.2553
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "fe5dcd374eef4e709132da52fdb52d80", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "f9b2c36dfc384e828af3f47f8a19cc71", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 37/60 - Train loss: 5.5267 - Val loss: 5.3885 - Val mpe: 2.2276
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1724963720434114a287e373f796c3db", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "20f73697cded47f4914f4981ef651770", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 38/60 - Train loss: 5.4954 - Val loss: 5.3974 - Val mpe: 2.4512
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "626f70e0080f422883300a23c119fc9d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "677084f3967448bfb17a7475f77ad3b4", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 39/60 - Train loss: 5.4204 - Val loss: 5.3822 - Val mpe: 2.4493
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cb01658ed8cf488eb16a5a322dc21bec", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "228792a3f4fa46afb89040bbae0fbed7", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 40/60 - Train loss: 5.4198 - Val loss: 5.4089 - Val mpe: 2.3253
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "350a696733bf4a748da41fdfa1ee80ef", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "095dca5e1be34604aee59402cde4c40f", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 41/60 - Train loss: 5.3810 - Val loss: 5.3777 - Val mpe: 2.3584
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ef149eb6c5ef466ea56c06c2a522fd7d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7d7dc3b0396542e3b33bfcc5185d276b", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 42/60 - Train loss: 5.3267 - Val loss: 5.3954 - Val mpe: 2.3004
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "007a7ee7d0764589a14d6ea1e1675ad1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "212c8882cd664765b40c2e7fdaabd349", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 43/60 - Train loss: 5.2859 - Val loss: 5.3714 - Val mpe: 2.2624
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e7aeaabc336748a3879e282c33889b9a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "57532ba37d194d8080c8d77f66f8c9e6", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 44/60 - Train loss: 5.2517 - Val loss: 5.3506 - Val mpe: 2.3085
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d5b0524d89cb46ada39620a411206e2c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a5b122dbc6d8476fbb1392aba67c8b45", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 45/60 - Train loss: 5.2162 - Val loss: 5.3774 - Val mpe: 2.4262
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "86c27d7d87884e3088139174f2695562", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fb98afa84bf8401192605de851cafd3d", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 46/60 - Train loss: 5.1680 - Val loss: 5.3671 - Val mpe: 2.3427
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "2536844ed2814fb6aa85aaaf7e4a56c6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a59d7230b4264d038e6197a3b49e47b4", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 47/60 - Train loss: 5.1511 - Val loss: 5.3600 - Val mpe: 2.2358
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4fca6e6bea5f4a35b9b905a8014250e3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "45b1d63cc0f947239ca8d6c60cdbaee7", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 48/60 - Train loss: 5.0686 - Val loss: 5.3624 - Val mpe: 2.1927
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "79545e7b9282432cbb01b3d6ec76c6fe", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "cc033d3ae0684882b2a6f83494e8b2f3", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 49/60 - Train loss: 5.0631 - Val loss: 5.4156 - Val mpe: 2.3349
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ae16dfc9448243a59217b4ff1fb909fc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "1ac754d5e5d8431ca3154ae8ffe1a737", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 50/60 - Train loss: 5.0215 - Val loss: 5.3805 - Val mpe: 2.2567
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c797aa57bf424de593406dda18846a68", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "490f8e9c40034cda939a772abf7fa1c8", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 51/60 - Train loss: 4.9756 - Val loss: 5.3894 - Val mpe: 2.2176
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "0a32332ca84843d4884d89117ae95fd0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "da0d00f5adf74830bc50d9a4869f3843", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 52/60 - Train loss: 4.9549 - Val loss: 5.3873 - Val mpe: 2.1362
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e09a1f7988a94d558e6e918b16aa12e8", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "781ac8fa08404346b98bbc3979ba1a81", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 53/60 - Train loss: 4.8994 - Val loss: 5.3969 - Val mpe: 2.2065
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "800add091b684045872e7511aad40088", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "4dc369e83cd54d8d9f6151ff9e89c22b", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 54/60 - Train loss: 4.8777 - Val loss: 5.4026 - Val mpe: 2.0645
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "19ef389a9e09401aa5ce2c187105a7d2", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "07cfe4bf2e3c482ea61fd4e62fcec0a0", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 55/60 - Train loss: 4.8202 - Val loss: 5.4019 - Val mpe: 2.1457
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4b792a1b922948d098a84eeaba3f5df5", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8658a85506154dee99f8f45de509c5d4", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 56/60 - Train loss: 4.7835 - Val loss: 5.4449 - Val mpe: 2.1925
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8f1dca29f71e412684659db7fb5a06ba", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "39848f4d740b4299aa2fcf8c197510e0", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 57/60 - Train loss: 4.7842 - Val loss: 5.4435 - Val mpe: 2.1724
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5baae709d93f4345bd47eddbd9e34658", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "726aad5a991e45bb8c2f592bf0f6968c", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 58/60 - Train loss: 4.7428 - Val loss: 5.4447 - Val mpe: 2.1622
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "52dabac5f5f54c0580b651587888313f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a8038638b411469abda97d6478246bef", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 59/60 - Train loss: 4.7937 - Val loss: 5.4324 - Val mpe: 2.1657
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3cad1839902846438b2e510119b57f56", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "ce680c31c60b404582c91725a6cf33d8", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 60/60 - Train loss: 4.7140 - Val loss: 5.4536 - Val mpe: 2.1793
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># torch.save(model.state_dict(), &quot;3D-mml-one-hot-unet.pt&quot;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="evaluating-the-model">
+<h2>Evaluating the model<a class="headerlink" href="#evaluating-the-model" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># model.load_state_dict(torch.load(&quot;3D-mml-one-hot-unet.pt&quot;, weights_only=True))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pred_landmarks_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">true_landmarks_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">dim_origs_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pixel_spacings_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">paddings_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_mpe</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">dim_orig</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;dim_original&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">pixel_spacing</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;spacing&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;padding&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;landmark&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">pred_landmark</span> <span class="o">=</span> <span class="n">heatmap_to_coord</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;argmax&quot;</span><span class="p">,</span> <span class="n">spatial_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">test_mpe</span> <span class="o">+=</span> <span class="n">point_error</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">pred_landmark</span><span class="p">,</span> <span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:],</span> <span class="n">dim_orig</span><span class="p">,</span>
+                                <span class="n">pixel_spacing</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+        <span class="n">pred_landmarks_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pred_landmark</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">true_landmarks_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">landmarks</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">dim_origs_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim_orig</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">pixel_spacings_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pixel_spacing</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">paddings_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">padding</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+<span class="n">pred_landmarks_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pred_landmarks_test</span><span class="p">)</span>
+<span class="n">true_landmarks_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">true_landmarks_test</span><span class="p">)</span>
+<span class="n">dim_origs_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">dim_origs_test</span><span class="p">)</span>
+<span class="n">pixel_spacings_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pixel_spacings_test</span><span class="p">)</span>
+<span class="n">paddings_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">paddings_test</span><span class="p">)</span>
+
+<span class="n">test_mpe</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test Mean PE: </span><span class="si">{</span><span class="n">test_mpe</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4fd543ace9644f6e93040eb4fa608287", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Mean PE: 2.5072
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.metrics</span> <span class="kn">import</span> <span class="n">sdr</span>
+
+<span class="n">sdr_test</span> <span class="o">=</span> <span class="n">sdr</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">true_landmarks</span><span class="o">=</span><span class="n">true_landmarks_test</span><span class="p">,</span> <span class="n">pred_landmarks</span><span class="o">=</span><span class="n">pred_landmarks_test</span><span class="p">,</span>
+               <span class="n">dim</span><span class="o">=</span><span class="n">dim_img</span><span class="p">,</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs_test</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span> <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_test</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings_test</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results on Test Set:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sdr_test</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SDR for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">mm: </span><span class="si">{</span><span class="n">sdr_test</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Results on Test Set:
+SDR for 2.0mm: 68.2143
+SDR for 2.5mm: 78.3571
+SDR for 3.0mm: 81.2143
+SDR for 4.0mm: 86.2143
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize</span> <span class="kn">import</span> <span class="n">detection_report</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Set&quot;</span><span class="p">)</span>
+<span class="n">detection_report</span><span class="p">(</span><span class="n">true_landmarks_test</span><span class="p">,</span> <span class="n">pred_landmarks_test</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim_img</span><span class="p">,</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs_test</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+                    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_test</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings_test</span><span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">ds_test</span><span class="o">.</span><span class="n">class_names</span><span class="p">,</span>
+                    <span class="n">radius</span><span class="o">=</span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Set
+Detection report:
+1# Point-to-point error (PE) statistics:
+======================================================================
+Class               Mean      Median    Std       Min       Max       
+----------------------------------------------------------------------
+landmark_0          2.62      1.32      4.43      0.00      40.08     
+landmark_1          2.50      1.14      3.40      0.01      17.28     
+landmark_2          2.09      1.17      4.34      0.25      41.70     
+landmark_3          2.16      1.21      4.72      0.01      46.03     
+landmark_4          2.06      1.22      2.45      0.15      11.16     
+landmark_5          3.28      1.91      6.24      0.15      55.77     
+landmark_6          2.57      1.39      4.47      0.00      42.38     
+landmark_7          2.94      1.19      6.45      0.00      52.89     
+landmark_8          2.74      1.21      4.60      0.05      39.47     
+landmark_9          1.95      1.31      1.73      0.09      8.73      
+landmark_10         2.62      1.38      5.15      0.05      42.96     
+landmark_11         2.66      1.10      7.09      0.23      47.77     
+landmark_12         2.68      1.31      5.31      0.19      45.69     
+landmark_13         2.25      1.42      2.01      0.03      13.16     
+======================================================================
+
+2# Success detection rate (SDR):
+================================================================================
+Class               SDR (PE≤2.0mm) SDR (PE≤2.5mm) SDR (PE≤3.0mm) SDR (PE≤4.0mm) 
+--------------------------------------------------------------------------------
+landmark_0          65.13          77.91          79.13          80.38          
+landmark_1          78.39          82.12          83.00          84.01          
+landmark_2          76.40          85.50          89.31          91.28          
+landmark_3          74.02          86.87          89.51          92.82          
+landmark_4          77.34          84.94          87.12          87.28          
+landmark_5          53.64          63.19          68.00          80.04          
+landmark_6          61.49          72.34          74.44          86.36          
+landmark_7          67.75          76.80          79.34          80.37          
+landmark_8          70.28          80.27          82.37          84.38          
+landmark_9          68.59          79.81          83.56          88.19          
+landmark_10         65.19          77.13          81.28          88.10          
+landmark_11         83.22          89.28          90.38          91.14          
+landmark_12         64.56          72.93          78.04          90.06          
+landmark_13         59.88          68.62          72.44          85.22          
+================================================================================
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">landmarker.visualize</span> <span class="kn">import</span> <span class="n">plot_cpe</span>
+
+<span class="n">plot_cpe</span><span class="p">(</span><span class="n">true_landmarks_test</span><span class="p">,</span> <span class="n">pred_landmarks_test</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim_img</span><span class="p">,</span> <span class="n">dim_orig</span><span class="o">=</span><span class="n">dim_origs_test</span><span class="o">.</span><span class="n">int</span><span class="p">(),</span>
+                    <span class="n">pixel_spacing</span><span class="o">=</span><span class="n">pixel_spacings_test</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">paddings_test</span><span class="p">,</span> <span class="n">class_names</span><span class="o">=</span><span class="n">ds_test</span><span class="o">.</span><span class="n">class_names</span><span class="p">,</span>
+                    <span class="n">group</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CPE curve&quot;</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;proportion&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;ecdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/5bc6042e6ca796dcfe01a3ad1157786bbd4af360d58de4db2758f25e6bfaa81c.png" src="../../_images/5bc6042e6ca796dcfe01a3ad1157786bbd4af360d58de4db2758f25e6bfaa81c.png" />
+</div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Jef Jonkers
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/predict-idlab/landmarker" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Training and Evaluating One-hot Encoded (Mask) Regression Model for Landmark Localizatioin on MML (3D)</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment</a></li>
+<li><a class="reference internal" href="#setup-imports-and-variables">Setup imports and variables</a></li>
+<li><a class="reference internal" href="#loading-the-dataset">Loading the dataset</a><ul>
+<li><a class="reference internal" href="#short-description-of-the-data-and-dataset-module">Short description of the data and dataset module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inspecting-the-dataset">Inspecting the dataset</a><ul>
+<li><a class="reference internal" href="#visualize-3d-image-landmarks">Visualize 3D Image + Landmarks</a></li>
+<li><a class="reference internal" href="#visualize-3d-image-masks-landmarks">Visualize 3D Image + Masks + Landmarks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#training-and-initializing-the-unet-model">Training and initializing the Unet model</a><ul>
+<li><a class="reference internal" href="#initializing-the-model-optimizer-and-loss-function">Initializing the model, optimizer and loss function</a></li>
+<li><a class="reference internal" href="#setting-the-data-loaders">Setting the data loaders</a></li>
+<li><a class="reference internal" href="#training-the-model">Training the model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#evaluating-the-model">Evaluating the model</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    </body>
+</html>
