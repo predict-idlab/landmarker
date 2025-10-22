@@ -4,38 +4,64 @@ on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: write
+
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
           tool-cache: false
-
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
           android: true
           dotnet: true
           haskell: true
           large-packages: true
           docker-images: true
           swap-storage: true
-      - uses: actions/setup-python@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.10"
           architecture: "x64"
+
+      - name: Show Python
+        run: |
+          python --version
+          which python
+
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
-      - name: Install Dependencies
+        with:
+          python-version: "3.10"
+          cache: true
+
+      - name: Make PDM use this Python
         run: |
-          pip install -U .
+          pdm use -f "$(python -c 'import sys; print(sys.executable)')"
+          pdm info
+
+      - name: Install dependencies into PDM venv
+        run: |
           pdm sync -d
+
+      # 🔧 Add pip to the PDM venv
+      - name: Ensure pip is available in the PDM venv
+        run: |
+          pdm run python -m ensurepip --upgrade
+
+      # Install your package (editable) so Sphinx/autodoc can import it
+      - name: Install project (editable) into PDM venv
+        run: |
+          pdm run pip install -e .
+
       - name: Sphinx build
-        run: pdm run doc
+        run: |
+          pdm run doc
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

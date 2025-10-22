@@ -5,7 +5,7 @@
 </p>
 
 [![PyPI Latest Release](https://img.shields.io/pypi/v/landmarker.svg)](https://pypi.org/project/landmarker/)
-[![support-version](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)](https://pypi.org/project/landmarker/)
+[![support-version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/landmarker/)
 [![codecov](https://img.shields.io/codecov/c/github/predict-idlab/landmarker?logo=codecov)](https://codecov.io/gh/predict-idlab/landmarker)
 [![CodeQL](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml/badge.svg)](https://github.com/predict-idlab/landmarker/actions/workflows/codeql.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?)](http://makeapullrequest.com)

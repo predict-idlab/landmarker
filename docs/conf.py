@@ -39,7 +39,6 @@ extensions = [
     "sphinx_togglebutton",
     "sphinx_design",
     "myst_nb",
-    "sphinxcontrib.collections",
 ]
 
 
@@ -115,12 +114,5 @@ autodoc_class_signature = "separated"
 # -- Options for MySt Notebook ----------------------------------------------------
 nb_execution_mode = "off"
 
-
-# -- Options for sphinx-collection ----------------------------------------------------
-collections = {
-    "examples": {
-        "driver": "copy_folder",
-        "source": "examples/",
-        "ignore": [],
-    }
-}
+# Copy extra files/folders (like examples/) into the built HTML
+html_extra_path = ["examples"]

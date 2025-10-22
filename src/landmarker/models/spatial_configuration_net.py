@@ -152,7 +152,7 @@ class OriginalSpatialConfigurationNet(nn.Module):
         out_channels: int = 4,
         la_channels: int = 128,
         la_depth: int = 3,
-        la_kernel_size: int | tuple[int, ...] = 3,
+        la_kernel_size: int | tuple[int, int] | tuple[int, int, int] = 3,
         la_dropout: float = 0.5,
         sp_channels: int = 128,
         sp_kernel_size: int = 11,
@@ -162,6 +162,8 @@ class OriginalSpatialConfigurationNet(nn.Module):
     ) -> None:
         super().__init__()
         self.init_weights = init_weigths
+        conv: type[nn.Conv2d | nn.Conv3d]
+        avg_pool: type[nn.AvgPool2d | nn.AvgPool3d]
         if spatial_dim == 2:
             conv = nn.Conv2d  # type: ignore
             avg_pool = nn.AvgPool2d  # type: ignore
@@ -303,6 +305,9 @@ class DownLayer(nn.Module):
         spatial_dim: int = 2,
     ) -> None:
         super().__init__()
+        conv: type[nn.Conv2d | nn.Conv3d]
+        avg_pool: type[nn.AvgPool2d | nn.AvgPool3d]
+        dropout_func: type[nn.Dropout2d | nn.Dropout3d]
         if spatial_dim == 2:
             conv = nn.Conv2d
             avg_pool = nn.AvgPool2d
@@ -367,6 +372,7 @@ class UpLayer(nn.Module):
         spatial_dim: int = 2,
     ):
         super().__init__()
+        conv: type[nn.Conv2d | nn.Conv3d]
         if spatial_dim == 2:
             conv = nn.Conv2d
             mode = "bilinear"
