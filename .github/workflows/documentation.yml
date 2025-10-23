@@ -26,7 +26,7 @@ jobs:
           swap-storage: true
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
           architecture: "x64"
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
