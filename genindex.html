@@ -1,0 +1,772 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/favicon_landmarker.svg"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 --><title>Index - Landmarker Documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Landmarker Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static//images/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static//images/logo-dark-mode.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">Landmarker Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">🚀 Getting Started</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="reference/index.html">📖 API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 📖 API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/data.html">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/losses.html">Losses Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/models.html">Models Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/train.html">Train Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/uncertainty.html">Uncertainty Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/utils.html">Utils Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/visualize.html">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev/contributing.html">🤝 Contributing to <code class="docutils literal notranslate"><span class="pre">landmarker</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/changelog.html">📈 Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/code_of_conduct.html">🫶 Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/license.html">📝 License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/data.html">Data Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/datasets.html">Datasets Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/losses.html">Losses Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/metrics.html">Metrics Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/models.html">Models Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/train.html">Train Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/transforms.html">Transforms Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/utils.html">Utils Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/visualize.html">Visualize Module</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/data.html#landmarker.data.HeatmapDataset.__init__">__init__() (landmarker.data.HeatmapDataset method)</a>
+
+        <ul>
+          <li><a href="reference/data.html#landmarker.data.LandmarkDataset.__init__">(landmarker.data.LandmarkDataset method)</a>
+</li>
+          <li><a href="reference/data.html#landmarker.data.MaskDataset.__init__">(landmarker.data.MaskDataset method)</a>
+</li>
+          <li><a href="reference/heatmap.html#landmarker.heatmap.GaussianHeatmapGenerator.__init__">(landmarker.heatmap.GaussianHeatmapGenerator method)</a>
+</li>
+          <li><a href="reference/heatmap.html#landmarker.heatmap.LaplacianHeatmapGenerator.__init__">(landmarker.heatmap.LaplacianHeatmapGenerator method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.AdaptiveWingLoss.__init__">(landmarker.losses.AdaptiveWingLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.EuclideanDistanceVarianceReg.__init__">(landmarker.losses.EuclideanDistanceVarianceReg method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.GaussianHeatmapL2Loss.__init__">(landmarker.losses.GaussianHeatmapL2Loss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.GeneralizedNormalHeatmapLoss.__init__">(landmarker.losses.GeneralizedNormalHeatmapLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.MultivariateGaussianNLLLoss.__init__">(landmarker.losses.MultivariateGaussianNLLLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.NLLLoss.__init__">(landmarker.losses.NLLLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.StackedLoss.__init__">(landmarker.losses.StackedLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.StarLoss.__init__">(landmarker.losses.StarLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.WingLoss.__init__">(landmarker.losses.WingLoss method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.AddCoordChannels.__init__">(landmarker.models.AddCoordChannels method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.CholeskyHourglass.__init__">(landmarker.models.CholeskyHourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.CoordConvLayer.__init__">(landmarker.models.CoordConvLayer method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.Hourglass.__init__">(landmarker.models.Hourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.OriginalSpatialConfigurationNet.__init__">(landmarker.models.OriginalSpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.OriginalSpatialConfigurationNet3d.__init__">(landmarker.models.OriginalSpatialConfigurationNet3d method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.ProbSpatialConfigurationNet.__init__">(landmarker.models.ProbSpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.SpatialConfigurationNet.__init__">(landmarker.models.SpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.StackedCholeskyHourglass.__init__">(landmarker.models.StackedCholeskyHourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.StackedHourglass.__init__">(landmarker.models.StackedHourglass method)</a>
+</li>
+          <li><a href="reference/schedulers.html#landmarker.schedulers.AdalossScheduler.__init__">(landmarker.schedulers.AdalossScheduler method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/schedulers.html#landmarker.schedulers.AdalossScheduler">AdalossScheduler (class in landmarker.schedulers)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.AdaptiveWingLoss">AdaptiveWingLoss (class in landmarker.losses)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.AddCoordChannels">AddCoordChannels (class in landmarker.models)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/utils.html#landmarker.utils.all_annotations_to_landmarks">all_annotations_to_landmarks() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.all_annotations_to_landmarks_numpy">all_annotations_to_landmarks_numpy() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.annotation_to_landmark">annotation_to_landmark() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.annotation_to_landmark_numpy">annotation_to_landmark_numpy() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/models.html#landmarker.models.CholeskyHourglass">CholeskyHourglass (class in landmarker.models)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.coord_argmax">coord_argmax() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.coord_cov_from_gaussian_ls">coord_cov_from_gaussian_ls() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.coord_local_soft_argmax">coord_local_soft_argmax() (in module landmarker.heatmap)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.coord_weighted_spatial_mean">coord_weighted_spatial_mean() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.coord_weighted_spatial_mean_cov">coord_weighted_spatial_mean_cov() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.CoordConvLayer">CoordConvLayer (class in landmarker.models)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.cov_from_gaussian_ls">cov_from_gaussian_ls() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.covert_video_to_frames">covert_video_to_frames() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/visualize.html#landmarker.visualize.detection_report">detection_report() (in module landmarker.visualize)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/losses.html#landmarker.losses.EuclideanDistanceVarianceReg">EuclideanDistanceVarianceReg (class in landmarker.losses)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/utils.html#landmarker.utils.extract_roi">extract_roi() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/losses.html#landmarker.losses.AdaptiveWingLoss.forward">forward() (landmarker.losses.AdaptiveWingLoss method)</a>
+
+        <ul>
+          <li><a href="reference/losses.html#landmarker.losses.EuclideanDistanceVarianceReg.forward">(landmarker.losses.EuclideanDistanceVarianceReg method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.GaussianHeatmapL2Loss.forward">(landmarker.losses.GaussianHeatmapL2Loss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.GeneralizedNormalHeatmapLoss.forward">(landmarker.losses.GeneralizedNormalHeatmapLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.MultivariateGaussianNLLLoss.forward">(landmarker.losses.MultivariateGaussianNLLLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.NLLLoss.forward">(landmarker.losses.NLLLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.StackedLoss.forward">(landmarker.losses.StackedLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.StarLoss.forward">(landmarker.losses.StarLoss method)</a>
+</li>
+          <li><a href="reference/losses.html#landmarker.losses.WingLoss.forward">(landmarker.losses.WingLoss method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.AddCoordChannels.forward">(landmarker.models.AddCoordChannels method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.CholeskyHourglass.forward">(landmarker.models.CholeskyHourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.CoordConvLayer.forward">(landmarker.models.CoordConvLayer method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.Hourglass.forward">(landmarker.models.Hourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.OriginalSpatialConfigurationNet.forward">(landmarker.models.OriginalSpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.ProbSpatialConfigurationNet.forward">(landmarker.models.ProbSpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.SpatialConfigurationNet.forward">(landmarker.models.SpatialConfigurationNet method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.StackedCholeskyHourglass.forward">(landmarker.models.StackedCholeskyHourglass method)</a>
+</li>
+          <li><a href="reference/models.html#landmarker.models.StackedHourglass.forward">(landmarker.models.StackedHourglass method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.GaussianHeatmapGenerator">GaussianHeatmapGenerator (class in landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.GaussianHeatmapL2Loss">GaussianHeatmapL2Loss (class in landmarker.losses)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.GeneralizedNormalHeatmapLoss">GeneralizedNormalHeatmapLoss (class in landmarker.losses)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.get_angle">get_angle() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.get_angle_numpy">get_angle_numpy() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/datasets.html#landmarker.datasets.get_cepha_heatmap_datasets">get_cepha_heatmap_datasets() (in module landmarker.datasets)</a>
+</li>
+        <li><a href="reference/datasets.html#landmarker.datasets.get_cepha_landmark_datasets">get_cepha_landmark_datasets() (in module landmarker.datasets)</a>
+</li>
+        <li><a href="reference/datasets.html#landmarker.datasets.get_cepha_mask_datasets">get_cepha_mask_datasets() (in module landmarker.datasets)</a>
+</li>
+        <li><a href="reference/datasets.html#landmarker.datasets.get_cepha_patch_datasets">get_cepha_patch_datasets() (in module landmarker.datasets)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.get_paths">get_paths() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.GaussianHeatmapGenerator.heatmap_fun">heatmap_fun() (landmarker.heatmap.GaussianHeatmapGenerator method)</a>
+
+        <ul>
+          <li><a href="reference/heatmap.html#landmarker.heatmap.LaplacianHeatmapGenerator.heatmap_fun">(landmarker.heatmap.LaplacianHeatmapGenerator method)</a>
+</li>
+        </ul></li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.heatmap_to_coord">heatmap_to_coord() (in module landmarker.heatmap)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.heatmap_to_coord_cov">heatmap_to_coord_cov() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.heatmap_to_coord_enlarge">heatmap_to_coord_enlarge() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/data.html#landmarker.data.HeatmapDataset">HeatmapDataset (class in landmarker.data)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.Hourglass">Hourglass (class in landmarker.models)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/visualize.html#landmarker.visualize.inspection_plot">inspection_plot() (in module landmarker.visualize)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/data.html#landmarker.data.LandmarkDataset">LandmarkDataset (class in landmarker.data)</a>
+</li>
+        <li>
+    landmarker.data
+
+        <ul>
+          <li><a href="reference/data.html#module-landmarker.data">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.datasets
+
+        <ul>
+          <li><a href="reference/datasets.html#module-landmarker.datasets">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.heatmap
+
+        <ul>
+          <li><a href="reference/heatmap.html#module-landmarker.heatmap">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.losses
+
+        <ul>
+          <li><a href="reference/losses.html#module-landmarker.losses">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.metrics
+
+        <ul>
+          <li><a href="reference/metrics.html#module-landmarker.metrics">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.models
+
+        <ul>
+          <li><a href="reference/models.html#module-landmarker.models">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    landmarker.schedulers
+
+        <ul>
+          <li><a href="reference/schedulers.html#module-landmarker.schedulers">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.transforms
+
+        <ul>
+          <li><a href="reference/transforms.html#module-landmarker.transforms">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.uncertainty
+
+        <ul>
+          <li><a href="reference/uncertainty.html#module-landmarker.uncertainty">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.utils
+
+        <ul>
+          <li><a href="reference/utils.html#module-landmarker.utils">module</a>
+</li>
+        </ul></li>
+        <li>
+    landmarker.visualize
+
+        <ul>
+          <li><a href="reference/visualize.html#module-landmarker.visualize">module</a>
+</li>
+        </ul></li>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.LaplacianHeatmapGenerator">LaplacianHeatmapGenerator (class in landmarker.heatmap)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/data.html#landmarker.data.MaskDataset">MaskDataset (class in landmarker.data)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="reference/data.html#module-landmarker.data">landmarker.data</a>
+</li>
+          <li><a href="reference/datasets.html#module-landmarker.datasets">landmarker.datasets</a>
+</li>
+          <li><a href="reference/heatmap.html#module-landmarker.heatmap">landmarker.heatmap</a>
+</li>
+          <li><a href="reference/losses.html#module-landmarker.losses">landmarker.losses</a>
+</li>
+          <li><a href="reference/metrics.html#module-landmarker.metrics">landmarker.metrics</a>
+</li>
+          <li><a href="reference/models.html#module-landmarker.models">landmarker.models</a>
+</li>
+          <li><a href="reference/schedulers.html#module-landmarker.schedulers">landmarker.schedulers</a>
+</li>
+          <li><a href="reference/transforms.html#module-landmarker.transforms">landmarker.transforms</a>
+</li>
+          <li><a href="reference/uncertainty.html#module-landmarker.uncertainty">landmarker.uncertainty</a>
+</li>
+          <li><a href="reference/utils.html#module-landmarker.utils">landmarker.utils</a>
+</li>
+          <li><a href="reference/visualize.html#module-landmarker.visualize">landmarker.visualize</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/losses.html#landmarker.losses.MultivariateGaussianNLLLoss">MultivariateGaussianNLLLoss (class in landmarker.losses)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/losses.html#landmarker.losses.NLLLoss">NLLLoss (class in landmarker.losses)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/utils.html#landmarker.utils.normalize">normalize() (in module landmarker.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/models.html#landmarker.models.OriginalSpatialConfigurationNet">OriginalSpatialConfigurationNet (class in landmarker.models)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/models.html#landmarker.models.OriginalSpatialConfigurationNet3d">OriginalSpatialConfigurationNet3d (class in landmarker.models)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/utils.html#landmarker.utils.pixel_to_unit">pixel_to_unit() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.pixel_to_unit_numpy">pixel_to_unit_numpy() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/visualize.html#landmarker.visualize.plot_cpe">plot_cpe() (in module landmarker.visualize)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/metrics.html#landmarker.metrics.point_error">point_error() (in module landmarker.metrics)</a>
+</li>
+        <li><a href="reference/visualize.html#landmarker.visualize.prediction_inspect_plot">prediction_inspect_plot() (in module landmarker.visualize)</a>
+</li>
+        <li><a href="reference/utils.html#landmarker.utils.preprocess_all">preprocess_all() (in module landmarker.utils)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.ProbSpatialConfigurationNet">ProbSpatialConfigurationNet (class in landmarker.models)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/uncertainty.html#landmarker.uncertainty.resize_landmarks">resize_landmarks() (in module landmarker.uncertainty)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/metrics.html#landmarker.metrics.sdr">sdr() (in module landmarker.metrics)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.SpatialConfigurationNet">SpatialConfigurationNet (class in landmarker.models)</a>
+</li>
+        <li><a href="reference/models.html#landmarker.models.StackedCholeskyHourglass">StackedCholeskyHourglass (class in landmarker.models)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/models.html#landmarker.models.StackedHourglass">StackedHourglass (class in landmarker.models)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.StackedLoss">StackedLoss (class in landmarker.losses)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.StarLoss">StarLoss (class in landmarker.losses)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.weighted_sample_cov">weighted_sample_cov() (in module landmarker.heatmap)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="reference/heatmap.html#landmarker.heatmap.windowed_weigthed_sample_cov">windowed_weigthed_sample_cov() (in module landmarker.heatmap)</a>
+</li>
+        <li><a href="reference/losses.html#landmarker.losses.WingLoss">WingLoss (class in landmarker.losses)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Jef Jonkers
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/predict-idlab/landmarker" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    </body>
+</html>

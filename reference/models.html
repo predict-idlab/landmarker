@@ -1,0 +1,1020 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Models Module" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="reference/models.html" />
+<meta property="og:site_name" content="Landmarker" />
+<meta property="og:description" content="Module for defining models for landmark detection." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary_reference_models_d7209712.png" />
+<meta property="og:image:alt" content="Module for defining models for landmark detection." />
+<meta name="description" content="Module for defining models for landmark detection." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Metrics Module" href="metrics.html" /><link rel="prev" title="Losses Module" href="losses.html" />
+
+    <link rel="shortcut icon" href="../_static/favicon_landmarker.svg"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Models Module - Landmarker Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Landmarker Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static//images/logo.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static//images/logo-dark-mode.svg" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">Landmarker Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">🚀 Getting Started</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">📖 API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 📖 API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html">Datasets Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="losses.html">Losses Module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Models Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="train.html">Train Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transforms.html">Transforms Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uncertainty.html">Uncertainty Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualize.html">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contributing.html">🤝 Contributing to <code class="docutils literal notranslate"><span class="pre">landmarker</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/changelog.html">📈 Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/code_of_conduct.html">🫶 Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/license.html">📝 License</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="heatmap.html">Heatmap Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="losses.html">Losses Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics Module</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Models Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schedulers.html">Schedulers Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="train.html">Train Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transforms.html">Transforms Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualize.html">Visualize Module</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/predict-idlab/landmarker/edit/main/docs/reference/models.md" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-landmarker.models">
+<span id="models-module"></span><h1>Models Module<a class="headerlink" href="#module-landmarker.models" title="Link to this heading">#</a></h1>
+<p>Module for defining models for landmark detection.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.AddCoordChannels">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">AddCoordChannels</span></span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#AddCoordChannels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.AddCoordChannels" title="Link to this definition">#</a></dt>
+<dd><p>Adds the x and y coordinates of each pixel as additional channels to the input tensor.
+Optionally, it can also add the radial distance of each pixel to the center of the image as an
+additional channel. This is done to provide the network with spatial information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>radial_channel</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to add the radial distance of each pixel to the
+center of the image as an additional channel. Defaults to False.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.AddCoordChannels.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radial_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#AddCoordChannels.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.AddCoordChannels.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>radial_channel</strong> (<em>bool</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.AddCoordChannels.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#AddCoordChannels.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.AddCoordChannels.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id1"><span class="problematic" id="id2">*</span></a>spatial_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, in_channels + 2 + radial_channel, <a href="#id3"><span class="problematic" id="id4">*</span></a>spatial_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tensor</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.CholeskyHourglass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">CholeskyHourglass</span></span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#CholeskyHourglass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CholeskyHourglass" title="Link to this definition">#</a></dt>
+<dd><p>Proposed in “UGLLI Face Alignment: Estimating Uncertainty with
+Gaussian Log-Likelihood Loss” - Kumar et al. (2019)
+# TODO: Note that the implementation of Kumar et al. use DU-Net as the backbone.
+# We use the residual hourglass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_size</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – size of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional layer.</p></li>
+<li><p><strong>subunits</strong> (<em>int</em><em>, </em><em>optional</em>) – number of subunits in each convolutional layer.</p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – upsampling mode. Defaults to ‘nearest’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>predicted heatmaps of shape (batch_size, out_channels, <a href="#id5"><span class="problematic" id="id6">*</span></a>img_dims)
+cen: covariance matrices of the predicted heatmaps of shape (batch_size,</p>
+<blockquote>
+<div><p>out_channels, 2, 2)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pred</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.CholeskyHourglass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">img_size,</span> <span class="pre">in_channels,</span> <span class="pre">out_channels,</span> <span class="pre">channels=[64,</span> <span class="pre">128,</span> <span class="pre">256,</span> <span class="pre">512],</span> <span class="pre">conv_block=&lt;class</span> <span class="pre">'monai.networks.blocks.convolutions.ResidualUnit'&gt;,</span> <span class="pre">up_sample_mode='nearest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#CholeskyHourglass.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CholeskyHourglass.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_size</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>conv_block</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.CholeskyHourglass.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#CholeskyHourglass.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CholeskyHourglass.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id7"><span class="problematic" id="id8">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>predicted heatmaps of shape (batch_size, out_channels, <a href="#id9"><span class="problematic" id="id10">*</span></a>img_dims)
+cen: covariance matrices of the predicted heatmaps of shape (batch_size,</p>
+<blockquote>
+<div><p>out_channels, 2, 2)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pred</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.CoordConvLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">CoordConvLayer</span></span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#CoordConvLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CoordConvLayer" title="Link to this definition">#</a></dt>
+<dd><p>CoordConv is a convolutional layer that adds the x and y coordinates of each pixel as additional
+channels to the input tensor. Optionally, it can also add the radial distance of each pixel to
+the center of the image as an additional channel. This is done to provide the network with
+spatial information.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>source: “An intriguing failing of convolutional neural networks and the CoordConv</dt><dd><p>solution” - Liu et al.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – number of spatial dimensions of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>radial_channel</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to add the radial distance of each pixel to the
+center of the image as an additional channel. Defaults to False.</p></li>
+<li><p><strong>conv_block</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – convolutional block to use. Defaults to ResidualUnit.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.CoordConvLayer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_channel=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_block=&lt;class</span> <span class="pre">'monai.networks.blocks.convolutions.ResidualUnit'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#CoordConvLayer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CoordConvLayer.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>radial_channel</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>conv_block</strong> (<em>Module</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.CoordConvLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/coord_conv.html#CoordConvLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.CoordConvLayer.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id11"><span class="problematic" id="id12">*</span></a>spatial_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, out_channels, <a href="#id13"><span class="problematic" id="id14">*</span></a>spatial_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tensor</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.Hourglass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">Hourglass</span></span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#Hourglass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.Hourglass" title="Link to this definition">#</a></dt>
+<dd><p>Hourglass network is a network with symmetrical encoder and decoder paths. The encoder path
+downsamples the input image while the decoder path upsamples the image. Skip connections are
+added between the encoder and decoder paths to preserve spatial information. This network is
+used for pose estimation.</p>
+<blockquote>
+<div><p>Proposed in: “Stacked Hourglass Networks for Human Pose Estimation” - Newell et al. (2016)</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – number of spatial dimensions of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional layer.</p></li>
+<li><p><strong>conv_block</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – convolutional block to use. Defaults to ResidualUnit.</p></li>
+<li><p><strong>pooling</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – pooling layer to use. Defaults to nn.MaxPool2d.</p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – upsampling mode. Defaults to ‘nearest’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.Hourglass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">spatial_dims,</span> <span class="pre">in_channels,</span> <span class="pre">out_channels,</span> <span class="pre">channels=[64,</span> <span class="pre">128,</span> <span class="pre">256,</span> <span class="pre">512],</span> <span class="pre">conv_block=&lt;class</span> <span class="pre">'monai.networks.blocks.convolutions.ResidualUnit'&gt;,</span> <span class="pre">pooling=&lt;class</span> <span class="pre">'torch.nn.modules.pooling.MaxPool2d'&gt;,</span> <span class="pre">up_sample_mode='nearest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#Hourglass.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.Hourglass.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>conv_block</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>pooling</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.Hourglass.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#Hourglass.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.Hourglass.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id15"><span class="problematic" id="id16">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, out_channels, <a href="#id17"><span class="problematic" id="id18">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tensor</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.OriginalSpatialConfigurationNet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">OriginalSpatialConfigurationNet</span></span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#OriginalSpatialConfigurationNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.OriginalSpatialConfigurationNet" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of the Spatial Configuration Network (SCN) from the paper
+“Integrating spatial configuration into heatmap regression based CNNs for landmark localization”
+by Payer et al. (2019).
+<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S1361841518305784">https://www.sciencedirect.com/science/article/pii/S1361841518305784</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of input channels. Defaults to 1.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of output channels. Defaults to 4.</p></li>
+<li><p><strong>la_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of output channels for each convolutional layer.
+Defaults to 128.</p></li>
+<li><p><strong>la_depth</strong> (<em>int</em><em>, </em><em>optional</em>) – number of convolutional layers. Defaults to 3.</p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em>, </em><em>optional</em>) – kernel size for the convolutional layers. Defaults to 3.</p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em><em>, </em><em>optional</em>) – dropout probability. Defaults to 0.5.</p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of channels for the convolutional layers. Defaults to
+128.</p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em><em>, </em><em>optional</em>) – kernel size for the convolutional layers. Defaults to 11.</p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em><em>, </em><em>optional</em>) – factor by which the image is downsampled. Defaults to 16.</p></li>
+<li><p><strong>init_weights</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to initialize the weights of the convolutional
+layers.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.OriginalSpatialConfigurationNet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_weigths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#OriginalSpatialConfigurationNet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.OriginalSpatialConfigurationNet.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_depth</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em>) – </p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em>) – </p></li>
+<li><p><strong>init_weigths</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>spatial_dim</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.OriginalSpatialConfigurationNet.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#OriginalSpatialConfigurationNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.OriginalSpatialConfigurationNet.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id19"><span class="problematic" id="id20">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, out_channels, <a href="#id21"><span class="problematic" id="id22">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.OriginalSpatialConfigurationNet3d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">OriginalSpatialConfigurationNet3d</span></span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#OriginalSpatialConfigurationNet3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.OriginalSpatialConfigurationNet3d" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of the Spatial Configuration Network (SCN) from the paper
+“Integrating spatial configuration into heatmap regression based CNNs for landmark localization”
+by Payer et al. (2019).
+<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S1361841518305784">https://www.sciencedirect.com/science/article/pii/S1361841518305784</a></p>
+<p>This is the 3D version of the original SCN.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.OriginalSpatialConfigurationNet3d.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#OriginalSpatialConfigurationNet3d.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.OriginalSpatialConfigurationNet3d.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_depth</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>) – </p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em>) – </p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.ProbSpatialConfigurationNet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">ProbSpatialConfigurationNet</span></span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#ProbSpatialConfigurationNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.ProbSpatialConfigurationNet" title="Link to this definition">#</a></dt>
+<dd><p>Probabilistic Spatial Configuration Network (PSCN)</p>
+<p>Adapted implementation of the Probabilistic Spatial Configuration Network (PSCN) from the paper
+“Integrating spatial configuration into heatmap regression based CNNs for landmark localization”
+by Payer et al. (2019). This is the same as the Spatial Configuration Network (SCN), but with
+a different last layer. Instead of multiplying the output of the SCN with the output of the
+spatial configuration network, we add them together, since the output of the spatial
+configuration network is a probability distribution in the logit space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em><em>, </em><em>optional</em>) – number of spatial dimensions of the input image. Defaults to
+2.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of input channels. Defaults to 1.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of output channels. Defaults to 4.</p></li>
+<li><p><strong>la_channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional
+layer. Defaults to (128, 128, 128, 128).</p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – kernel size for the convolutional
+layers. Defaults to 3.</p></li>
+<li><p><strong>la_strides</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – strides for the convolutional layers. Defaults to
+(2, 2, 2).</p></li>
+<li><p><strong>la_num_res_units</strong> (<em>int</em><em>, </em><em>optional</em>) – number of residual units in the convolutional layers.
+Defaults to 2.</p></li>
+<li><p><strong>la_norm</strong> (<em>str</em><em>, </em><em>optional</em>) – type of normalization to use. Defaults to “instance”.</p></li>
+<li><p><strong>la_activation</strong> (<em>str</em><em>, </em><em>optional</em>) – type of activation to use. Defaults to “PRELU”.</p></li>
+<li><p><strong>la_adn_ordering</strong> (<em>str</em><em>, </em><em>optional</em>) – ordering of the layers in the residual units. Defaults to
+“NDA”.</p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em><em>, </em><em>optional</em>) – dropout probability. Defaults to 0.0.</p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of channels for the convolutional layers. Defaults to
+128.</p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em><em>, </em><em>optional</em>) – kernel size for the convolutional layers. Defaults to 11.</p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em><em>, </em><em>optional</em>) – factor by which the image is downsampled. Defaults to 16.</p></li>
+<li><p><strong>sp_image_input</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to use the input image as input for the spatial</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.ProbSpatialConfigurationNet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128,</span> <span class="pre">128,</span> <span class="pre">128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,</span> <span class="pre">2,</span> <span class="pre">2,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_num_res_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'instance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PRELU'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_adn_ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NDA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_image_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#ProbSpatialConfigurationNet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.ProbSpatialConfigurationNet.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_strides</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_num_res_units</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_norm</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_activation</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_adn_ordering</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em>) – </p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_image_input</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.ProbSpatialConfigurationNet.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#ProbSpatialConfigurationNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.ProbSpatialConfigurationNet.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id23"><span class="problematic" id="id24">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, out_channels, <a href="#id25"><span class="problematic" id="id26">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.SpatialConfigurationNet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">SpatialConfigurationNet</span></span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#SpatialConfigurationNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.SpatialConfigurationNet" title="Link to this definition">#</a></dt>
+<dd><p>Adapted implementation of the Spatial Configuration Network (SCN) from the paper
+“Integrating spatial configuration into heatmap regression based CNNs for landmark localization”
+by Payer et al. (2019).
+<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S1361841518305784">https://www.sciencedirect.com/science/article/pii/S1361841518305784</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – number of spatial dimensions of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>la_channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional
+layer.</p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em>, </em><em>optional</em>) – kernel size for the convolutional layers.</p></li>
+<li><p><strong>la_strides</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – strides for the convolutional layers.</p></li>
+<li><p><strong>la_num_res_units</strong> (<em>int</em><em>, </em><em>optional</em>) – number of residual units in the convolutional layers.</p></li>
+<li><p><strong>la_norm</strong> (<em>str</em><em>, </em><em>optional</em>) – type of normalization to use. Defaults to “INSTANCE”.</p></li>
+<li><p><strong>la_activation</strong> (<em>str</em><em>, </em><em>optional</em>) – type of activation to use. Defaults to “PRELU”.</p></li>
+<li><p><strong>la_adn_ordering</strong> (<em>str</em><em>, </em><em>optional</em>) – ordering of the layers in the residual units. Defaults to
+“ADN”.</p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em><em>, </em><em>optional</em>) – dropout probability. Defaults to 0.0.</p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em><em>, </em><em>optional</em>) – number of channels for the convolutional layers.</p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em><em>, </em><em>optional</em>) – kernel size for the convolutional layers.</p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em><em>, </em><em>optional</em>) – factor by which the image is downsampled.</p></li>
+<li><p><strong>sp_image_input</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to use the input image as input for the spatial
+configuration network.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.SpatialConfigurationNet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">128,</span> <span class="pre">128,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,</span> <span class="pre">2,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_num_res_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INSTANCE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PRELU'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_adn_ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ADN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">la_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_image_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#SpatialConfigurationNet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.SpatialConfigurationNet.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_kernel_size</strong> (<em>int</em><em> | </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_strides</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>la_num_res_units</strong> (<em>int</em>) – </p></li>
+<li><p><strong>la_norm</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_activation</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_adn_ordering</strong> (<em>str</em>) – </p></li>
+<li><p><strong>la_dropout</strong> (<em>float</em>) – </p></li>
+<li><p><strong>sp_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_kernel_size</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_downsample</strong> (<em>int</em>) – </p></li>
+<li><p><strong>sp_image_input</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.SpatialConfigurationNet.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/spatial_configuration_net.html#SpatialConfigurationNet.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.SpatialConfigurationNet.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id27"><span class="problematic" id="id28">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output tensor of shape (batch_size, out_channels, <a href="#id29"><span class="problematic" id="id30">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.StackedCholeskyHourglass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">StackedCholeskyHourglass</span></span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#StackedCholeskyHourglass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedCholeskyHourglass" title="Link to this definition">#</a></dt>
+<dd><p>Stacked Cholesky Hourglass Network as proposed in “UGLLI Face Alignment: Estimating Uncertainty
+with Gaussian Log-Likelihood Loss” - Kumar et al. (2019).  It is a stack of hourglass networks
+with a Cholesky Estimator Network at the bottleneck of each hourglass. The output of the
+Cholesky Estimator Network is a lower triangular matrix that is used to estimate the covariance
+matrix of the Gaussian distribution of the predicted heatmaps. The covariance matrix is then
+used to compute the Gaussian Log-Likelihood Loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_stacks</strong> (<em>int</em>) – number of hourglass networks to stack.</p></li>
+<li><p><strong>img_size</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – size of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional layer.</p></li>
+<li><p><strong>conv_block</strong> (<em>nn.Module</em><em>, </em><em>optional</em>) – convolutional block to use. Defaults to ResidualUnit.</p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – upsampling mode. Defaults to ‘nearest’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.StackedCholeskyHourglass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">nb_stacks,</span> <span class="pre">img_size,</span> <span class="pre">in_channels,</span> <span class="pre">out_channels,</span> <span class="pre">channels=[64,</span> <span class="pre">128,</span> <span class="pre">256,</span> <span class="pre">512],</span> <span class="pre">conv_block=&lt;class</span> <span class="pre">'monai.networks.blocks.convolutions.ResidualUnit'&gt;,</span> <span class="pre">up_sample_mode='nearest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#StackedCholeskyHourglass.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedCholeskyHourglass.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_stacks</strong> (<em>int</em>) – </p></li>
+<li><p><strong>img_size</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>conv_block</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.StackedCholeskyHourglass.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/cholesky_hourglass.html#StackedCholeskyHourglass.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedCholeskyHourglass.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id31"><span class="problematic" id="id32">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>list of predicted heatmaps of shape (batch_size, out_channels, <a href="#id33"><span class="problematic" id="id34">*</span></a>img_dims)
+cens: list of covariance matrices of the predicted heatmaps of shape (batch_size,</p>
+<blockquote>
+<div><p>out_channels, 2, 2)</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>heatmaps</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="landmarker.models.StackedHourglass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">landmarker.models.</span></span><span class="sig-name descname"><span class="pre">StackedHourglass</span></span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#StackedHourglass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedHourglass" title="Link to this definition">#</a></dt>
+<dd><p>Stacked hourglass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_stacks</strong> (<em>int</em>) – number of hourglass modules to stack.</p></li>
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – number of spatial dimensions of the input image.</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – number of input channels.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – number of output channels.</p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – number of output channels for each convolutional layer.</p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em><em>, </em><em>optional</em>) – upsampling mode. Defaults to ‘nearest’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.StackedHourglass.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">nb_stacks,</span> <span class="pre">spatial_dims,</span> <span class="pre">in_channels,</span> <span class="pre">out_channels,</span> <span class="pre">channels=[64,</span> <span class="pre">128,</span> <span class="pre">256,</span> <span class="pre">512],</span> <span class="pre">conv_block=&lt;class</span> <span class="pre">'monai.networks.blocks.convolutions.ResidualUnit'&gt;,</span> <span class="pre">pooling=&lt;class</span> <span class="pre">'torch.nn.modules.pooling.MaxPool2d'&gt;,</span> <span class="pre">up_sample_mode='nearest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#StackedHourglass.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedHourglass.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_stacks</strong> (<em>int</em>) – </p></li>
+<li><p><strong>spatial_dims</strong> (<em>int</em>) – </p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – </p></li>
+<li><p><strong>channels</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – </p></li>
+<li><p><strong>conv_block</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>pooling</strong> (<em>Module</em>) – </p></li>
+<li><p><strong>up_sample_mode</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="landmarker.models.StackedHourglass.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/landmarker/models/hourglass.html#StackedHourglass.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#landmarker.models.StackedHourglass.forward" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>Tensor</em>) – input tensor of shape (batch_size, in_channels, <a href="#id35"><span class="problematic" id="id36">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of output tensors of shape (batch_size, out_channels, <a href="#id37"><span class="problematic" id="id38">*</span></a>img_dims)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<em>Tensor</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="metrics.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Metrics Module</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="losses.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Losses Module</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Jef Jonkers
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/predict-idlab/landmarker" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Models Module</a><ul>
+<li><a class="reference internal" href="#landmarker.models.AddCoordChannels"><code class="docutils literal notranslate"><span class="pre">AddCoordChannels</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.AddCoordChannels.__init__"><code class="docutils literal notranslate"><span class="pre">AddCoordChannels.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.AddCoordChannels.forward"><code class="docutils literal notranslate"><span class="pre">AddCoordChannels.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.CholeskyHourglass"><code class="docutils literal notranslate"><span class="pre">CholeskyHourglass</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.CholeskyHourglass.__init__"><code class="docutils literal notranslate"><span class="pre">CholeskyHourglass.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.CholeskyHourglass.forward"><code class="docutils literal notranslate"><span class="pre">CholeskyHourglass.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.CoordConvLayer"><code class="docutils literal notranslate"><span class="pre">CoordConvLayer</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.CoordConvLayer.__init__"><code class="docutils literal notranslate"><span class="pre">CoordConvLayer.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.CoordConvLayer.forward"><code class="docutils literal notranslate"><span class="pre">CoordConvLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.Hourglass"><code class="docutils literal notranslate"><span class="pre">Hourglass</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.Hourglass.__init__"><code class="docutils literal notranslate"><span class="pre">Hourglass.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.Hourglass.forward"><code class="docutils literal notranslate"><span class="pre">Hourglass.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.OriginalSpatialConfigurationNet"><code class="docutils literal notranslate"><span class="pre">OriginalSpatialConfigurationNet</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.OriginalSpatialConfigurationNet.__init__"><code class="docutils literal notranslate"><span class="pre">OriginalSpatialConfigurationNet.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.OriginalSpatialConfigurationNet.forward"><code class="docutils literal notranslate"><span class="pre">OriginalSpatialConfigurationNet.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.OriginalSpatialConfigurationNet3d"><code class="docutils literal notranslate"><span class="pre">OriginalSpatialConfigurationNet3d</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.OriginalSpatialConfigurationNet3d.__init__"><code class="docutils literal notranslate"><span class="pre">OriginalSpatialConfigurationNet3d.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.ProbSpatialConfigurationNet"><code class="docutils literal notranslate"><span class="pre">ProbSpatialConfigurationNet</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.ProbSpatialConfigurationNet.__init__"><code class="docutils literal notranslate"><span class="pre">ProbSpatialConfigurationNet.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.ProbSpatialConfigurationNet.forward"><code class="docutils literal notranslate"><span class="pre">ProbSpatialConfigurationNet.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.SpatialConfigurationNet"><code class="docutils literal notranslate"><span class="pre">SpatialConfigurationNet</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.SpatialConfigurationNet.__init__"><code class="docutils literal notranslate"><span class="pre">SpatialConfigurationNet.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.SpatialConfigurationNet.forward"><code class="docutils literal notranslate"><span class="pre">SpatialConfigurationNet.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.StackedCholeskyHourglass"><code class="docutils literal notranslate"><span class="pre">StackedCholeskyHourglass</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.StackedCholeskyHourglass.__init__"><code class="docutils literal notranslate"><span class="pre">StackedCholeskyHourglass.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.StackedCholeskyHourglass.forward"><code class="docutils literal notranslate"><span class="pre">StackedCholeskyHourglass.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#landmarker.models.StackedHourglass"><code class="docutils literal notranslate"><span class="pre">StackedHourglass</span></code></a><ul>
+<li><a class="reference internal" href="#landmarker.models.StackedHourglass.__init__"><code class="docutils literal notranslate"><span class="pre">StackedHourglass.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#landmarker.models.StackedHourglass.forward"><code class="docutils literal notranslate"><span class="pre">StackedHourglass.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    </body>
+</html>
