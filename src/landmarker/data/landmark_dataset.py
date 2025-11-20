@@ -223,6 +223,10 @@ class LandmarkDataset(Dataset):
             padding = self.paddings[idx]
             dim_original = self.dim_original[idx]
         if self.transform is not None:
+            if hasattr(img, "affine"):
+                img.affine = torch.eye(
+                    4
+                )  # reset affine to avoid issues in transform when loading from file
             img, landmark_t, affine_matrix = self._transform_img_landmark(
                 img, landmark, self.transform  # type: ignore
             )
@@ -553,6 +557,10 @@ class MaskDataset(LandmarkDataset):
                         int(dim_original[2].item()),
                     )
         if self.transform is not None:
+            if hasattr(img, "affine"):
+                img.affine = torch.eye(
+                    4
+                )  # reset affine to avoid issues in transform when loading from file
             img, landmark_t, affine_matrix = self._transform_img_landmark(
                 img, landmark, self.transform  # type: ignore
             )
@@ -924,6 +932,10 @@ class HeatmapDataset(LandmarkDataset):
                     padding = torch.zeros(2)
             heatmap = self._create_heatmap(landmark).squeeze(0)
         if self.transform is not None:
+            if hasattr(img, "affine"):
+                img.affine = torch.eye(
+                    4
+                )  # reset affine to avoid issues in transform when loading from file
             (
                 img,
                 heatmap,
