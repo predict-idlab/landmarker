@@ -13,7 +13,6 @@ dependencies = [
     "tqdm>=4.66.1",
     "numpy>=1.24.4",
     "pandas>=2.3.3",
-    "opendatasets>=0.1.22",
     "rarfile>=4.1",
     "scipy>=1.15.0,<1.16.0",
     "pydicom>=2.4.3",

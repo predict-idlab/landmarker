@@ -8,7 +8,6 @@ import os
 import zipfile
 
 import numpy as np
-import opendatasets as od  # type: ignore
 import pandas as pd  # type: ignore
 import rarfile  # type: ignore
 
@@ -19,6 +18,7 @@ from landmarker.data.landmark_dataset import (
     PatchDataset,
     PatchMaskDataset,
 )
+from landmarker.utils import download_url
 
 
 def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
@@ -33,9 +33,9 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
             True.
     """
     if not os.path.exists(path_dir + "/ISBI2015"):
-        od.download(
+        download_url(
             "https://figshare.com/ndownloader/articles/3471833?private_link=37ec464af8e81ae6ebbf",
-            path_dir,
+            os.path.join(path_dir, "3471833.zip"),
         )
         # Change the name of the folder to ISBI2015
         with zipfile.ZipFile(path_dir + "/3471833.zip", "r") as zip_ref:
@@ -55,10 +55,10 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
         os.remove(path_dir + "/ISBI2015/EvaluationCode.rar")
         os.mkdir(path_dir + "/ISBI2015/cv_payer")
         for i in range(1, 5):
-            od.download(
+            download_url(
                 "https://raw.githubusercontent.com/christianpayer/MedicalDataAugmentationTool"
                 + f"-HeatmapUncertainty/main/setup_ann/all_landmarks/cv/{i}.txt",
-                path_dir + "/ISBI2015/cv_payer",
+                os.path.join(path_dir, "ISBI2015", "cv_payer", f"{i}.txt"),
             )
 
     landmarks_list = []

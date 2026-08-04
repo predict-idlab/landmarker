@@ -16,17 +16,19 @@ import zipfile
 
 import cv2
 import numpy as np
-import opendatasets as od  # type: ignore
 import torch
 from tqdm import tqdm  # type: ignore
 
 from landmarker.data import HeatmapDataset, LandmarkDataset, MaskDataset
-from landmarker.utils import get_paths
+from landmarker.utils import download_url, get_paths
 
 
 def get_plant_centroids_dataset(path_dir: str):
     if not os.path.exists(path_dir + "/plantcentroids"):
-        od.download("http://plantcentroids.cs.uni-freiburg.de/dataset/plantcentroids.zip", path_dir)
+        download_url(
+            "http://plantcentroids.cs.uni-freiburg.de/dataset/plantcentroids.zip",
+            os.path.join(path_dir, "plantcentroids.zip"),
+        )
         with zipfile.ZipFile(path_dir + "/plantcentroids.zip", "r") as zip_ref:
             zip_ref.extractall(path_dir)
         os.rename(path_dir + "/plantcentroids_dataset", path_dir + "/plantcentroids")

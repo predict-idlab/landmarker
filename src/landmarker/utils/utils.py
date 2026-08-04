@@ -3,12 +3,21 @@
 import glob
 import json
 import os
+from pathlib import Path
 from typing import Optional
+from urllib.request import urlretrieve
 
 import cv2
 import numpy as np
 import torch
 from tqdm import tqdm  # type: ignore
+
+
+def download_url(url: str, destination: str | os.PathLike) -> None:
+    """Download a URL to a specific local path, creating parent directories as needed."""
+    destination_path = Path(destination).expanduser()
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    urlretrieve(url, str(destination_path))
 
 
 def get_paths(folder_path: str, extension: str) -> list[str]:

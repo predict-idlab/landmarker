@@ -16,11 +16,10 @@ import json
 import os
 import zipfile
 
-import opendatasets as od  # type: ignore
 import torch
 
 from landmarker.data import HeatmapDataset, LandmarkDataset
-from landmarker.utils import covert_video_to_frames
+from landmarker.utils import covert_video_to_frames, download_url
 
 # class_names = ["LeftClasperPoint", "RightClasperPoint", "HeadPoint",
 #                "ShaftPoint", "TrackedPoint", "EndPoint"]
@@ -30,13 +29,13 @@ def get_endovis2015_dataset(
     path_dir: str, class_names: list[str] = ["LeftClasperPoint", "RightClasperPoint"]
 ):
     if not os.path.exists(path_dir + "/EndoVis2015"):
-        od.download_url(
+        download_url(
             "https://opencas.webarchiv.kit.edu/data/endovis15_ins/Tracking_Robotic_Training.zip",
-            path_dir,
+            os.path.join(path_dir, "Tracking_Robotic_Training.zip"),
         )
-        od.download_url(
+        download_url(
             "https://opencas.webarchiv.kit.edu/data/endovis15_ins/Tracking_Robotic_Testing.zip",
-            path_dir,
+            os.path.join(path_dir, "Tracking_Robotic_Testing.zip"),
         )
         with zipfile.ZipFile(path_dir + "/Tracking_Robotic_Training.zip", "r") as zip_ref:
             zip_ref.extractall(path=path_dir + "/EndoVis2015")
@@ -59,14 +58,26 @@ def get_endovis2015_dataset(
             "https://raw.githubusercontent.com/" + "surgical-vision/EndoVisPoseAnnotation/master"
         )
         for i in range(4):
-            od.download_url(
+            download_url(
                 f"{label_path}/train_labels/train{i+1}_labels.json",
-                path_dir + "/EndoVis2015/Tracking_Robotic_Training/labels",
+                os.path.join(
+                    path_dir,
+                    "EndoVis2015",
+                    "Tracking_Robotic_Training",
+                    "labels",
+                    f"train{i+1}_labels.json",
+                ),
             )
         for i in range(6):
-            od.download_url(
+            download_url(
                 f"{label_path}/test_labels/test{i+1}_labels.json",
-                path_dir + "/EndoVis2015/Tracking_Robotic_Testing/labels",
+                os.path.join(
+                    path_dir,
+                    "EndoVis2015",
+                    "Tracking_Robotic_Testing",
+                    "labels",
+                    f"test{i+1}_labels.json",
+                ),
             )
         for i in range(4):
             covert_video_to_frames(

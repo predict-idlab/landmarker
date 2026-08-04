@@ -14,12 +14,29 @@ from landmarker.utils.utils import (
     annotation_to_landmark,
     annotation_to_landmark_numpy,
     covert_video_to_frames,
+    download_url,
     get_angle,
     get_angle_numpy,
     get_paths,
     pixel_to_unit,
     pixel_to_unit_numpy,
 )
+
+
+def test_download_url_creates_parent_directories(tmp_path, monkeypatch):
+    """Test downloading to an explicit path whose parent does not exist yet."""
+    calls = []
+
+    def fake_urlretrieve(url, destination):
+        calls.append((url, destination))
+
+    monkeypatch.setattr("landmarker.utils.utils.urlretrieve", fake_urlretrieve)
+    destination = tmp_path / "nested" / "dataset.zip"
+
+    download_url("https://example.com/download", destination)
+
+    assert destination.parent.is_dir()
+    assert calls == [("https://example.com/download", str(destination))]
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -9,6 +9,7 @@ from .utils import (
     annotation_to_landmark,
     annotation_to_landmark_numpy,
     covert_video_to_frames,
+    download_url,
     get_angle,
     get_angle_numpy,
     get_paths,
@@ -31,5 +32,6 @@ __all__ = [
     "pixel_to_unit",
     "pixel_to_unit_numpy",
     "covert_video_to_frames",
+    "download_url",
     "extract_roi",
 ]
