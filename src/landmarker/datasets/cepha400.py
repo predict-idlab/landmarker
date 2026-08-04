@@ -28,7 +28,8 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
 
     Args:
         path_dir (str): The path to the directory where the dataset should be stored.
-        junior (bool, optional): Whether to use the junior or the average of senior and junior annotator. Defaults to False.
+        junior (bool, optional): Whether to use the junior or the average of senior and junior
+            annotator. Defaults to False.
         cv (bool, optional): Whether to use the cross validation splits from the paper. Defaults to
             True.
     """
@@ -65,7 +66,7 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
     for i in range(400):
         landmarks_list.append(
             pd.read_csv(
-                path_dir + f"/ISBI2015/400_junior/{str(i+1).zfill(3)}.txt",
+                path_dir + f"/ISBI2015/400_junior/{str(i + 1).zfill(3)}.txt",
                 sep=",",
                 header=None,
             )[:19].to_numpy()
@@ -79,7 +80,7 @@ def get_cepha_dataset(path_dir: str, junior: bool = False, cv: bool = True):
         for i in range(400):
             landmarks_list.append(
                 pd.read_csv(
-                    path_dir + f"/ISBI2015/400_senior/{str(i+1).zfill(3)}.txt",
+                    path_dir + f"/ISBI2015/400_senior/{str(i + 1).zfill(3)}.txt",
                     sep=",",
                     header=None,
                 )[:19].to_numpy()

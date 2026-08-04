@@ -14,7 +14,8 @@ dependencies = [
     "numpy>=1.24.4",
     "pandas>=2.3.3",
     "rarfile>=4.1",
-    "scipy>=1.15.0,<1.16.0",
+    "scipy>=1.15.0,<1.16.0; python_version < '3.14'",
+    "scipy>=1.16.1,<1.17.0; python_version >= '3.14'",
     "pydicom>=2.4.3",
     "matplotlib>=3.7.4",
     "seaborn>=0.13.0",
@@ -24,37 +25,30 @@ dependencies = [
     "pyzmq>=27.1.0",
     "typing-extensions>=4.15.0",
 ]
-requires-python = "<3.14,>=3.10"
+requires-python = ">=3.10,<3.15"
 readme = "README.md"
 license = {text = "MIT"}
 
-[tool.pdm.version]
-source = "file"
+[tool.hatch.version]
 path = "src/landmarker/__init__.py"
 
-[tool.pdm.scripts]
-test = "pytest"
-tox = "tox"
-type = "mypy src/landmarker"
-lint = "flake8 src/landmarker"
-doc = "sphinx-build docs docs/_build/html"
-docauto = "sphinx-autobuild docs docs/_build/html --ignore _collections"
-
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling>=1.28,<2"]
+build-backend = "hatchling.build"
 
-[tool.pdm.build]
-excludes = ["./**/.git"]
-package-dir = "src"
-includes = ["src/landmarker"]
-source-includes = ["tests", "CHANGELOG.md", "LICENSE", "README.md", "tox.ini"]
-editable-backend = "path"
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/landmarker",
+    "/tests",
+    "/CHANGELOG.md",
+    "/LICENSE",
+    "/README.md",
+    "/tox.ini",
+]
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 test = [
     "pytest",
-    "pdm[pytest]",
     "pytest-cov",
 ]
 lint = [
@@ -78,8 +72,19 @@ type = [
     "mypy>=1.7.1",
 ]
 tox = [
-    "tox",
+    "tox>=4",
+    "tox-uv>=1.36,<2",
 ]
+dev = [
+    {include-group = "test"},
+    {include-group = "lint"},
+    {include-group = "doc"},
+    {include-group = "type"},
+    {include-group = "tox"},
+]
+
+[tool.uv]
+default-groups = ["dev"]
 
 [tool.pytest.ini_options]
 filterwarnings = [

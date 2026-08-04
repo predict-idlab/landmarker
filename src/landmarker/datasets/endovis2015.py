@@ -59,36 +59,36 @@ def get_endovis2015_dataset(
         )
         for i in range(4):
             download_url(
-                f"{label_path}/train_labels/train{i+1}_labels.json",
+                f"{label_path}/train_labels/train{i + 1}_labels.json",
                 os.path.join(
                     path_dir,
                     "EndoVis2015",
                     "Tracking_Robotic_Training",
                     "labels",
-                    f"train{i+1}_labels.json",
+                    f"train{i + 1}_labels.json",
                 ),
             )
         for i in range(6):
             download_url(
-                f"{label_path}/test_labels/test{i+1}_labels.json",
+                f"{label_path}/test_labels/test{i + 1}_labels.json",
                 os.path.join(
                     path_dir,
                     "EndoVis2015",
                     "Tracking_Robotic_Testing",
                     "labels",
-                    f"test{i+1}_labels.json",
+                    f"test{i + 1}_labels.json",
                 ),
             )
         for i in range(4):
             covert_video_to_frames(
-                path_dir + f"/EndoVis2015/Tracking_Robotic_Training/Dataset{i+1}/Video.avi",
-                path_dir + f"/EndoVis2015/Tracking_Robotic_Training/Dataset{i+1}/raw",
+                path_dir + f"/EndoVis2015/Tracking_Robotic_Training/Dataset{i + 1}/Video.avi",
+                path_dir + f"/EndoVis2015/Tracking_Robotic_Training/Dataset{i + 1}/raw",
                 zero_fill=6,
             )
         for i in range(6):
             covert_video_to_frames(
-                path_dir + f"/EndoVis2015/Tracking_Robotic_Testing/Dataset{i+1}/Video.avi",
-                path_dir + f"/EndoVis2015/Tracking_Robotic_Testing/Dataset{i+1}/raw",
+                path_dir + f"/EndoVis2015/Tracking_Robotic_Testing/Dataset{i + 1}/Video.avi",
+                path_dir + f"/EndoVis2015/Tracking_Robotic_Testing/Dataset{i + 1}/raw",
                 zero_fill=4,
             )
 

@@ -666,7 +666,8 @@ class MR2CCP:
             raise ValueError("pred must have the same second dimension as nb_landmarks")
         elif heatmaps.shape[2:] != self.heatmap_size:
             raise ValueError(
-                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size {self.heatmap_size}"
+                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size "
+                f"{self.heatmap_size}"
             )
 
     def fit(self, heatmaps, target, original_dims=None, padding=None):
@@ -722,7 +723,7 @@ class MR2CCP:
             diff_y_min = resized_target[..., 0] - y_min
             diff_x_min = resized_target[..., 1] - x_min
 
-            # assign at indicecs y_max and y_min are the same diff_y_max and diff_y_min 0.5 to avoid division by zero
+            # Avoid division by zero when y_max and y_min have the same index.
             idx_y_max_y_min = np.where(y_max == y_min)
             diff_y_max[idx_y_max_y_min] = 0.5
             diff_y_min[idx_y_max_y_min] = 0.5
@@ -814,7 +815,7 @@ class MR2CCP:
             diff_y_min = resized_target[..., 1] - y_min
             diff_x_min = resized_target[..., 2] - x_min
 
-            # assign at indicecs z_max and z_min are the same diff_z_max and diff_z_min 0.5 to avoid division by zero
+            # Avoid division by zero when z_max and z_min have the same index.
             idx_z_max_z_min = np.where(z_max == z_min)
             diff_z_max[idx_z_max_z_min] = 0.5
             diff_z_min[idx_z_max_z_min] = 0.5
@@ -1031,7 +1032,8 @@ class MR2C2R:
             raise ValueError("pred must have the same second dimension as nb_landmarks")
         elif heatmaps.shape[2:] != self.heatmap_size:
             raise ValueError(
-                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size {self.heatmap_size}"
+                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size "
+                f"{self.heatmap_size}"
             )
 
     def fit(self, heatmaps, target, original_dims=None, padding=None, confidence=0.95):
@@ -1558,7 +1560,8 @@ class ContourHuggingRegressor:
             raise ValueError("pred must have the same second dimension as nb_landmarks")
         elif heatmaps.shape[2:] != self.heatmap_size:
             raise ValueError(
-                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size {self.heatmap_size}"
+                f"pred {heatmaps.shape[2:]} must have the same dimensions as heatmap_size "
+                f"{self.heatmap_size}"
             )
 
     def fit(self, heatmaps, target, original_dims=None, padding=None):
@@ -1845,5 +1848,6 @@ def resize_landmarks(
     if padding is None:
         padding = np.zeros_like(landmarks)
     t_landmarks = landmarks + padding.reshape((landmarks.shape[0], 1, spatial_dim))
-    t_landmarks = t_landmarks * (dim / (dim_orig + 2 * padding)).reshape((-1, 1, spatial_dim))  # type: ignore
+    scale = (dim / (dim_orig + 2 * padding)).reshape((-1, 1, spatial_dim))  # type: ignore
+    t_landmarks = t_landmarks * scale
     return t_landmarks

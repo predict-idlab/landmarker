@@ -22,45 +22,18 @@ jobs:
           docker-images: true
           swap-storage: true
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - name: Install uv and set Python 3.10
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
+          version: "0.11.32"
           python-version: "3.10"
-          architecture: "x64"
+          enable-cache: true
 
-      - name: Show Python
-        run: |
-          python --version
-          which python
-
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: "3.10"
-          cache: true
-
-      - name: Make PDM use this Python
-        run: |
-          pdm use -f "$(python -c 'import sys; print(sys.executable)')"
-          pdm info
-
-      - name: Install dependencies into PDM venv
-        run: |
-          pdm sync -d
-
-      # 🔧 Add pip to the PDM venv
-      - name: Ensure pip is available in the PDM venv
-        run: |
-          pdm run python -m ensurepip --upgrade
-
-      # Install your package (editable) so Sphinx/autodoc can import it
-      - name: Install project (editable) into PDM venv
-        run: |
-          pdm run pip install -e .
+      - name: Install locked documentation dependencies
+        run: uv sync --locked --no-default-groups --group doc
 
       - name: Sphinx build
-        run: |
-          pdm run doc
+        run: uv run --no-sync sphinx-build docs docs/_build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

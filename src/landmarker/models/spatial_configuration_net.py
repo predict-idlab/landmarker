@@ -178,7 +178,7 @@ class OriginalSpatialConfigurationNet(nn.Module):
             conv(
                 in_channels=in_channels,
                 out_channels=la_channels,
-                kernel_size=la_kernel_size,
+                kernel_size=la_kernel_size,  # type: ignore[arg-type]
                 stride=1,
                 padding="same",
                 bias=True,
@@ -213,14 +213,14 @@ class OriginalSpatialConfigurationNet(nn.Module):
             conv(
                 in_channels=la_channels,
                 out_channels=la_channels,
-                kernel_size=la_kernel_size,
+                kernel_size=la_kernel_size,  # type: ignore[arg-type]
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
             conv(
                 in_channels=la_channels,
                 out_channels=la_channels,
-                kernel_size=la_kernel_size,
+                kernel_size=la_kernel_size,  # type: ignore[arg-type]
                 padding="same",
             ),
             nn.LeakyReLU(negative_slope=0.1),
@@ -300,7 +300,7 @@ class DownLayer(nn.Module):
         in_channels: int,
         out_channels: int,
         dropout: float,
-        kernel_size: int | tuple[int, int] = 3,
+        kernel_size: int | tuple[int, int] | tuple[int, int, int] = 3,
         bias: bool = True,
         spatial_dim: int = 2,
     ) -> None:
@@ -322,7 +322,7 @@ class DownLayer(nn.Module):
             conv(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                kernel_size=kernel_size,
+                kernel_size=kernel_size,  # type: ignore[arg-type]
                 stride=1,
                 padding="same",
                 bias=bias,
@@ -334,7 +334,7 @@ class DownLayer(nn.Module):
             conv(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                kernel_size=kernel_size,
+                kernel_size=kernel_size,  # type: ignore[arg-type]
                 stride=1,
                 padding="same",
                 bias=bias,
@@ -367,7 +367,7 @@ class UpLayer(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        kernel_size: int | tuple[int, int] = 3,
+        kernel_size: int | tuple[int, int] | tuple[int, int, int] = 3,
         bias: bool = True,
         spatial_dim: int = 2,
     ):
@@ -385,7 +385,7 @@ class UpLayer(nn.Module):
             conv(
                 in_channels=in_channels,
                 out_channels=out_channels,
-                kernel_size=kernel_size,
+                kernel_size=kernel_size,  # type: ignore[arg-type]
                 stride=1,
                 padding="same",
                 bias=bias,
@@ -422,7 +422,7 @@ class OriginalSpatialConfigurationNet3d(OriginalSpatialConfigurationNet):
         out_channels: int = 4,
         la_channels: int = 64,
         la_depth: int = 3,
-        la_kernel_size: int | tuple[int, ...] = 3,
+        la_kernel_size: int | tuple[int, int, int] = 3,
         la_dropout: float = 0.5,
         sp_channels: int = 64,
         sp_kernel_size: int = 7,

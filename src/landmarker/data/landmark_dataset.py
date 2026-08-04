@@ -31,8 +31,8 @@ class LandmarkDataset(Dataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
-            or 3D: z, y, x.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D:
+            y, x or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)
@@ -333,8 +333,8 @@ class PatchDataset(LandmarkDataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
-            or 3D: z, y, x.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D:
+            y, x or 3D: z, y, x.
         index_landmark (int): index of the landmark to use to extract the patch. (defaults: 0)
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
@@ -355,7 +355,9 @@ class PatchDataset(LandmarkDataset):
         landmarks: np.ndarray | torch.Tensor,
         index_landmark=0,
         spatial_dims: int = 2,
-        pixel_spacing: Optional[torch.Tensor] = None,
+        pixel_spacing: Optional[
+            list[int] | tuple[int, ...] | np.ndarray | torch.Tensor
+        ] = None,
         class_names: Optional[list] = None,
         transform: Optional[Callable] = None,
         store_imgs: bool = False,
@@ -418,8 +420,8 @@ class MaskDataset(LandmarkDataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
-            or 3D: z, y, x.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D:
+            y, x or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)
@@ -441,7 +443,9 @@ class MaskDataset(LandmarkDataset):
         imgs: list[str] | list[np.ndarray] | np.ndarray | torch.Tensor,
         landmarks: Optional[np.ndarray | torch.Tensor] = None,
         spatial_dims: int = 2,
-        pixel_spacing: Optional[torch.Tensor] = None,
+        pixel_spacing: Optional[
+            list[int] | tuple[int, ...] | np.ndarray | torch.Tensor
+        ] = None,
         class_names: Optional[list] = None,
         transform: Optional[Callable] = None,
         store_imgs: bool = True,
@@ -718,7 +722,9 @@ class PatchMaskDataset(PatchDataset):
         landmarks: np.ndarray | torch.Tensor,
         index_landmark=0,
         spatial_dims: int = 2,
-        pixel_spacing: Optional[torch.Tensor] = None,
+        pixel_spacing: Optional[
+            list[int] | tuple[int, ...] | np.ndarray | torch.Tensor
+        ] = None,
         class_names: Optional[list] = None,
         transform: Optional[Callable] = None,
         store_imgs: bool = False,
@@ -800,8 +806,8 @@ class HeatmapDataset(LandmarkDataset):
     Args:
         imgs (list[str] | list[np.array] | np.ndarray | torch.Tensor): list of paths to the images
             or list of numpy arrays or numpy array/torch.Tensor.
-        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D: y, x
-            or 3D: z, y, x.
+        landmarks (np.ndarray | torch.Tensor): landmarks of the images. If the landmarks are 2D:
+            y, x or 3D: z, y, x.
         spatial_dims (int): number of spatial dimensions of the images. (defaults: 2)
         pixel_spacing (Optional[np.ndarray | torch.Tensor]): pixel spacing of the images.
             (defaults: None)

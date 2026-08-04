@@ -12,34 +12,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python & PDM ${{ matrix.python-version }}
-        uses: pdm-project/setup-pdm@v4
+      - name: Install uv and set Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
+          version: "0.11.32"
           python-version: ${{ matrix.python-version }}
-          cache: true
+          enable-cache: true
 
       - name: System packages
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg libsm6 libxext6 libopenblas-dev libzmq3-dev
 
-      # Make sure PDM points at the interpreter in this job
-      - name: Ensure PDM uses this interpreter
-        run: pdm use -f $(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')}")
-
-      # On 3.13/3.14, refresh the lock for this Python so we get cp313/cp314 wheels
-      - name: Refresh lockfile on 3.13/3.14
-        if: matrix.python-version == '3.13' || matrix.python-version == '3.14'
-        run: pdm lock --refresh
-
-      # Let PDM handle installing the project + dev deps
-      - name: Install deps (PDM)
-        run: pdm sync -d
+      - name: Install locked test dependencies
+        run: uv sync --locked --no-default-groups --group test
 
       - name: Test with pytest
-        run: pdm run pytest --junitxml=junit/test-results-${{ matrix.python-version }}.xml
+        run: uv run --no-sync pytest --junitxml=junit/test-results-${{ matrix.python-version }}.xml

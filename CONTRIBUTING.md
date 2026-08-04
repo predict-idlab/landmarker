@@ -13,36 +13,43 @@ For more information on contributing to open source projects, [GitHub's own guid
 
 ## Setting up your development environment
 
-To get started, fork the `landmarker` repository and clone it to your local machine. Then, install the required dependencies using <a href="https://pdm.fming.dev/" target="_blank">pdm</a> (see <a href="https://pdm-project.org/latest/#installation" target="_blank">installation instructions</a>):
+To get started, fork the `landmarker` repository and clone it to your local machine. Then, install the required dependencies using <a href="https://docs.astral.sh/uv/" target="_blank">uv</a> (see <a href="https://docs.astral.sh/uv/getting-started/installation/" target="_blank">installation instructions</a>):
 
 ```bash
-pdm install --dev
+uv sync
 ```
 
 ## Running tests
-`landmarker` uses [pytest](https://docs.pytest.org/en/stable/) for testing. You can run test by running a pdm script, by using the following command:
+`landmarker` uses [pytest](https://docs.pytest.org/en/stable/) for testing. Coverage reporting is enabled by default:
 
 ```bash
-pdm run test
+uv run pytest
 ```
 
-If you want to run pytest with coverage, you can use the following command:
+To run the complete test matrix across all supported Python versions, as well as the lint and type-check environments, use tox:
 
 ```bash
-pdm run coverage
+uv run tox
+```
+
+You can also run the lint and type checks directly:
+
+```bash
+uv run flake8 src/
+uv run mypy src/
 ```
 
 ## Building documentation
 `landmarker` uses [sphinx](https://www.sphinx-doc.org/en/master/) for documentation, and use MyST markdown for documentation pages. You can build the documentation locally by running the following command:
 
 ```bash
-pdm run doc
+uv run sphinx-build docs docs/_build/html
 ```
 
 We also support the use of [sphinx-autobuild](https://github.com/executablebooks/sphinx-autobuild), which will automatically rebuild the documentation when a change is detected and live-reload the page in your browser. You can run it using the following command:
 
 ```bash
-pdm run docauto
+uv run sphinx-autobuild docs docs/_build/html --ignore _collections
 ```
 
 ## Ground Rules
